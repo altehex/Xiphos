@@ -1,0 +1,61 @@
+This doc helps getting started with contribuitng to ThanatOS. It covers the build system, the repository structure, calling conventions, languages, etc.
+
+Table of contents:
+--------------------*
+- BUILDING THANATOS
+- SUPPORTED TARGETS
+- REPOSITORY FILE TREE STRUCTURE
+- PROGRAMMING LANGUAGES
+- DON'T BE A DICK
+
+
+|   BUILDING THANATOS
++-------------------------------*
+The build system is presented as the series of bash scripts, the main script is ./build.sh.
+
+Dependencies:
+- bash 
+- gcc or clang
+- fasm
+
+All you need to do is:
+```bash
+./build.sh
+
+```
+
+
+|   SUPPORTED TARGETS
++-------------------------------*
+The only supported target now is x86_64. ARM support is planned.
+
+
+
+|   REPOSITORY FILE TREE STRUCTURE
++-------------------------------*
+|- /boot - bootloader, kernel initialization code;
+|- /firmware - BIOS/UEFI, ACPI related stuff;
+|- /include - headers;
+|- /kernel - the "meat";
+|- /src - source code to be ditched and reimplemented in some other way. This mainly includes third-party library dependencies(it is preferable to keep the project as standalone as possible);
++- /util - utilities for building the source.
+
+
+|   PROGRAMMING LANGUAGES
++-------------------------------*
+The main language of the kernel and the bootloader is C. Additional modules can be written in C++.
+
+Usage of the following languages may be possible in the future:
+- Pascal
+- Forth
+- Ada
+- Rust
+
+
+|   DON'T BE A DICK
++-------------------------------*
+If you somehow happen to contribute to ThanatOS (thank you very much), remember this:
+- Have fun;
+- Take it easy;
+- Help others;
+- I love you;
