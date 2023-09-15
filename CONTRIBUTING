@@ -6,19 +6,22 @@ Table of contents:
 - SUPPORTED TARGETS
 - REPOSITORY FILE TREE STRUCTURE
 - PROGRAMMING LANGUAGES
+- THINGS TO GET RID OF
 - DON'T BE A DICK
 
 
 |   BUILDING THANATOS
 +-------------------------------*
-The build system is presented as the series of bash scripts, the main script is ./build.sh.
+This project uses GNU Make. As for now, the build is only possible on Unix-compatible systems.
 
 Dependencies:
 - bash 
 - gcc or clang
 - fasm
+- git (i'm sure you have it)
+- make (for EDK II)
 
-All you need to do is:
+build.sh is the script to do some preliminary checks and install submodules. It also starts Make. All you need to do is:
 ```bash
 ./build.sh
 
@@ -37,7 +40,7 @@ The only supported target now is x86_64. ARM support is planned.
 |- /firmware - BIOS/UEFI, ACPI related stuff;
 |- /include - headers;
 |- /kernel - the "meat";
-|- /src - source code to be ditched and reimplemented in some other way. This mainly includes third-party library dependencies(it is preferable to keep the project as standalone as possible);
+|- /src - source code to be ditched and reimplemented in some other way. This mainly includes third-party library dependencies and git submodules(it is preferable to keep the project as standalone as possible);
 +- /util - utilities for building the source.
 
 
@@ -52,10 +55,16 @@ Usage of the following languages may be possible in the future:
 - Rust
 
 
+|   THINGS TO GET RID OF
++-------------------------------*
+When the project will be mature enough, it's important to make the project as standalone as possible by getting rid of some dependencies:
+- EDK II
+
+
 |   DON'T BE A DICK
 +-------------------------------*
 If you somehow happen to contribute to ThanatOS (thank you very much), remember this:
 - Have fun;
 - Take it easy;
 - Help others;
-- I love you;
+- I love you.
