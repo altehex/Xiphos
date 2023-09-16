@@ -6,7 +6,7 @@ BASE_DIR=`pwd`
 BUILD_DIR=$BASE_DIR/build
 
 EDK2_DIR=$BASE_DIR/src/edk2
-EDK2_CON
+EDK2_CONFIG_DIR=$BASE_DIR/src/edk2_config
 
 echo "[ * ] Building for x86_64 on $(uname -sr)"
 
@@ -30,36 +30,25 @@ if [[ $! -ne 0 ]]; then
 fi
 echo $MAKE_VERSION
 
-echo -n "[ * ] Check for sed... "
-SED_VERSION=$(sed --version | head -n 1 | cut -d' ' -f4)
-if [[ $! -ne 0 ]]; then
-	echo "not present"
-	echo "[ ! ] Sed is not present. src/edk2/Conf/target.txt may need manual configuration. (See https://github.com/tianocore/tianocore.github.io/wiki/Common-instructions#modify-conf-files)"
-	read -p "[ ? ] Continue? (N/y) " -n1 -s NO_SED
-	if [[ $NO_SED != 'y' ]]; then
-	    exit 1
-	fi
-else
-    echo $SED_VERSION
-fi
 
-
-git submodule update --init >/dev/null
+git submodule update --init
 
 
 # EDK II build
 #--------------------------------------------*
 echo "[ * ] Building EDK II..."
-cd $EDK2_DIR
 
-git submodule update --init >/dev/null
+cd $EDK2_DIR
+git submodule update --init
 make -C BaseTools 
 . edksetup.sh
 make -C edk2/BaseTools
 export EDK_TOOLS_PATH=$HOME/src/edk2/BaseTools
 . edksetup.sh BaseTools
 cp src/edk2_config/target.txt
-	
+
+echo "[ * ] Finished building EDK II."
+
 # Main build
 #--------------------------------------------*
 cd $BASE_DIR
