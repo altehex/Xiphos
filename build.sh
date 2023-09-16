@@ -45,7 +45,7 @@ make -C BaseTools
 make -C edk2/BaseTools
 export EDK_TOOLS_PATH=$HOME/src/edk2/BaseTools
 . edksetup.sh BaseTools
-cp src/edk2_config/target.txt
+cp $EDK2_CONFIG_DIR/target.txt $EDK2_DIR/Conf/target.txt
 
 echo "[ * ] Finished building EDK II."
 
