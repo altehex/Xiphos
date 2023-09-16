@@ -39,12 +39,13 @@ git submodule update --init
 echo "[ * ] Building EDK II..."
 
 cd $EDK2_DIR
-git submodule update --init
 make -C BaseTools 
-. edksetup.sh
+./edksetup.sh
+cd ..
 make -C edk2/BaseTools
+cd $EDK2_DIR
 export EDK_TOOLS_PATH=$HOME/src/edk2/BaseTools
-. edksetup.sh BaseTools
+./edksetup.sh BaseTools
 cp $EDK2_CONFIG_DIR/target.txt $EDK2_DIR/Conf/target.txt
 
 echo "[ * ] Finished building EDK II."
