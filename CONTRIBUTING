@@ -6,12 +6,11 @@ Table of contents:
 - SUPPORTED TARGETS
 - REPOSITORY FILE TREE STRUCTURE
 - PROGRAMMING LANGUAGES
-- THINGS TO GET RID OF
 
 
 |   BUILDING THANATOS
 +-------------------------------*
-This project uses GNU Make. One may invoke just 'make' to build ThanatOS. check.sh checks for software dependencies and starts make after a prompt.
+This project uses GNU Make. One may invoke just 'make' to build ThanatOS. 'make help' outputs the targets. check.sh checks for software dependencies and starts make after a prompt.
 
 Requirements:
 - make
@@ -41,6 +40,7 @@ The only supported target now is x86_64. ARM support is planned. ThanatOS bootlo
 |   PROGRAMMING LANGUAGES
 +-------------------------------*
 The main language of the kernel and the bootloader is C. Additional modules can be written in C++.
+Usage of assembly is possible (fasm by defauilt).
 
 Usage of the following languages may be possible in the future:
 - Pascal
@@ -48,9 +48,3 @@ Usage of the following languages may be possible in the future:
 - Ada
 - Rust
 
-
-|   THINGS TO GET RID OF
-+-------------------------------*
-It's important to make the project as standalone as possible. It's possible to achieve this by becoming independent of the following tools:
-- gnu-efi
-- Autotools (but it's gonna stick around for a long time)
