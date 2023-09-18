@@ -1,0 +1,11 @@
+# Compiler settings
+USER_CFLAGS   =
+USER_LDFLAGS  =
+
+
+SRC_ROOT := .
+
+# Bootloader config
+include $(SRC_ROOT)/boot/config.mk
+# ThanatOS config
+include $(SRC_ROOT)/kernel/config.mk 
