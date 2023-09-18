@@ -1,4 +1,0 @@
-SUBDIRS = $(SRC_ROOT)/firmware/uefi
-
-bin_PROGRAMS         = bootloader
-bootloader_SOURCES   = main.c
