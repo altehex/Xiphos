@@ -1,2 +1,4 @@
+LLVM = 0
+
 USER_CFLAGS   = 
 USER_LDFLAGS  =
