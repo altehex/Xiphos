@@ -6,8 +6,11 @@ firmware: uefi # bios
 
 .PHONY += uefi
 uefi:
-	$(_ECHO)$(MAKE) -C $(SRC_ROOT)/firmware/uefi
+	$(_QUIET)$(MAKE) -C $(SRC_ROOT)/firmware/uefi
 
 .PHONY += bios
 bios:
 
+.PHONY += clean
+clean:
+	@$(RM) *.o

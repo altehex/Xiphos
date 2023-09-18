@@ -12,9 +12,12 @@ include $(SRC_ROOT)/config.mk
 
 MAKEFLAGS += -rR
 
+
 unexport LC_ALL
 export LC_COLLATE = C
 export LC_NUMERIC = C
+
+export RM      = rm -f
 
 
 # Verbosity configuration
@@ -23,14 +26,14 @@ ifeq ("$(origin v)", "command line")
 	__VERBOSE = $(v)
 endif
 
-_ECHO    = @
+_QUIET   = @
 _VERBOSE = --verbose
 ifneq ($(findstring 1, $(_VERBOSE)),)
-	_ECHO =
+	_QUIET   =
 	_VERBOSE = 
 endif
 
-export _ECHO
+export _QUIET _VERBOSE
 #-(end of verbosity configuration)---
 
 
@@ -79,18 +82,22 @@ all: kernel bootloader
 
 .PHONY += kernel
 kernel:
-	$(_ECHO)$(MAKE) -C kernel
+	$(_QUIET)$(MAKE) -C kernel
 
 .PHONY += bootloader
 bootloader:
-	$(_ECHO)$(MAKE) -C boot
+	$(_QUIET)$(MAKE) -C boot
 
 .PHONY += dist
 dist:
 	# tar: compress the kernel image and the bootloader
 
 .PHONY += clean
+clean: MAKEFLAGS += --quiet
 clean:
+		$(_QUIET)$(MAKE) clean -C boot
+		$(_QUIET)$(MAKE) clean -C firmware
+		$(_QUIET)$(MAKE) clean -C kernel
 
 .PHONY += help
 help:
@@ -122,3 +129,6 @@ test:
 		@echo   "* LLVM flag:            "$(LLVM)
 		@echo	"* User-defined CFLAGS:  "$(USER_CFLAGS)
 		@echo	"* User-defined LDFLAGS: "$(USER_LDFLAGS)
+		@echo	""
+		@echo   "Generated files:"
+		@echo	"* Object files: "$(shell ls -R *.o)

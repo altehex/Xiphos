@@ -6,4 +6,8 @@ UEFI_CFLAGS = -fno-stack-protector   \
 uefi: uefi.o
 
 uefi.o: uefi.c 
-	$(_ECHO)$(CC) $(CFLAGS) $(UEFI_CFLAGS) $(INCLUDE) -o uefi.o -c uefi.c
+	$(_QUIET)$(CC) $(CFLAGS) $(UEFI_CFLAGS) $(INCLUDE) -o uefi.o -c uefi.c
+
+.PHONY += clean
+clean:
+	$(_QUIET)$(RM) *.o
