@@ -17,8 +17,7 @@ unexport LC_ALL
 export LC_COLLATE = C
 export LC_NUMERIC = C
 
-export RM      = rm -f
-
+RM      = rm -f
 
 # Verbosity configuration
 #---------------------------*
@@ -28,12 +27,15 @@ endif
 
 _QUIET   = @
 _VERBOSE = --verbose
-ifneq ($(findstring 1, $(_VERBOSE)),)
+ifeq (1, $(__VERBOSE))
 	_QUIET   =
 	_VERBOSE = 
 endif
 
-export _QUIET _VERBOSE
+MAKE := $(_QUIET)$(MAKE)
+RM   := $(_QUIET)$(RM)
+
+export _QUIET _VERBOSE RM MAKE
 #-(end of verbosity configuration)---
 
 
@@ -43,11 +45,11 @@ export _QUIET _VERBOSE
 ifeq (1,$(LLVM))
 	TARGET ?= -target x86_64-pc-none
 
-	CC		= clang $(TARGET)
-	LD		= ld.lld
+	CC		= $(_QUIET)clang $(TARGET)
+	LD		= $(_QUIET)ld.lld
 else
-	CC		= gcc
-	LD		= ld
+	CC		= $(_QUIET)gcc
+	LD		= $(_QUIET)ld
 
 endif
 
@@ -58,8 +60,7 @@ export CC LD
 # Flags configuration 
 #---------------------------------*
 CFLAGS = -std=c17                 \
-		 -funsigned-char		  \
-		 -fshort-wchar
+		 -funsigned-char		 
 
 CWARNINGS = -Wall                 \
 		    -Wextra               \
@@ -82,11 +83,11 @@ all: kernel bootloader
 
 .PHONY += kernel
 kernel:
-	$(_QUIET)$(MAKE) -C kernel
+	$(MAKE) -C kernel
 
 .PHONY += bootloader
 bootloader:
-	$(_QUIET)$(MAKE) -C boot
+	$(MAKE) -C boot
 
 .PHONY += dist
 dist:
@@ -95,9 +96,9 @@ dist:
 .PHONY += clean
 clean: MAKEFLAGS += --quiet
 clean:
-		$(_QUIET)$(MAKE) clean -C boot
-		$(_QUIET)$(MAKE) clean -C firmware
-		$(_QUIET)$(MAKE) clean -C kernel
+		$(MAKE) clean -C boot
+		$(MAKE) clean -C firmware
+		$(MAKE) clean -C kernel
 
 .PHONY += help
 help:
@@ -124,6 +125,7 @@ test:
 		@echo   "LDFLAGS:              "$(LDFLAGS)
 		@echo	"Source directory:     "$(SRC_ROOT)
 		@echo   "Included directories: "$(INCLUDE)
+		@echo   "Shhhh:                "$(_QUIET)
 		@echo	""
 		@echo   "User settings:"
 		@echo   "* LLVM flag:            "$(LLVM)
