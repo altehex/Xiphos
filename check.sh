@@ -4,9 +4,6 @@
 
 echo "[ * ] Building ThanatOS for x86_64 on $(uname -sr)"
 
-# Checking or components
-#------------------------------------*
-
 echo -n "[ * ] Checking for make... "
 if [[ ! -e /usr/bin/make ]]; then
 	echo "not present"
