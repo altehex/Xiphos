@@ -22,20 +22,20 @@ RM      = rm -f
 # Verbosity configuration
 #---------------------------*
 ifeq ("$(origin v)", "command line")
-	__VERBOSE = $(v)
+	_VERBOSE = $(v)
 endif
 
-_QUIET   = @
-_VERBOSE = --verbose
-ifeq (1, $(__VERBOSE))
-	_QUIET   =
-	_VERBOSE = 
+QUIET   = @
+VERBOSE = --verbose
+ifeq (1, $(_VERBOSE))
+	QUIET   =
+	VERBOSE = 
 endif
 
-MAKE := $(_QUIET)$(MAKE)
-RM   := $(_QUIET)$(RM)
+MAKE := $(QUIET)$(MAKE)
+RM   := $(QUIET)$(RM)
 
-export _QUIET _VERBOSE RM MAKE
+export QUIET VERBOSE RM MAKE
 #-(end of verbosity configuration)---
 
 
@@ -45,11 +45,12 @@ export _QUIET _VERBOSE RM MAKE
 ifeq (1,$(LLVM))
 	TARGET ?= -target x86_64-pc-none
 
-	CC		= $(_QUIET)clang $(TARGET)
-	LD		= $(_QUIET)ld.lld
+	CC		= $(QUIET)clang $(TARGET)
+	CPP     = $(QUIET)
+	LD		= $(QUIET)ld.lld
 else
-	CC		= $(_QUIET)gcc
-	LD		= $(_QUIET)ld
+	CC		= $(QUIET)gcc
+	LD		= $(QUIET)ld
 
 endif
 
@@ -125,7 +126,7 @@ test:
 		@echo   "LDFLAGS:              "$(LDFLAGS)
 		@echo	"Source directory:     "$(SRC_ROOT)
 		@echo   "Included directories: "$(INCLUDE)
-		@echo   "Shhhh:                "$(_QUIET)
+		@echo   "Shhhh:                "$(QUIET)
 		@echo	""
 		@echo   "User settings:"
 		@echo   "* LLVM flag:            "$(LLVM)
