@@ -1,9 +1,13 @@
-.PHONY := uefi
-uefi: uefi.o
+.PHONY: _all
+OBJ = reloc.o start.o
 
-uefi.o: uefi.c 
-	$(CC) $(CFLAGS) $(UEFI_CFLAGS) $(INCLUDE) -o uefi.o -c uefi.c
+_all: $(OBJ)
 
-.PHONY += clean
+reloc.o: reloc.c
+	$(CC) $(UEFI_CFLAGS) $(INCLUDE) -o $@ -c $^
+
+start.o: start.S
+	$(CC) $(UEFI_CFLAGS) $(INCLUDE) -o $@ -c $^
+
 clean:
 	$(RM) *.o

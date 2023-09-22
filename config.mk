@@ -1,4 +1,9 @@
-LLVM = 0
+CONFIG_QUIET    = 0
+CONFIG_VERBOSE  = 0 
+
+CONFIG_LLVM = 0
 
 USER_CFLAGS   = 
 USER_LDFLAGS  =
+
+include $(SRC_ROOT)/boot/config.mk

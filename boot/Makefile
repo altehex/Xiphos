@@ -1,25 +1,61 @@
-export UEFI_CFLAGS = -ffreestanding         \
-					 -fshort-wchar          \
-			         -mno-red-zone          
+UEFI_DIR    = $(SRC_ROOT)/firmware/uefi
+UEFI_LDS    = $(UEFI_DIR)/elf_efi.lds
 
-export UEFI_LDFLAGS = -nostdlib             \
-					  -Wl,-
+UEFI_FORMAT = efi-app-x86_64
 
-.PHONY := bootloader
-bootloader: bootx64.efi boot.bin
+UEFI_CFLAGS = -ffreestanding \
+			  -fno-stack-protector \
+			  -fshort-wchar \
+			  -fPIC \
+			  -m64 \
+	          -mno-red-zone
+ifeq (0, $(CONFIG_LLVM))
+UEFI_CFLAGS += -maccumulate-outgoing-args
+endif
 
-bootx64.efi: bootx64.o
-# make bootx64.efi
+UEFI_LDFLAGS = -t -T $(UEFI_LDS) \
+			   -Bsymbolic \
+			   -shared \
+			   -nostdlib \
+			   -znocombreloc
 
-bootx64.o: uefi
-	$(CC) $(CFLAGS) $(UEFI_CFLAGS) $(INCLUDE) -o bootx64.o -c bootx64.c
-#	$(LD) $(LDFLAGS) $(UEFI_LDFLAGS)
+export UEFI_CFLAGS
 
-uefi: # uefi.o
-	$(MAKE) -C $(SRC_ROOT)/firmware/uefi
+OBJCOPYFLAGS := -j .text \
+			    -j .sdata \
+			    -j .data \
+			    -j .dynamic \
+			    -j .dynsym \
+			    -j .rel \
+			    -j .rela \
+			    -j .reloc \
+			    -S --target=$(UEFI_FORMAT)
+
+OBJ = $(UEFI_DIR)/*.o
+
+.PHONY := all
+all: $(if $(CONFIG_EFI), uefi bootx64.efi, boot.bin)
+	$(CP) $(filter bootx64.efi boot.bin, $^) $(SRC_ROOT)/build
+
+bootx64.efi: bootx64.so
+	objcopy $(OBJCOPYFLAGS) $^ $@
+
+bootx64.so: bootx64.o $(shell $(CC) -print-libgcc-file-name)
+	$(LD) $(UEFI_LDFLAGS) $^ $(OBJ) -o $@
+
+bootx64.o: bootx64.c
+	$(CC) $(UEFI_CFLAGS) $(INCLUDE) -o bootx64.o -c bootx64.c
+
+.PHONY += uefi
+uefi:
+	$(MAKE) -C $(UEFI_DIR)
 
 boot.bin: # WIP
 
-.PHONY += clean
+
 clean:
 	$(RM) *.o
+
+.PHONY += test
+test:
+		@echo	"* EFI flag: "$(CONFIG_EFI)
