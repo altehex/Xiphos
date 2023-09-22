@@ -12,64 +12,56 @@ include $(SRC_ROOT)/config.mk
 
 MAKEFLAGS += -rR
 
-
 unexport LC_ALL
 export LC_COLLATE = C
 export LC_NUMERIC = C
 
 RM      = rm -f
+CP      = cp
 
-# Verbosity configuration
-#---------------------------*
-ifeq ("$(origin v)", "command line")
-	_VERBOSE = $(v)
+VERBOSE := 
+ifeq (1, $(CONFIG_VERBOSE))
+	VERBOSE := --verbose
 endif
 
-QUIET   = @
-VERBOSE = --verbose
-ifeq (1, $(_VERBOSE))
-	QUIET   =
-	VERBOSE = 
+ifeq (1, $(CONFIG_QUIET))
+	MAKEFLAGS += -s
 endif
 
-MAKE := $(QUIET)$(MAKE)
-RM   := $(QUIET)$(RM)
-
-export QUIET VERBOSE RM MAKE
-#-(end of verbosity configuration)---
+export VERBOSE RM CP
 
 
 # Toolchain configuration 
 #--------------------------------*
+TARGET = x86_64-pc-none
 
-ifeq (1,$(LLVM))
-	TARGET ?= -target x86_64-pc-none
-
-	CC		= $(QUIET)clang $(TARGET)
-	CPP     = $(QUIET)
-	LD		= $(QUIET)ld.lld
+ifeq (1,$(CONFIG_LLVM))
+	CC		= clang $(VERBOSE)
+	CPP     = clang++ $(VERBOSE)
+	LD		= ld.lld $(VERBOSE)
 else
-	CC		= $(QUIET)gcc
-	LD		= $(QUIET)ld
-
+	CC		= gcc
+	CPP     = g++
+	LD		= ld
 endif
 
-export CC LD
+export CC LD TARGET
 #-(end of toolchain configuration)---
 
 
 # Flags configuration 
 #---------------------------------*
-CFLAGS = -std=c17                 \
-		 -funsigned-char		 
+CFLAGS = -std=c17 \
+		 -funsigned-char
 
-CWARNINGS = -Wall                 \
-		    -Wextra               \
+CWARNINGS = -Wall \
+		    -Wextra
 
 LDFLAGS = 
 
-CFLAGS  += $(USER_CFLAGS) $(CWARNINGS)
+CFLAGS  += $(USER_CFLAGS)$(CWARNINGS)
 LDFLAGS += $(USER_LDFLAGS)
+CPPFLAGS := $(CFLAGS)
 
 INCLUDE := -I$(SRC_ROOT)/include
 
@@ -80,9 +72,11 @@ export CFLAGS LDFLAGS INCLUDE
 # Targets
 #-------------------------------*
 .PHONY := all
-all: kernel bootloader
+all: bootloader kernel
 
 .PHONY += kernel
+kernel: CC += $(if $(CONFIG_LLVM), -target $(TARGET))
+kernel: LD += $(if $(CONFIG_LLVM), -target $(TARGET))
 kernel:
 	$(MAKE) -C kernel
 
@@ -94,12 +88,11 @@ bootloader:
 dist:
 	# tar: compress the kernel image and the bootloader
 
-.PHONY += clean
-clean: MAKEFLAGS += --quiet
 clean:
-		$(MAKE) clean -C boot
-		$(MAKE) clean -C firmware
-		$(MAKE) clean -C kernel
+	$(MAKE) clean -C boot
+	$(MAKE) clean -C firmware
+	$(MAKE) clean -C kernel
+	$(RM) build/*
 
 .PHONY += help
 help:
@@ -120,7 +113,8 @@ help:
 test:
 		@echo   "Project name:         "$(OS_NAME) $(OS_EDITION)-$(OS_VERSION)
 		@echo   ".tar.xz name:         "$(TARNAME)
-		@echo 	"Compiler:             "$(CC)
+		@echo 	"C compiler:           "$(CC)
+		@echo   "C++ compiler          "$(CPP)
 		@echo   "Linker:               "$(LD)
 		@echo   "CFLAGS:               "$(CFLAGS) 
 		@echo   "LDFLAGS:              "$(LDFLAGS)
@@ -133,5 +127,5 @@ test:
 		@echo	"* User-defined CFLAGS:  "$(USER_CFLAGS)
 		@echo	"* User-defined LDFLAGS: "$(USER_LDFLAGS)
 		@echo	""
-		@echo   "Generated files:"
-		@echo	"* Object files: "$(shell ls -R *.o)
+		@echo	"Bootloader:"
+		@$(MAKE) test -C boot

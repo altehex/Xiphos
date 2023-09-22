@@ -10,7 +10,8 @@
 #define __EFIAPI__ __attribute__((ms_abi))
 
 /* EFI status codes */
-#define EFI_SUCCESS  0
+#define EFI_SUCCESS     0
+#define EFI_LOAD_ERROR  1 
 
 /* For time services */
 #define EFI_TIME_ADJUST_DAYLIGHT 0x1
@@ -37,9 +38,9 @@ typedef U64     EfiPhysicalAddress;
 typedef U64     EfiVirtualAddress;
 
 typedef void (__EFIAPI__ *efi_event_t)();
-typedef void (__EFIAPI__ *efi_event_notify_t)(efi_event_t, void *);
+typedef void (__EFIAPI__ *efi_event_notify_t)(efi_event_t, void*);
 
-typedef void             *EfiHandle;
+typedef void*            EfiHandle;
 typedef UN               EfiStatus;
 typedef UN               EfiTpl;    
 
@@ -63,15 +64,15 @@ typedef struct _EfiTime             EfiTime;
 
 typedef struct {
 	void                    *reset;
-	EfiStatus   (__EFIAPI__ *read_key_stroke)(EfiSimpleTextIn *,
-											 EfiInputKey *);
+	EfiStatus   (__EFIAPI__ *read_key_stroke)(EfiSimpleTextIn*,
+											 EfiInputKey*);
 	efi_event_t     __EFIAPI__ wait_for_key;
 } _EfiSimpleTextIn;
 
 typedef struct {
 	void                    *reset;
-	EfiStatus   (__EFIAPI__ *output_string)(EfiSimpleTextOut *,
-											U16 *);
+	EfiStatus   (__EFIAPI__ *output_string)(EfiSimpleTextOut*,
+											U16*);
 	void                    *test_string;
 } _EfiSimpleTextOut;
 
@@ -100,66 +101,66 @@ typedef struct {
 	EfiTableHeader           hdr;
 	EfiTpl      (__EFIAPI__ *raise_tpl)(EfiTpl);
 	void        (__EFIAPI__ *restore_tpl)(EfiTpl);
-	EfiStatus   (__EFIAPI__ *allocate_pages)(U32, U32, UN, EfiPhysicalAddress *);
+	EfiStatus   (__EFIAPI__ *allocate_pages)(U32, U32, UN, EfiPhysicalAddress*);
 	EfiStatus   (__EFIAPI__ *free_pages)(EfiPhysicalAddress, UN);
-	EfiStatus   (__EFIAPI__ *get_memory_map)(UN *, EfiMemoryDescriptor *, UN *, UN *, U32 *);
-	EfiStatus   (__EFIAPI__ *allocate_pool)(U32, UN, void **);
-	EfiStatus   (__EFIAPI__ *free_pool)(void *);
-	EfiStatus   (__EFIAPI__ *create_event)(U32, EfiTpl, efi_event_notify_t, void *, efi_event_t *);
+	EfiStatus   (__EFIAPI__ *get_memory_map)(UN*, EfiMemoryDescriptor*, UN*, UN*, U32*);
+	EfiStatus   (__EFIAPI__ *allocate_pool)(U32, UN, void**);
+	EfiStatus   (__EFIAPI__ *free_pool)(void*);
+	EfiStatus   (__EFIAPI__ *create_event)(U32, EfiTpl, efi_event_notify_t, void*, efi_event_t*);
 	EfiStatus   (__EFIAPI__ *set_timer)(efi_event_t, U32, U64);
-	EfiStatus   (__EFIAPI__ *wait_for_event)(UN, efi_event_t, UN *);
+	EfiStatus   (__EFIAPI__ *wait_for_event)(UN, efi_event_t, UN*);
 	EfiStatus   (__EFIAPI__ *signal_event)(efi_event_t);
 	EfiStatus   (__EFIAPI__ *close_event)(efi_event_t);
 	EfiStatus   (__EFIAPI__ *check_event)(efi_event_t);
-	EfiStatus   (__EFIAPI__ *install_protocol_interface)(EfiHandle *, GUID *, U32, void *);
-	EfiStatus   (__EFIAPI__ *reinstall_protocol_interface)(EfiHandle, GUID *, void *, void *);
-	EfiStatus   (__EFIAPI__ *uninstall_protocol_interface)(EfiHandle, GUID *, void *);
-	EfiStatus   (__EFIAPI__ *handle_protocol)(EfiHandle, GUID *, void **);
+	EfiStatus   (__EFIAPI__ *install_protocol_interface)(EfiHandle*, GUID*, U32, void*);
+	EfiStatus   (__EFIAPI__ *reinstall_protocol_interface)(EfiHandle, GUID*, void*, void*);
+	EfiStatus   (__EFIAPI__ *uninstall_protocol_interface)(EfiHandle, GUID*, void*);
+	EfiStatus   (__EFIAPI__ *handle_protocol)(EfiHandle, GUID*, void**);
 	void                    *_reserved;
-	EfiStatus   (__EFIAPI__ *register_protocol_notify)(GUID *, efi_event_t, void **);
-	EfiStatus   (__EFIAPI__ *locate_handle)(U32, GUID *, void *, UN *, EfiHandle *);
-	EfiStatus   (__EFIAPI__ *locate_dev_path)(GUID *, EfiDevPath **, EfiHandle *);
-	EfiStatus   (__EFIAPI__ *install_config_table)(GUID *, void *);
-	EfiStatus   (__EFIAPI__ *load_image)(EfiBool, EfiHandle, EfiDevPath *, void *, UN, EfiHandle *);
-	EfiStatus   (__EFIAPI__ *start_image)(EfiHandle, UN *, U16 **);
-	EfiStatus   (__EFIAPI__ *exit)(EfiHandle, EfiStatus, UN, U16 *);
+	EfiStatus   (__EFIAPI__ *register_protocol_notify)(GUID*, efi_event_t, void**);
+	EfiStatus   (__EFIAPI__ *locate_handle)(U32, GUID*, void*, UN*, EfiHandle*);
+	EfiStatus   (__EFIAPI__ *locate_dev_path)(GUID*, EfiDevPath**, EfiHandle*);
+	EfiStatus   (__EFIAPI__ *install_config_table)(GUID*, void*);
+	EfiStatus   (__EFIAPI__ *load_image)(EfiBool, EfiHandle, EfiDevPath*, void*, UN, EfiHandle*);
+	EfiStatus   (__EFIAPI__ *start_image)(EfiHandle, UN*, U16**);
+	EfiStatus   (__EFIAPI__ *exit)(EfiHandle, EfiStatus, UN, U16*);
 	EfiStatus   (__EFIAPI__ *unload_image)(EfiHandle);
 	EfiStatus   (__EFIAPI__ *exit_boot_services)(EfiHandle, UN);
-	EfiStatus   (__EFIAPI__ *get_next_mono_count)(U64 *);
+	EfiStatus   (__EFIAPI__ *get_next_mono_count)(U64*);
 	EfiStatus   (__EFIAPI__ *stall)(UN);
-	EfiStatus   (__EFIAPI__ *set_watchdog_timer)(UN, U64, UN, U16 *);
-	EfiStatus   (__EFIAPI__ *connect_controller)(EfiHandle, EfiHandle *, EfiDevPath *, EfiBool);
+	EfiStatus   (__EFIAPI__ *set_watchdog_timer)(UN, U64, UN, U16*);
+	EfiStatus   (__EFIAPI__ *connect_controller)(EfiHandle, EfiHandle*, EfiDevPath*, EfiBool);
 	EfiStatus   (__EFIAPI__ *disconnect_controller)(EfiHandle, EfiHandle, EfiHandle);
-	EfiStatus   (__EFIAPI__ *open_protocol)(EfiHandle, GUID *, void **, EfiHandle, EfiHandle, U32);
-	EfiStatus   (__EFIAPI__ *close_protocol)(EfiHandle, GUID *, EfiHandle, EfiHandle);
-	EfiStatus   (__EFIAPI__ *open_protocol_info)(EfiHandle, GUID *, EfiOpenProtocolInfoEntry **, UN *);
-	EfiStatus   (__EFIAPI__ *protocols_per_handle)(EfiHandle, GUID ***, UN *);
-	EfiStatus   (__EFIAPI__ *locate_handle_buf)(U32, GUID *, void *, UN *, EfiHandle **);
-	EfiStatus   (__EFIAPI__ *locate_protocol)(GUID *, void *, void **);
-	EfiStatus   (__EFIAPI__ *install_multiple_protocol_interfaces)(EfiHandle *, ...);
+	EfiStatus   (__EFIAPI__ *open_protocol)(EfiHandle, GUID*, void**, EfiHandle, EfiHandle, U32);
+	EfiStatus   (__EFIAPI__ *close_protocol)(EfiHandle, GUID*, EfiHandle, EfiHandle);
+	EfiStatus   (__EFIAPI__ *open_protocol_info)(EfiHandle, GUID*, EfiOpenProtocolInfoEntry**, UN*);
+	EfiStatus   (__EFIAPI__ *protocols_per_handle)(EfiHandle, GUID***, UN*);
+	EfiStatus   (__EFIAPI__ *locate_handle_buf)(U32, GUID*, void*, UN*, EfiHandle**);
+	EfiStatus   (__EFIAPI__ *locate_protocol)(GUID*, void*, void**);
+	EfiStatus   (__EFIAPI__ *install_multiple_protocol_interfaces)(EfiHandle*, ...);
 	EfiStatus   (__EFIAPI__ *uninstall_multiple_protocol_interfaces)(EfiHandle, ...);
-	EfiStatus   (__EFIAPI__ *calculate_crc32)(void *, UN, U32 *);
-	EfiStatus   (__EFIAPI__ *copy_mem)(void *, void *, UN);
-    EfiStatus   (__EFIAPI__ *set_mem)(void *, UN, U8);
-	EfiStatus   (__EFIAPI__ *create_event_ex)(U32, EfiTpl, efi_event_notify_t, const void *, const GUID *, efi_event_t *);
+	EfiStatus   (__EFIAPI__ *calculate_crc32)(void*, UN, U32*);
+	EfiStatus   (__EFIAPI__ *copy_mem)(void*, void*, UN);
+    EfiStatus   (__EFIAPI__ *set_mem)(void*, UN, U8);
+	EfiStatus   (__EFIAPI__ *create_event_ex)(U32, EfiTpl, efi_event_notify_t, const void*, const GUID*, efi_event_t*);
 } EfiBootServices;
 
 typedef struct {
 	EfiTableHeader           hdr;
-	EfiStatus   (__EFIAPI__ *get_time)(EfiTime *);
-	EfiStatus   (__EFIAPI__ *set_time)(EfiTime *);
-	EfiStatus   (__EFIAPI__ *get_wakeup_time)(EfiBool *, EfiBool *, EfiTime *);
-	EfiStatus   (__EFIAPI__ *set_wakeup_time)(EfiBool, EfiTime *);
-	EfiStatus   (__EFIAPI__ *set_virtual_address_map)(UN, UN, U32, EfiMemoryDescriptor *);
-	EfiStatus   (__EFIAPI__ *convert_ptr)(UN, void **);
-	EfiStatus   (__EFIAPI__ *get_var)(U16 *, GUID *, U32 *, UN *, void *);
-	EfiStatus   (__EFIAPI__ *get_next_var_name)(UN *, U16 *, GUID *);
-	EfiStatus   (__EFIAPI__ *set_var)(U16 *, GUID *, U32, UN, void *);
-	EfiStatus   (__EFIAPI__ *get_next_high_mono_count)(U32 *);
-	EfiStatus   (__EFIAPI__ *reset_system)(U32, EfiStatus, UN, void *);
-	EfiStatus   (__EFIAPI__ *update_capsule)(EfiCapsuleHeader **, UN, EfiPhysicalAddress);
-	EfiStatus   (__EFIAPI__ *query_capsule_capabilities)(EfiCapsuleHeader **, UN, U64, U32);
-	EfiStatus   (__EFIAPI__ *query_var_info)(U32, U64 *, U64 *, U64 *);
+	EfiStatus   (__EFIAPI__ *get_time)(EfiTime*);
+	EfiStatus   (__EFIAPI__ *set_time)(EfiTime*);
+	EfiStatus   (__EFIAPI__ *get_wakeup_time)(EfiBool*, EfiBool*, EfiTime*);
+	EfiStatus   (__EFIAPI__ *set_wakeup_time)(EfiBool, EfiTime*);
+	EfiStatus   (__EFIAPI__ *set_virtual_address_map)(UN, UN, U32, EfiMemoryDescriptor*);
+	EfiStatus   (__EFIAPI__ *convert_ptr)(UN, void**);
+	EfiStatus   (__EFIAPI__ *get_var)(U16*, GUID*, U32*, UN*, void*);
+	EfiStatus   (__EFIAPI__ *get_next_var_name)(UN*, U16*, GUID*);
+	EfiStatus   (__EFIAPI__ *set_var)(U16*, GUID*, U32, UN, void*);
+	EfiStatus   (__EFIAPI__ *get_next_high_mono_count)(U32*);
+	EfiStatus   (__EFIAPI__ *reset_system)(U32, EfiStatus, UN, void*);
+	EfiStatus   (__EFIAPI__ *update_capsule)(EfiCapsuleHeader**, UN, EfiPhysicalAddress);
+	EfiStatus   (__EFIAPI__ *query_capsule_capabilities)(EfiCapsuleHeader**, UN, U64, U32);
+	EfiStatus   (__EFIAPI__ *query_var_info)(U32, U64*, U64*, U64*);
 } EfiRuntimeServices;
 
 
