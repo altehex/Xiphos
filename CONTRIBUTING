@@ -19,6 +19,7 @@ Requirements:
 - bash 
 - gcc or clang
 - ld or ld.lld
+- fasm
 
 Building ThanatOS from its installation image is planned for the future, but it's not happening in the near future as
 it requires porting some build system or making one from scratch for the system.
@@ -44,12 +45,12 @@ is planned too (it's not hard to implement it).
 
 |   PROGRAMMING LANGUAGES
 +------------------------------------------------------------------------------------------------------*
-The main language of the kernel and the bootloader is C. Additional modules can be written in C++.
-Usage of assembly is possible (fasm by defauilt).
+The main language of the kernel and the bootloader is C. Additional modules can be written in C++. For assemblies, fasm
+is recommended.
 
 Usage of the following languages may be possible in the future:
 - Pascal
-- Forth
+- Forth (it'd be cool to have a forth machine in thanatos)
 - Ada
 - Rust
 
@@ -61,5 +62,5 @@ NAMING:
 --------------------------------
 Use snake_case for function names and function pointer typedefs(end those with _t).
 Use camelCase for variable and structure names. Structure names should start with a capital letter(CamelCase).
-Use SNAKE_CASE_WITH_CAPITAL_LETTERS for macros and Makefile variables.
+Use SNAKE_CASE_WITH_CAPITAL_LETTERS for macros.
 Use single underscore prefix for thunks and stubs. Two underscores are usually for internal functions.
