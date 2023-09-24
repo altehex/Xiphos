@@ -18,17 +18,23 @@ export LC_NUMERIC = C
 
 RM      = rm -f
 CP      = cp
+MV		= mv
 
 VERBOSE := 
+DEBUG :=
 ifeq (1, $(CONFIG_VERBOSE))
 	VERBOSE := --verbose
+endif
+
+ifeq (1, $(CONFIG_DEBUG))
+	DEBUG := -g
 endif
 
 ifeq (1, $(CONFIG_QUIET))
 	MAKEFLAGS += -s
 endif
 
-export VERBOSE RM CP
+export VERBOSE RM CP MV
 
 
 # Toolchain configuration 
@@ -36,16 +42,17 @@ export VERBOSE RM CP
 TARGET = x86_64-pc-none
 
 ifeq (1,$(CONFIG_LLVM))
-	CC		= clang $(VERBOSE)
-	CPP     = clang++ $(VERBOSE)
+	CC		= clang $(VERBOSE) $(DEBUG)
+	CPP     = clang++ $(VERBOSE) $(DEBUG)
 	LD		= ld.lld $(VERBOSE)
 else
 	CC		= gcc
 	CPP     = g++
 	LD		= ld
 endif
+FASM = fasm
 
-export CC LD TARGET
+export CC LD FASM TARGET
 #-(end of toolchain configuration)---
 
 
@@ -90,11 +97,11 @@ dist:
 
 clean:
 	$(MAKE) clean -C boot
-	$(MAKE) clean -C firmware
 	$(MAKE) clean -C kernel
 	$(RM) build/*
 
 .PHONY += help
+help: MAKEFLAGS += -s
 help:
 		@echo   "config.mk is a global configuration file, containing user settings"
 		@echo   "and putting together config.mk's from other subdirectories."
@@ -112,7 +119,7 @@ help:
 .PHONY += test
 test:
 		@echo   "Project name:         "$(OS_NAME) $(OS_EDITION)-$(OS_VERSION)
-		@echo   ".tar.xz name:         "$(TARNAME)
+		@echo   "Tarball name:         "$(TARNAME)
 		@echo 	"C compiler:           "$(CC)
 		@echo   "C++ compiler          "$(CPP)
 		@echo   "Linker:               "$(LD)
@@ -120,10 +127,9 @@ test:
 		@echo   "LDFLAGS:              "$(LDFLAGS)
 		@echo	"Source directory:     "$(SRC_ROOT)
 		@echo   "Included directories: "$(INCLUDE)
-		@echo   "Shhhh:                "$(QUIET)
 		@echo	""
 		@echo   "User settings:"
-		@echo   "* LLVM flag:            "$(LLVM)
+		@echo   "* LLVM flag:            "$(CONFIG_LLVM)
 		@echo	"* User-defined CFLAGS:  "$(USER_CFLAGS)
 		@echo	"* User-defined LDFLAGS: "$(USER_LDFLAGS)
 		@echo	""
