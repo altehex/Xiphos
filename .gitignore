@@ -12,3 +12,4 @@ debug.log
 log.txt
 *.efi
 *.fas
+build
