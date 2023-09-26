@@ -31,13 +31,13 @@ gentoo-install()
 	    echo	"location = /var/db/repos/crossdev" >> $CROSSDEV_CONF
 	    echo	"priority = 10"                     >> $CROSSDEV_CONF
 	    echo	"masters = gentoo"                  >> $CROSSDEV_CONF
-	    echo	"auto-sync = no" >> $CROSSDEV_CONF
+	    echo	"auto-sync = no"                    >> $CROSSDEV_CONF
 
 		echo    "[ :) ] Installed crossdev."
 	fi
 
 	crossdev $CROSSDEV_FLAGS
-	[[ $? -eq 0 ]] && echo    "[ :) ] Installed x86_64-elf-gcc." && return
+	[[ $? -eq 0 ]] && echo "[ :) ] Installed x86_64-elf-gcc." && return
 	echo    "[ !! ] Installation failed."
 	exit 1
 }
