@@ -1,24 +1,3 @@
-<<<<<<< HEAD
-macro EFI_CALL protocol,	\
-	  		   func, 		\
-			   a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11
-{
-	aNum = 0
-	if ~ a11
-	    aNum = aNum + 1
-	    if ~ a11 eq RDI
-	   	    mov RDI, a11
-		end if
-	end if
-}
-
-macro EFI_INIT imgHandle,	\
-	  		   sysTable,	\
-			   return
-=======
-;; Macros
-;;-------------------------------------
-
 include "./types.inc"
 	
 _REG1	equ	RCX
@@ -97,7 +76,6 @@ macro EFI_CALL interface,	\
 
 	
 macro EFI_INIT
->>>>>>> bootloader2
 {
 	clc
 	or		RDX, RDX
@@ -110,16 +88,6 @@ macro EFI_INIT
 	stc
 @@:
 	mov		[imgHandle], RCX
-<<<<<<< HEAD
-	mov		[sysTable], RDX
-	mov     [return], RSP
-}
-
-EFI_SUCCESS		equ		0
-EFI_LOAD_ERROR	equ		1
-
-EFI_BOOT_SERVICES		equ		0x60
-=======
 	mov		[sysTable],  RDX
 	mov     [return],    RSP
 }
@@ -210,4 +178,4 @@ sysTable		rq 	1
 return			rq  1
 	
 section '.reloc' fixups data discardable
->>>>>>> bootloader2
+
