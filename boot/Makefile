@@ -7,7 +7,7 @@ all: $(if $(CONFIG_EFI), bootx64.efi, boot.bin)
 
 boot.bin: # WIP
 
-CLEAN = *.efi
+CLEAN = *.efi *.fas
 
 clean:
 	$(RM) $(CLEAN)

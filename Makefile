@@ -26,10 +26,6 @@ ifeq (1, $(CONFIG_VERBOSE))
 	VERBOSE := --verbose
 endif
 
-ifeq (1, $(CONFIG_DEBUG))
-	DEBUG := -g
-endif
-
 ifeq (1, $(CONFIG_QUIET))
 	MAKEFLAGS += -s
 endif
@@ -51,6 +47,11 @@ else
 	LD		= ld
 endif
 FASM = fasm
+
+ifeq (1, $(CONFIG_DEBUG))
+	CC   += -g
+	FASM += -s $@.fas
+endif
 
 export CC LD FASM TARGET
 #-(end of toolchain configuration)---
@@ -78,7 +79,14 @@ export CFLAGS LDFLAGS INCLUDE
 
 # Targets
 #-------------------------------*
-.PHONY := all
+.PHONY := __all
+__all: check_build_dir all
+
+.PHONY += check_build_dir
+check_build_dir:
+	[[ -e build ]] || mkdir build
+
+.PHONY += all
 all: bootloader kernel
 
 .PHONY += kernel
@@ -98,7 +106,7 @@ dist:
 clean:
 	$(MAKE) clean -C boot
 	$(MAKE) clean -C kernel
-	$(RM) build/*
+	$(RM) -r build
 
 .PHONY += help
 help: MAKEFLAGS += -s
