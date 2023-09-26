@@ -42,7 +42,7 @@ ifeq (1,$(CONFIG_LLVM))
 	CPP     = clang++ $(VERBOSE) $(DEBUG) -target $(TARGET)
 	LD		= ld.lld $(VERBOSE)
 else
-	CC		= gcc
+	CC		= $(TARGET)-gcc
 	CPP     = g++
 	LD		= ld
 endif
