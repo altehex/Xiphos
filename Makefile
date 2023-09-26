@@ -26,10 +26,6 @@ ifeq (1, $(CONFIG_VERBOSE))
 	VERBOSE := --verbose
 endif
 
-ifeq (1, $(CONFIG_DEBUG))
-	DEBUG := -g
-endif
-
 ifeq (1, $(CONFIG_QUIET))
 	MAKEFLAGS += -s
 endif
@@ -51,6 +47,11 @@ else
 	LD		= ld
 endif
 FASM = fasm
+
+ifeq (1, $(CONFIG_DEBUG))
+	CC   += -g
+	FASM += -s $@.fas
+endif
 
 export CC LD FASM TARGET
 #-(end of toolchain configuration)---
