@@ -79,7 +79,14 @@ export CFLAGS LDFLAGS INCLUDE
 
 # Targets
 #-------------------------------*
-.PHONY := all
+.PHONY := __all
+__all: check_build_dir all
+
+.PHONY += check_build_dir
+check_build_dir:
+	[[ -e build ]] || mkdir build
+
+.PHONY += all
 all: bootloader kernel
 
 .PHONY += kernel
@@ -99,7 +106,7 @@ dist:
 clean:
 	$(MAKE) clean -C boot
 	$(MAKE) clean -C kernel
-	$(RM) build/*
+	$(RM) -r build
 
 .PHONY += help
 help: MAKEFLAGS += -s
