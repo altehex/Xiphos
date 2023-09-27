@@ -1,5 +1,5 @@
 ![Static Badge](https://img.shields.io/badge/ThanatOS-%CE%B1--0.0-262431)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/altehex/ThanatOS/c-cpp.yml%3Fbranch%3Dmaster)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/altehex/ThanatOS/c-cpp.yml?branch=master)
 
 Run with:
 ```bash
