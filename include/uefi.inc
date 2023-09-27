@@ -1,5 +1,7 @@
 include "./types.inc"
-	
+
+EFI_SYSTEM_TABLE_SIGNATURE	equ 0x20494249
+
 _REG1	equ	RCX
 _REG2	equ	RDX
 _REG3	equ	R8
@@ -13,12 +15,12 @@ _REG10	equ	RSI
 _REG11	equ	RDI
 
 define _INTERFACES 	conInHdl,		\
-					conIn,			\
-					conOutHdl,		\
-					conOut,			\
-					stdErrHdl,		\
-					stdErr,			\
-					rts, bs
+			conIn,			\
+			conOutHdl,		\
+			conOut,			\
+			stdErrHdl,		\
+			stdErr,			\
+			rts, bs
 
 ;; func should have the format:
 ;; <struct>.<service>
@@ -78,9 +80,8 @@ macro EFI_CALL interface,	\
 macro EFI_INIT
 {
 	clc
-	or		RDX, RDX
 	jz		.err
-	cmp		dword [RDX], 0x20494249
+	cmp		dword [RDX], EFI_SYSTEM_TABLE_SIGNATURE
 	je		@f
 .err:
 	XOR		RCX, RCX
@@ -89,7 +90,7 @@ macro EFI_INIT
 @@:
 	mov		[imgHandle], RCX
 	mov		[sysTable],  RDX
-	mov     [return],    RSP
+	mov     	[return],    RSP
 }
 
 	
@@ -97,7 +98,7 @@ macro EFI_INIT
 ;;-------------------------------------
 	
 EFI_SUCCESS		equ		0
-EFI_LOAD_ERROR	equ		1
+EFI_LOAD_ERROR		equ		1
 
 	
 ;; Structs
@@ -105,7 +106,7 @@ EFI_LOAD_ERROR	equ		1
 macro struct name
 {
 	virtual at 0
-		name name
+		name 	name
 	end virtual
 }
 	
@@ -128,7 +129,7 @@ struc EfiSystemTable {
 	.stdErrHdl		PTR
 	.stdErr			PTR
 	.rts			PTR
-	.bs				PTR
+	.bs			PTR
 	.entryNum		IN
 	.conf			PTR
 }
@@ -140,7 +141,7 @@ struct EfiTextInProtocol
 
 struc EfiTextOutProtocol {
 	.reset			PTR
-	.output_string	PTR
+	.output_string		PTR
 }
 struct EfiTextOutProtocol
 	
@@ -153,19 +154,19 @@ __efi_call:
 
 	bt		EAX, 0
 	jnc		@f
-	push	RAX
+	push		RAX
 
 	rept 7 n:5
 	{
 		reverse
 @@:
-		cmp		al, n
+		cmp		AL, n
 		jb		@f
-		push	_REG#n
+		push		_REG#n
 	}
 @@:
 	sub		RSP, 4 * 8
-	call	RBX
+	call		RBX
 	
 	mov		RSP, [return]
 	ret
@@ -175,7 +176,7 @@ section 	'.data' data readable writeable
 	
 imgHandle		rq 	1
 sysTable		rq 	1
-return			rq  1
+return			rq  	1
 	
 section '.reloc' fixups data discardable
 
