@@ -150,7 +150,7 @@ section		".text" code executable readable
 
 __efi_call:
 	mov		[return], RSP
-	and		ESP, 0x0FFFFFFF
+	and		ESP, 0xFFFFFFF0
 
 	bt		EAX, 0
 	jnc		@f
