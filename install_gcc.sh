@@ -7,7 +7,7 @@ CROSSDEV_LAYOUT_CONF=$CROSSDEV_METADATA_DIR/layout.conf
 CROSSDEV_CONF_DIR=/etc/portage/repos.conf
 CROSSDEV_CONF=$CROSSDEV_CONF_DIR/crossdev.conf
 
-CROSSDEV_FLAGS=--stage1 -S --target x86_64-elf --show-fail-log
+CROSSDEV_FLAGS='--stage1 -S --target x86_64-elf --show-fail-log'
 
 gentoo-install()
 {
