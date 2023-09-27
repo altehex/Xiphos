@@ -1,7 +1,8 @@
 export OS_NAME    = ThanatOS
 export OS_VERSION = 0.0
-export OS_EDITION = alpha
-TARNAME := thanatos-$(OS_EDITION)-$(OS_VERSION).tar.xz
+export OS_EDITION = α
+export OS_EDITION_LATIN = alpha
+TARNAME := thanatos-$(OS_EDITION_LATIN)-$(OS_VERSION).tar.xz
 
 
 export SRC_ROOT := $(shell pwd)

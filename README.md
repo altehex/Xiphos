@@ -1,3 +1,5 @@
+![Static Badge](https://img.shields.io/badge/ThanatOS-%CE%B1--0--0-262431)
+
 Run with:
 ```bash
 qemu-system-x86_64 -machine cpu35 -vga std -net none -usb -device usb-tablet \
