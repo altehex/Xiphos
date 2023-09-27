@@ -19,7 +19,6 @@ gentoo-install()
 	    emerge -av crossdev
 	    [[ $? -ne 0 ]] && echo "[ ** ] Quitting..."	 && return
 	    echo	"*-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--*"
-	    echo	"[ ** ] Installed crossdev."
 
 	    mkdir -p $CROSSDEV_METADATA_DIR
 	    touch $CROSSDEV_LAYOUT_CONF
