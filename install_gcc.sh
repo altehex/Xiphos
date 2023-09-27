@@ -36,7 +36,9 @@ gentoo-install()
 		echo    "[ :) ] Installed crossdev."
 	fi
 
+	echo	"*-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--*"
 	crossdev $CROSSDEV_FLAGS
+	echo	"*-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--*"
 	[[ $? -eq 0 ]] && echo "[ :) ] Installed x86_64-elf-gcc." && return
 	echo    "[ !! ] Installation failed."
 	exit 1

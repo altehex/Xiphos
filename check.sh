@@ -25,7 +25,7 @@ if [[ -d $GCC_PATH ]]; then
 else
 	echo    "not present"
 	echo    "[ ?? ] Install GCC cross-compiler?"
-	read -p "*-+-( [y] Yes )-+-( [N] No )-+-> " -n 1 INSTALL_GCC
+	read -p "*-+--+-( [y] Yes )-+-( [N] No )-+--+-> " -n 1 INSTALL_GCC
 	echo    ""
 	if [[ $INSTALL_GCC == 'Y' ]] || [[ $INSTALL_GCC == 'y' ]]; then
 	   ./install_gcc.sh
@@ -39,6 +39,6 @@ fi
 
 echo    "[ :) ] OK"
 echo    "[ ?? ] Run make? "
-read -p "*-+-( [y] Yes )-+-( [N] No )-+-> " -n 1 RUN_MAKE
+read -p "*-+--+-( [y] Yes )-+-( [N] No )-+--+-> " -n 1 RUN_MAKE
 
 [[ $RUN_MAKE == 'y' ]] || [[ $RUN_MAKE == 'Y' ]] && make all
