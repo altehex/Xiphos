@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: make
-      run: make
+    - name: make 
+      run: make -C kernel
     - name: make clean
       run: make clean    
