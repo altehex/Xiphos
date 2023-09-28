@@ -40,5 +40,6 @@ fi
 echo    "[ :) ] OK"
 echo    "[ ?? ] Run make? "
 read -p "*-+--+-( [y] Yes )-+-( [N] No )-+--+-> " -n 1 RUN_MAKE
+echo    ""
 
 [[ $RUN_MAKE == 'y' ]] || [[ $RUN_MAKE == 'Y' ]] && make all

@@ -6,9 +6,6 @@ include "./types.inc"
 include "./types.inc"
 
 
-EFI_SYSTEM_TABLE_SIGNATURE	equ 0x20494249
-
-
 _REG1	equ	RCX
 _REG2	equ	RDX
 _REG3	equ	R8
@@ -35,34 +32,25 @@ define _INTERFACES 	conInHdl,		\
 ;;-(Example)-----------------
 ;; EFI_CALL conOut, EfiTextOutProtocol.output_string
 ;;
-macro EFI_CALL interface,	\
-	  		   func, 		\
- 			   arg1, [arg]
+;; Conditionals with _aNum are a workaround, so fasm
+;; won't generate unnecessary moveabs and push instructions
+;; (that's the caveat when iterating through group args
+;; with rept). This is stupid, but code generates better that way
+macro EFI_CALL interface*,	\
+	  		   func*, 		\
+ 			   _aNum*, a1, [a]
 {
-	aNum = 0
-	
-	forward
-	rept 10 n:2
-	\{
- 		if ~ arg eq
- 		   aNum = aNum + 1
- 		   if ~ arg eq _REG\#n
- 		   	  mov	_REG\#n, arg
- 		   end if
- 		end if
-	\}
-
-	if ~ arg1 eq
-		argNum = aNum + 1
-		if ~ arg1 eq _REG1
-	   		if ~ arg1 in <_INTERFACES>
-	   			mov		_REG1, arg1
-	   		end if
-		end if
+	if _aNum >= 2
+		forward
+		rept 10 n:2
+		\{
+ 			if n <= _aNum
+ 			if ~ a eq _REG\#n
+ 				mov	_REG\#n, a
+ 			end if
+ 			end if
+		\}
 	end if
-
-	xor		RAX, RAX
-	mov		AL, aNum
 
 	if interface in	<_INTERFACES>
 	 	mov		RBX, [sysTable]
@@ -73,16 +61,35 @@ macro EFI_CALL interface,	\
 		end if
 	end if
 
-	if arg1 in <_INTERFACES>
-		mov		RCX, RBX
+	if a1 in <_INTERFACES>
+		mov		_REG1, RBX
+	else
+		mov		_REG1, RCX
 	end if
 
 	mov		RBX, [RBX + func]
+
+	if _aNum > 4
+		stackArgs = _aNum - 4
+		mov		[return], RSP
+		and		ESP, 0xFFFFFFF0
+
+		rept 7 n:5
+		\{
+			\reverse
+
+			if n <= stackArgs
+				push	_REG\#n
+			end if
+		\}
+	end if
 	
-	call	__efi_call
+	call	RBX
+	
+	if _aNum > 4
+		mov		RSP, [return]
+	end if
 }
-
-
 	
 macro EFI_INIT
 {
@@ -98,19 +105,21 @@ macro EFI_INIT
 @@:
 	mov		[imgHandle], RCX
 	mov		[sysTable],  RDX
-	mov     [return],    RSP
 }
 
 	
 ;; Equates
-;;-------------------------------------
+;;-------------------------------------*
 	
-EFI_SUCCESS		equ		0
-EFI_LOAD_ERROR	equ		1
+EFI_SUCCESS				equ		0
+EFI_LOAD_ERROR			equ		1
+EFI_INVALID_PARAMETER	equ		2
+
+EFI_SYSTEM_TABLE_SIGNATURE	equ 0x20494249
 
 	
 ;; Structs
-;;--------------------------------------
+;;--------------------------------------*
 macro struct name
 {
 	virtual at 0
@@ -119,65 +128,93 @@ macro struct name
 }
 	
 struc EfiTableHeader {
-	.sig			I64
-	.rev 			I32
-	.hdrSz			I32
-	.crc32			I32
-	._res			I32
+	.sig					I64
+	.rev					I32
+	.hdrSz					I32
+	.crc32					I32
+	._res					I32
 }
 	
 struc EfiSystemTable {
-	.hdr			EfiTableHeader
-	.vendor			PTR
-	.rev			I32
-	.conInHdl		PTR
-	.conIn			PTR
-	.conOutHdl		PTR
-	.conOut			PTR
-	.stdErrHdl		PTR
-	.stdErr			PTR
-	.rts			PTR
-	.bs				PTR
-	.entryNum		IN
-	.conf			PTR
+	.hdr					EfiTableHeader
+	.vendor					PTR
+	.rev					I32
+	.conInHdl				PTR
+	.conIn					PTR
+	.conOutHdl				PTR
+	.conOut					PTR
+	.stdErrHdl				PTR
+	.stdErr					PTR
+	.rts					PTR
+	.bs						PTR
+	.entryNum				IN
+	.conf					PTR
 }
 struct EfiSystemTable
 
-struc EfiTextInProtocol {
+struc EfiBootServices {
+	.hdr					EfiTableHeader
+	.raise_tpl				PTR
+	.restore_tpl			PTR
+	.alloc_pages			PTR
+	.free_pages				PTR
+	.get_memmap				PTR
+	.alloc_pool				PTR
+	.free_pool				PTR
+	.create_event			PTR
+	.set_timer				PTR
+	.wait_for_event			PTR
+	.sig_event				PTR
+	.close_event			PTR
+	.check_event			PTR
+	.install_interface		PTR
+	.reinstall_interface	PTR
+	.uninstall_interface	PTR
+	.hdl_protocol			PTR
+	._res					PTR
+	.reg_protocol_notify	PTR
+	.locate_hdl				PTR
+	.locate_dev_path		PTR
+	.install_conf_table		PTR
+	.img_load				PTR
+	.img_start				PTR
+	.exit					PTR
+	.img_unload				PTR
+	.exit_bs				PTR
+	.get_next_mono_count	PTR
+	.stall					PTR
+	.set_watchdog_timer		PTR
+	.connect_controller		PTR
+	.disconnect_controller	PTR
+	.open_protocol			PTR
+	.close_protocol			PTR
+	.open_protocol_info		PTR
+	.protocols_per_hdl		PTR
+	.locate_hdl_buf			PTR
+	.locate_protocol		PTR
+	.install_mul_protocols	PTR
+	.uninstall_mul_protocols	PTR
+	.calculate_crc32		PTR
+	.copy_mem				PTR
+	.set_mem				PTR
+	.create_event_EX		PTR
 }
-struct EfiTextInProtocol
-
-struc EfiTextOutProtocol {
-	.reset			PTR
-	.output_string	PTR
+struct EfiBootServices
+	
+struc EfiTextIn {
 }
-struct EfiTextOutProtocol
-	
-	
-section		".text" code executable readable
+struct EfiTextIn
 
-__efi_call:
-	mov		[return], RSP
-	and		ESP, 0xFFFFFFF0
-
-	bt		EAX, 0
-	jnc		@f
-	push	RAX
-
-	rept 7 n:5
-	{
-		reverse
-@@:
-		cmp		AL, n
-		jb		@f
-		push	_REG#n
-	}
-@@:
-	sub		RSP, 4 * 8
-	call	RBX
-	
-	mov		RSP, [return]
-	ret
+struc EfiTextOut {
+	.reset				PTR
+	.output_string		PTR
+	.test_string		PTR
+	.query_mode			PTR
+	.set_mode			PTR
+	.set_attr			PTR
+	.clear_scr			PTR
+}
+struct EfiTextOut
 
 
 section 	'.data' data readable writeable
@@ -185,5 +222,23 @@ section 	'.data' data readable writeable
 imgHandle		rq 	1
 sysTable		rq 	1
 return			rq  1
+
+;; UUIDs
+EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID:
+	dd	0x9042A9DE
+	dw	0x23DC, 0x4A38
+	db  0x96, 0xFB, 0x7A, 0xDE, 0xD0, 0x80, 0x51, 0x6A
+
 	
 section '.reloc' fixups data discardable
+
+	
+;; More equates
+;;---------------------------------*
+
+NULL	equ	0x00
+	
+;; Color attributes
+EFI_LIGHTGRAY			equ 0x07
+
+EFI_BACKGROUD_BLACK		equ	0x00
