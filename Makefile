@@ -19,6 +19,7 @@ export LC_NUMERIC = C
 
 RM      = rm -f
 CP      = cp
+MKDIR   = mkdir
 MV		= mv
 
 VERBOSE := 
@@ -31,7 +32,7 @@ ifeq (1, $(CONFIG_QUIET))
 	MAKEFLAGS += -s
 endif
 
-export VERBOSE RM CP MV
+export VERBOSE RM CP MKDIR MV
 
 
 # Toolchain configuration 

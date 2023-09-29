@@ -1,5 +1,8 @@
+if ~ defined _TYPES_INC_
+define _TYPES_INC_
+
 struc I8
-	  { . db ? }
+	{ . db ? }
 
 struc I16 {
 	align 2
@@ -18,3 +21,5 @@ struc I64 {
 
 IN		fix I64
 PTR		fix	I64
+
+end if	; ~_TYPES_INC_
