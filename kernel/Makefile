@@ -17,6 +17,8 @@ $(PACKAGE_NAME).img:: $(OBJ)
 
 kernel.o: kernel.c
 
+CLEAN = *.img *.o
+
 .PHONY += clean
 clean:
-	$(_QUIET)$(RM) *.o
+	$(_QUIET)$(RM) $(CLEAN)
