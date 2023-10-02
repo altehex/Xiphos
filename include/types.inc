@@ -1,5 +1,5 @@
 if ~ defined _TYPES_INC_
-define _TYPES_INC_
+define _TYPES_INC_ 1
 
 struc I8
 	{ . db ? }

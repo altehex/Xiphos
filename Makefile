@@ -1,8 +1,9 @@
-export OS_NAME    = ThanatOS
-export OS_VERSION = 0.0
-export OS_EDITION = α
+export OS_NAME          = ThanatOS
+export OS_VERSION       = 0.0
+export OS_EDITION       = α
 export OS_EDITION_LATIN = alpha
-TARNAME := thanatos-$(OS_EDITION_LATIN)-$(OS_VERSION).tar.xz
+export PACKAGE_NAME     = thanatos-$(OS_EDITION_LATIN)-$(OS_VERSION)
+TARNAME := $(PACKAGE_NAME).tar.xz
 
 
 export SRC_ROOT := $(shell pwd)
@@ -67,7 +68,10 @@ CFLAGS = -std=c17 \
 CWARNINGS = -Wall \
 		    -Wextra
 
-LDFLAGS = 
+LDFLAGS = -ffreestanding \
+		  -shared \
+		  -O2 \
+		  -nostdlib
 
 CFLAGS  += $(USER_CFLAGS) $(CWARNINGS)
 LDFLAGS += $(USER_LDFLAGS)
@@ -89,7 +93,7 @@ check_build_dir:
 	[[ -e build ]] || mkdir build
 
 .PHONY += all
-all: bootloader _kernel
+all: _kernel bootloader
 
 .PHONY += kernel
 _kernel:

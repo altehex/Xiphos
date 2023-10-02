@@ -1,11 +1,14 @@
 if ~ defined _UEFI_INC_
-define _UEFI_INC_
+define _UEFI_INC_ 1
 	
 ;; Macros
 ;;-------------------------------------
 
 include "./types.inc"
 
+EfiVirtAddr	fix I64
+EfiPhysAddr	fix I64
+	
 
 define _INTERFACES 	conInHdl,			\
 					EfiTextIn,			\
@@ -18,14 +21,10 @@ define _INTERFACES 	conInHdl,			\
 
 
 	
-macro EFI_CALL interface*,	\
+macro __eficall interface*,	\
 				func*, 		\
  				a1, a2, a3, a4, [a]
 {
-	_aNum = _aNum_#func
-
-	if _aNum > 0
-
 	if ~ a4 eq
 		if ~ a4 eq R9
 			mov		R9, a4
@@ -49,40 +48,34 @@ macro EFI_CALL interface*,	\
 		mov		RBX, [RBX + EfiSystemTable.#interface]
 	else
 		if ~ interface eq RBX
-			mov		RBX, interface
+			mov		RBX, [interface]
 		end if
 	end if
 
-	if a1 in <_INTERFACES>
-		mov		RCX, RBX
-	else
-		mov		RCX, a1
+	if ~ a1 eq
+		if a1 in <_INTERFACES> | a1 eq interface
+			mov		RCX, RBX
+		else
+			mov		RCX, a1
+		end if
 	end if
 
 	mov		RBX, [RBX + _#interface#.#func]
 
-	if _aNum > 4
-		push	RAX
+	if ~ a eq
 		mov		[return], RSP
 		and		ESP, 0xFFFFFFF0
 
-;; Not sure yet, how this part is going to work
-		n = 11
 		reverse
-		if n <= _aNum & n >= 5
-			mov		RAX, a
-			push	RAX
-			n = n - 1
-		end if
+		push	a
+
+		common
 	end if
-	
-	end if		; _aNum > 0
 	
 	call	RBX
 	
-	if _aNum > 4
+	if ~ a eq
 		mov		RSP, [return]
-		pop		RAX
 	end if
 }
 	
@@ -100,26 +93,36 @@ macro EFI_INIT	_imgHandle,	\
 	stc
 @@:
 	mov		[_imgHandle], RCX
+	
 	mov		[_sysTable],  RDX
-
-__sysTable equ _sysTable
+__sysTable = _sysTable
 }
 
 	
 ;; Equates
 ;;-------------------------------------*
 	
-EFI_SUCCESS				equ		0
-EFI_LOAD_ERROR			equ		1
-EFI_INVALID_PARAMETER	equ		2
+EFI_SUCCESS				=		0
+EFI_LOAD_ERROR			=		1
+EFI_INVALID_PARAMETER	=		2
 
-EFI_NOT_FOUND			equ		14
-
-EFI_SYSTEM_TABLE_SIGNATURE	equ 0x20494249
+EFI_DEVICE_ERROR		= 		7
+EFI_WRITE_PROTECTED		=		8
+EFI_OUT_OF_RESOURCES	=		9
+EFI_VOLUME_CORRUPTED	=		10
+EFI_VOLUME_FULL			=		11
+EFI_NO_MEDIA			=		12
+EFI_MEDIA_CHANGED		=		13
+EFI_NOT_FOUND			=		14
+EFI_ACCESS_DENIED		=		15
+	
+EFI_SYSTEM_TABLE_SIGNATURE	= 0x20494249
 
 	
 ;; Structs
 ;;--------------------------------------*
+
+;; Interfaces
 macro struct name
 {
 	virtual at 0
@@ -152,10 +155,6 @@ struc EfiSystemTable {
 }
 struct EfiSystemTable
 
-_aNum_exit				equ 4
-_aNum_get_memmap		equ 5
-_aNum_locate_protocol	equ	3
-	
 struc _EfiBootServices {
 	.hdr					EfiTableHeader
 	.raise_tpl				PTR
@@ -180,10 +179,10 @@ struc _EfiBootServices {
 	.locate_hdl				PTR
 	.locate_dev_path		PTR
 	.install_conf_table		PTR
-	.img_load				PTR
-	.img_start				PTR
+	.load_img				PTR
+	.start_img				PTR
 	.exit					PTR
-	.img_unload				PTR
+	.unload_img				PTR
 	.exit_bs				PTR
 	.get_next_mono_count	PTR
 	.stall					PTR
@@ -209,9 +208,6 @@ struc _EfiTextIn {
 }
 struct _EfiTextIn
 
-_aNum_clear_scr			equ 1
-_aNum_output_string		equ 2
-	
 struc _EfiTextOut {
 	.reset				PTR
 	.output_string		PTR
@@ -223,24 +219,61 @@ struc _EfiTextOut {
 }
 struct _EfiTextOut
 
+struc _EfiFileSystem {
+	.rev			I64
+	.open_vol		PTR
+}
+struct _EfiFileSystem
 
-section		'.data'		data readable writeable
+EFI_FILE_MODE_READ	equ		0x0000000000000001
+	
+struc _EfiFile {
+	.rev			I64
+	.open			PTR
+	.close			PTR
+	.delete			PTR
+	.read			PTR
+}
+struct _EfiFile
+	
+;; Data structures
+struc EfiMemoryDescriptor {
+	.type			I32
+	.physStart		EfiPhysAddr
+	.virtStart		EfiVirtAddr
+	.numOfPages		I64
+	.attrs			I64
+}
+struct EfiMemoryDescriptor
+	
+	
+
 ;; UUIDs
-EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID:
+macro _EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
+{
 	dd	0x9042A9DE
 	dw	0x23DC, 0x4A38
 	db  0x96, 0xFB, 0x7A, 0xDE, 0xD0, 0x80, 0x51, 0x6A
-
-
+}
+	
+macro _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
+{
+	dd	0x964E5B22
+	dw	0x6459, 0x11D2
+	db  0x8E, 0x39, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B
+}
 	
 ;; More equates
 ;;---------------------------------*
 
-NULL	equ	0x00
+NULL	=	0x00
 	
 ;; Color attributes
-EFI_LIGHTGRAY			equ 0x07
+EFI_LIGHTGRAY			= 	0x07
 
-EFI_BACKGROUD_BLACK		equ	0x00
+EFI_BACKGROUD_BLACK		=	0x00
 
+;; Revisions
+EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION	=	0x00010000
+	
 end if	; ~_UEFI_INC_

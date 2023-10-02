@@ -1,3 +1,5 @@
+
+
 int
 __start(void)
 {
