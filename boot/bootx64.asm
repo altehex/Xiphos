@@ -7,10 +7,6 @@ include "../include/types.inc"
 	
 	
 MEMMAP_SZ   equ 65536
-
-;; CODE32 = code32 - gdtStart
-;; DATA32 = data32 - gdtStart
-;; CODE64 = code64 - gdtStart
 	
 	
 section		'.text'		code executable readable
@@ -179,11 +175,6 @@ memMap			EfiMemoryDescriptor
 memMapKey		IN
 memMapDescSz	IN
 memMapDescVer	I32
-
-	
-section		'.kernel'	code readable writeable executable
-KERN_BASE:	
-	rb	6000
 	
 	
 section		'.reloc'	fixups data discardable
