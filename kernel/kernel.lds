@@ -2,8 +2,7 @@
 ENTRY(__start)
 SECTIONS
 {
-	. = 0x00100000;
-	IMG_BASE = . ;
+	IMG_BASE = .;
 
 	.text : 
 	{

@@ -235,6 +235,22 @@ struc _EfiFile {
 	.read			PTR
 }
 struct _EfiFile
+
+struc _EfiLoadedImg {
+	.rev			I32
+	.parentHdl		PTR
+	.sysTable		PTR
+	.devHdl			PTR
+	.filePath		PTR
+	._res			PTR
+}
+struct _EfiLoadedImg
+
+struc _EfiLoadFile {
+	.load_file		PTR
+}
+struct _EfiLoadFile
+	
 	
 ;; Data structures
 struc EfiMemoryDescriptor {
@@ -246,7 +262,6 @@ struc EfiMemoryDescriptor {
 }
 struct EfiMemoryDescriptor
 	
-	
 
 ;; UUIDs
 macro _EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
@@ -254,6 +269,20 @@ macro _EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
 	dd	0x9042A9DE
 	dw	0x23DC, 0x4A38
 	db  0x96, 0xFB, 0x7A, 0xDE, 0xD0, 0x80, 0x51, 0x6A
+}
+
+macro _EFI_LOAD_FILE_PROTOCOL_GUID
+{
+	dd	0x56EC3091
+	dw	0x954C, 0x11D2
+	db	0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B
+}
+	
+macro _EFI_LOADED_IMAGE_PROTOCOL_GUID
+{
+	dd	0x5B1B31A1
+	dw	0x9562, 0x11D2
+	db	0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B
 }
 	
 macro _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID

@@ -6,8 +6,8 @@ BOOT_DIR := $(EFI_DIR)/boot
 IMG_DIR  := $(EFI_DIR)/thanatos
 
 # For EFI_FILE_PROTOCOL.Open()
-IMG_PATH            = \"\\efi\\thanatos\\$(PACKAGE_NAME).img\"
-IMG_SIZE 			= $(shell stat -L -c %s $(IMG_DIR)/$(PACKAGE_NAME).img)
+IMG_PATH = \"\\efi\\thanatos\\$(PACKAGE_NAME).img\"
+IMG_SIZE = $(shell stat -L -c %s $(IMG_DIR)/$(PACKAGE_NAME).img)
 
 export FASM_DEFINES = -dIMG_BASE=$(IMG_BASE) \
 					  -dIMG_BASE_QUOTED=\"$(IMG_BASE)\" \

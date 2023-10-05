@@ -3,5 +3,5 @@
 int
 __start(void)
 {
-	return 0;
+	while (1) {}
 }
