@@ -25,7 +25,7 @@ __entry:
 ;; TODO: Get ACPI table address
 ;;---------------------
 ;; Set up video (the snippet is inlined)
-include "../firmware/uefi/asm/video.asm"
+include "./video.asm"
 
 ;; Get the loaded image interface
 	lea		RDX, [EFI_LOADED_IMAGE_PROTOCOL_GUID]
