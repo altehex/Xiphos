@@ -1,8 +1,8 @@
-export OS_NAME          = ThanatOS
+export OS_NAME          = Xiphos
 export OS_VERSION       = 0.0
 export OS_EDITION       = α
 export OS_EDITION_LATIN = alpha
-export PACKAGE_NAME     = thanatos-$(OS_EDITION_LATIN)-$(OS_VERSION)
+export PACKAGE_NAME     = xiphos-$(OS_EDITION_LATIN)-$(OS_VERSION)
 TARNAME := $(PACKAGE_NAME).tar.xz
 
 

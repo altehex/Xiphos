@@ -1,6 +1,5 @@
 |   BUILD SYSTEM
 +----------------------*
-- Comments output (for v=2)
 - Improve check.sh (so it won't reevaluate if files exist twice)
 
 |   MISC

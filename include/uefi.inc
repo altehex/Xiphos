@@ -105,7 +105,8 @@ __sysTable = _sysTable
 EFI_SUCCESS				=		0
 EFI_LOAD_ERROR			=		1
 EFI_INVALID_PARAMETER	=		2
-
+EFI_UNSUPPORTED			=		3
+	
 EFI_DEVICE_ERROR		= 		7
 EFI_WRITE_PROTECTED		=		8
 EFI_OUT_OF_RESOURCES	=		9
@@ -250,6 +251,14 @@ struc _EfiLoadFile {
 	.load_file		PTR
 }
 struct _EfiLoadFile
+
+struc _EfiVideoOut {
+	.query_mode		PTR
+	.set_mode		PTR
+	.blt			PTR
+	.mode			PTR			; EfiVideoOutMode
+}
+struct _EfiVideoOut
 	
 	
 ;; Data structures
@@ -261,6 +270,34 @@ struc EfiMemoryDescriptor {
 	.attrs			I64
 }
 struct EfiMemoryDescriptor
+
+struc EfiVideoOutMode {
+	.maxMode		I32
+	.mode			I32
+	.info			PTR			; EfiVideoOutModeinfo
+	.infoSz			IN
+	.fbBase			EfiPhysAddr
+	.fbSz			IN
+}
+struct EfiVideoOutMode
+
+struc EfiPixelBitmask {
+	.redMask		I32
+	.greenMask		I32
+	.blueMask		I32
+	._res			I32
+}
+struct EfiPixelBitmask
+
+struc EfiVideoOutModeInfo {
+	.ver			I32
+	.hRes			I32
+	.vRes			I32
+	.pixFmt			I32
+	.pixInfo		EfiPixelBitmask
+	.pixPerLine		I32
+}
+struct EfiVideoOutModeInfo
 	
 
 ;; UUIDs
@@ -271,13 +308,6 @@ macro _EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
 	db  0x96, 0xFB, 0x7A, 0xDE, 0xD0, 0x80, 0x51, 0x6A
 }
 
-macro _EFI_LOAD_FILE_PROTOCOL_GUID
-{
-	dd	0x56EC3091
-	dw	0x954C, 0x11D2
-	db	0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B
-}
-	
 macro _EFI_LOADED_IMAGE_PROTOCOL_GUID
 {
 	dd	0x5B1B31A1
@@ -304,5 +334,12 @@ EFI_BACKGROUD_BLACK		=	0x00
 
 ;; Revisions
 EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION	=	0x00010000
+
+;; EFI_GRAPHICS_PIXEL_FORMAT
+PixelRedGreenBlueReserved8BitPerColor	equ	0x00
+PixelBlueGreenRedReserved8BitPerColor	equ	0x01
+PixelBitMask							equ	0x02
+PixelBltOnly							equ 0x03
+PixelFormatMax							equ 0x04
 	
 end if	; ~_UEFI_INC_

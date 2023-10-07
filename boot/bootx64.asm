@@ -16,16 +16,11 @@ __entry:
 	EFI_INIT	imgHandle, sysTable
 	jc		__error
 	
-	__eficall	EfiTextOut, clear_scr, EfiTextOut
+;; Set up video (the snippet is inlined)
+include "./video.asm"
 					  
 	__eficall 	EfiTextOut, output_string, 	\ 
 	 			EfiTextOut, startupMsg
-
-;;----------------------
-;; TODO: Get ACPI table address
-;;---------------------
-;; Set up video (the snippet is inlined)
-include "./video.asm"
 
 ;; Get the loaded image interface
 	lea		RDX, [EFI_LOADED_IMAGE_PROTOCOL_GUID]
@@ -108,8 +103,7 @@ _sub_EfiFile	equ imgFileHandle
 				[imgHandle], [memMapKey]
 	test		RAX, RAX
 	jnz 	__error
-	
-	
+		
 ;; Load the kernel entry point
 	mov		RAX, IMG_BASE + 0x1000
 	push	RAX
@@ -135,13 +129,12 @@ imgPath			du	IMG_PATH, 0
 startupMsg  	du  "Starting up ", IMG_NAME, "...", 13, 10, \
 					"*-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-*", 13, 10, 0
 loadingImgMsg	du	"[ ** ] Loading ", IMG_PATH, "...", 13, 10, 0
-imgIsLoadedMsg	du	"[ ** ] Loaded OS image at ", IMG_BASE_QUOTED, ".", 13, 10, 0
-welcomeMsg		du	"[ :) ] Welcome to ThanatOS!"
+imgIsLoadedMsg	du	"[ ** ] Loaded the kernel image at ", IMG_BASE_QUOTED, ".", 13, 10, 0
 
 ;; Error messages
 errorMsg		du	"[ !! ] An error occured.", 13, 10, 0
-imgNotFoundMsg	du	"[ !! ] OS image is not present.", 13, 10, 0
-imgLoadErrorMsg du	"[ !! ] Failed to load the OS image.", 13, 10, 0
+imgNotFoundMsg	du	"[ !! ] The kernel image is not present.", 13, 10, 0
+imgLoadErrorMsg du	"[ !! ] Failed to load the kernel image.", 13, 10, 0
 	
 ;; UUID table
 EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID:		_EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
@@ -149,26 +142,24 @@ EFI_LOADED_IMAGE_PROTOCOL_GUID:			_EFI_LOADED_IMAGE_PROTOCOL_GUID
 EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID:	_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 
 	
-;; Video, acpi, etc related stuff for the kernel
-section 	'.data'		data readable writeable
+section 	'.bss'		data readable writeable discardable
 
 imgHandle		PTR
 sysTable		PTR
 return			PTR
 	
-imgSz			dq	IMG_SIZE
-
-	
-section 	'.bss'		data readable writeable discardable
-
 ;; Protocol table
 EfiFile			PTR
 EfiFileSystem	PTR
-EfiGraphicsOut	PTR
-EfiLoadFile		PTR
 EfiLoadedImg	PTR
+EfiVideoOut		PTR
 
 imgFileHandle	PTR
+imgSz			I64	IMG_SIZE
+
+videoInfoSz		IN
+videoInfo		PTR
+	
 	
 ;; Memory map
 memMap			EfiMemoryDescriptor

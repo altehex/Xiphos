@@ -3,18 +3,18 @@ include	mem_layout.mk
 
 EFI_DIR  := $(SRC_ROOT)/build/efi
 BOOT_DIR := $(EFI_DIR)/boot
-IMG_DIR  := $(EFI_DIR)/thanatos
+IMG_DIR  := $(EFI_DIR)/xiphos
 
 # For EFI_FILE_PROTOCOL.Open()
-IMG_PATH = \"\\efi\\thanatos\\$(PACKAGE_NAME).img\"
+IMG_PATH = \"\\efi\\xiphos\\$(PACKAGE_NAME).img\"
 IMG_SIZE = $(shell stat -L -c %s $(IMG_DIR)/$(PACKAGE_NAME).img)
 
 export FASM_DEFINES = -dIMG_BASE=$(IMG_BASE) \
 					  -dIMG_BASE_QUOTED=\"$(IMG_BASE)\" \
-					  -dSTACK_SIZE=$(STACK_SIZE) \
 					  -dIMG_NAME=\"$(PACKAGE_NAME)\" \
 					  -dIMG_PATH=$(IMG_PATH) \
-					  -dIMG_SIZE=$(IMG_SIZE)
+					  -dIMG_SIZE=$(IMG_SIZE) \
+					  -dSTACK_SIZE=$(STACK_SIZE) 
 
 .PHONY := all
 all: $(if $(CONFIG_EFI), bootx64.efi, boot.bin)

@@ -5,7 +5,7 @@
 CLANG_PATH=/usr/lib/clang
 GCC_PATH=/usr/lib/gcc/x86_64-elf
 
-echo " Building ThanatOS for x86_64 on $(uname -sr)"
+echo " Building Xiphos for x86_64 on $(uname -sr)"
 echo "*-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--*"
 
 echo -n     "[ ** ] Checking for make...           "
