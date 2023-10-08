@@ -262,6 +262,13 @@ struct _EfiVideoOut
 	
 	
 ;; Data structures
+struc EfiConfTable {
+	.guid_q0		I64
+	.guid_q1		I64
+	.table			PTR
+}
+struct EfiConfTable
+	
 struc EfiMemoryDescriptor {
 	.type			I32
 	.physStart		EfiPhysAddr
@@ -321,6 +328,22 @@ macro _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 	dw	0x6459, 0x11D2
 	db  0x8E, 0x39, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B
 }
+
+	
+macro _EFI_ACPI_TABLE_GUID
+{
+	dd	0x8868E871
+	dw	0xE4F1, 0x11D3
+	db	0xBC, 0x22, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81
+}
+
+macro _EFI_DTB_TABLE_GUID
+{
+	dd	0xB1B621D5
+	dw	0xF19C, 0x41A5
+	db	0x83, 0x0B, 0xD9, 0x15, 0x2C, 0x69, 0xAA, 0xE0
+}
+
 	
 ;; More equates
 ;;---------------------------------*
@@ -341,5 +364,6 @@ PixelBlueGreenRedReserved8BitPerColor	equ	0x01
 PixelBitMask							equ	0x02
 PixelBltOnly							equ 0x03
 PixelFormatMax							equ 0x04
+
 	
 end if	; ~_UEFI_INC_

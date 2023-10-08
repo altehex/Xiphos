@@ -89,6 +89,17 @@ _sub_EfiFile	equ imgFileHandle
 	call	RBX
 	
 	purge	_sub_EfiFile
+
+;; Get ACPI table
+	mov		RAX, [sysTable]
+	mov		RAX, [RAX + EfiSystemTable.conf]
+	mov		RCX, [sysTable]
+	mov		RCX, [RCX + EfiSystemTable.entryNum]
+	dec		RCX
+
+get_apci:
+
+	loop	get_apci
 	
 ;; Get memory map
 	lea		RCX, [memMapSz]
