@@ -268,6 +268,7 @@ struc EfiConfTable {
 	.table			PTR
 }
 struct EfiConfTable
+EfiConfTable_ENTRY_SZ	equ	8 * 3
 	
 struc EfiMemoryDescriptor {
 	.type			I32

@@ -1,7 +1,8 @@
 	format	PE64 DLL EFI
 	stack	STACK_SIZE
 	entry	__entry
-	
+
+include "../include/acpi.inc"
 include "../include/uefi.inc"
 include "../include/types.inc"
 	
@@ -90,16 +91,12 @@ _sub_EfiFile	equ imgFileHandle
 	
 	purge	_sub_EfiFile
 
-;; Get ACPI table
-	mov		RAX, [sysTable]
-	mov		RAX, [RAX + EfiSystemTable.conf]
-	mov		RCX, [sysTable]
-	mov		RCX, [RCX + EfiSystemTable.entryNum]
-	dec		RCX
+	lea		RDX, [relocTablesMsg]
+	__eficall	EfiTextOut, output_string,	\
+				EfiTextOut, RDX
 
-get_apci:
-
-	loop	get_apci
+;; System tables relocation code
+include "./reloc_tables.asm"
 	
 ;; Get memory map
 	lea		RCX, [memMapSz]
@@ -114,7 +111,9 @@ get_apci:
 				[imgHandle], [memMapKey]
 	test		RAX, RAX
 	jnz 	__error
-		
+
+;; TO-DO setup pages
+
 ;; Load the kernel entry point
 	mov		RAX, IMG_BASE + 0x1000
 	push	RAX
@@ -141,6 +140,7 @@ startupMsg  	du  "Starting up ", IMG_NAME, "...", 13, 10, \
 					"*-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-*", 13, 10, 0
 loadingImgMsg	du	"[ ** ] Loading ", IMG_PATH, "...", 13, 10, 0
 imgIsLoadedMsg	du	"[ ** ] Loaded the kernel image at ", IMG_BASE_QUOTED, ".", 13, 10, 0
+relocTablesMsg	du	"[ ** ] Relocating system data tables...", 13, 10, 0
 
 ;; Error messages
 errorMsg		du	"[ !! ] An error occured.", 13, 10, 0
@@ -152,6 +152,8 @@ EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID:		_EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
 EFI_LOADED_IMAGE_PROTOCOL_GUID:			_EFI_LOADED_IMAGE_PROTOCOL_GUID
 EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID:	_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 
+EFI_RSDP_GUID:		_EFI_ACPI_TABLE_GUID	
+	
 	
 section 	'.bss'		data readable writeable discardable
 

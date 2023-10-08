@@ -1,5 +1,4 @@
 # Address table
-include	mem_layout.mk
 
 EFI_DIR  := $(SRC_ROOT)/build/efi
 BOOT_DIR := $(EFI_DIR)/boot
@@ -9,11 +8,14 @@ IMG_DIR  := $(EFI_DIR)/xiphos
 IMG_PATH = \"\\efi\\xiphos\\$(PACKAGE_NAME).img\"
 IMG_SIZE = $(shell stat -L -c %s $(IMG_DIR)/$(PACKAGE_NAME).img)
 
+export STACK_SIZE = 1024
+
 export FASM_DEFINES = -dIMG_BASE=$(IMG_BASE) \
 					  -dIMG_BASE_QUOTED=\"$(IMG_BASE)\" \
 					  -dIMG_NAME=\"$(PACKAGE_NAME)\" \
 					  -dIMG_PATH=$(IMG_PATH) \
 					  -dIMG_SIZE=$(IMG_SIZE) \
+					  -dRSDP=$(RSDP) \
 					  -dSTACK_SIZE=$(STACK_SIZE) 
 
 .PHONY := all

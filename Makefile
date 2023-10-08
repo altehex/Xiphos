@@ -10,6 +10,7 @@ export SRC_ROOT := $(shell pwd)
 
 # User settings
 include $(SRC_ROOT)/config.mk
+include $(SRC_ROOT)/mem_layout.mk
 
 
 MAKEFLAGS += -rR
