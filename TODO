@@ -1,7 +1,29 @@
-|   BUILD SYSTEM
+|   FEATURES
++----------------------*
+
+VGA:
+-----------------------*
+- TBD
+
+
+|   BOOTLOADER
++----------------------*
+- Make a proper memory map(see the comments in boot/mem_map.asm)
+- Relocate all the ACPI tables(see boot/reloc_tables.asm)
+- Move the kernel to the higher half of the memory
+
+
+|   UTILS
++----------------------*
+- SIZE_OF macro in fasm
+
+
+|	BUILD SYSTEM
 +----------------------*
 - Improve check.sh (so it won't reevaluate if files exist twice)
+- Add other systems to install_gcc.sh
+
 
 |   MISC
 +----------------------*
-- Make a nice reame.md
+- Make a nice readme.md
