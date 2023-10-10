@@ -2,7 +2,7 @@
 ENTRY(__start)
 SECTIONS
 {
-	IMG_BASE = .;
+	. = 0xFFFFFFFFFFE00000;
 
 	.text : 
 	{
@@ -11,7 +11,8 @@ SECTIONS
 
 	.data : 
 	{
-		*(.data)
+		*(.data .data.*)
+		*(.rodata .rodata.*)
 	}
 
 	.bss :

@@ -1,5 +1,11 @@
-;; WIP. New tables will be added if the're needed
+;; WIP. New tables will be added if they're needed
 
+;; ......
+
+	lea		RDX, [relocTablesMsg]
+	__eficall	EfiTextOut, output_string,	\
+				EfiTextOut, RDX
+	
 ;; Get ACPI table address
 	mov		RAX, [sysTable] 					 ; ->sysTable
 	mov		RCX, [RAX + EfiSystemTable.entryNum] ; ->sysTable->num
@@ -16,8 +22,12 @@
 	loop	@b
 
 @@:	
-	;; Copy RSDP address to 0x00000000
+	;; Copy RSDP address
 	mov		RAX, [RAX + EfiConfTable.table]
 	mov		[qword RSDP], RAX
+;; But it gotta copy the entire RSDP, XSDT et al.
+	
+;; Make sure to accumulate the size of tables in acpitTablesSz
+;; It's important to make a proper memory map
 
-;; Copy every needed table
+;; ......

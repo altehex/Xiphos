@@ -3,12 +3,11 @@
 	entry	__entry
 
 include "../include/acpi.inc"
-include "../include/uefi.inc"
+include "../include/size.inc"
 include "../include/types.inc"
+include "../include/boot/uefi.inc"
 	
-	
-MEMMAP_SZ   equ 65536
-	
+MEM_MAP_SZ  = 65536
 	
 section		'.text'		code executable readable
 	
@@ -22,7 +21,7 @@ include "./video.asm"
 					  
 	__eficall 	EfiTextOut, output_string, 	\ 
 	 			EfiTextOut, startupMsg
-
+	
 ;; Get the loaded image interface
 	lea		RDX, [EFI_LOADED_IMAGE_PROTOCOL_GUID]
 	lea		R8,	[EfiLoadedImg]
@@ -91,28 +90,17 @@ _sub_EfiFile	equ imgFileHandle
 	
 	purge	_sub_EfiFile
 
-	lea		RDX, [relocTablesMsg]
-	__eficall	EfiTextOut, output_string,	\
-				EfiTextOut, RDX
-
-;; System tables relocation code
+;; System tables relocation 
 include "./reloc_tables.asm"
 	
 ;; Get memory map
-	lea		RCX, [memMapSz]
-	lea		RDX, [memMap]
-	lea		R8, [memMapKey]
-	lea		R9, [memMapDescSz]
-	__eficall	EfiBootServices, get_memmap,	\
-				RCX, RDX, R8, R9, memMapDescVer
+include "./mem_map.asm"
 	
 ;; Exit EFI
 	__eficall	EfiBootServices, exit_bs,	\
 				[imgHandle], [memMapKey]
-	test		RAX, RAX
+	test		EAX, EAX
 	jnz 	__error
-
-;; TO-DO setup pages
 
 ;; Load the kernel entry point
 	mov		RAX, IMG_BASE + 0x1000
@@ -124,13 +112,13 @@ include "./reloc_tables.asm"
 __error:			
 	__eficall 	EfiTextOut, output_string, 	\ 
  				EfiTextOut, errorMsg
-	xor		EAX, EAX	; EFI_SUCCESS
+	xor		RAX, RAX	; EFI_SUCCESS
 	ret					
 
 	
 section		'.rodata'	data readable
 
-memMapSz		dq	MEMMAP_SZ
+memMapSz		I64	MEM_MAP_SZ
 	
 ;; String table
 ;;-------------------------------------------
@@ -172,14 +160,16 @@ imgSz			I64	IMG_SIZE
 
 videoInfoSz		IN
 videoInfo		PTR
+
+acpiTablesSz	I64	; Is used to map ACPI tables from 0x00000000
 	
-	
-;; Memory map
-memMap			EfiMemoryDescriptor
+;; Memory map info
 memMapKey		IN
 memMapDescSz	IN
 memMapDescVer	I32
 	
+section		'.mmap'		data readable discardable	
+memMap		rq		1
 	
 section		'.reloc'	fixups data discardable
 

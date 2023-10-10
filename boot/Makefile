@@ -15,6 +15,7 @@ export FASM_DEFINES = -dIMG_BASE=$(IMG_BASE) \
 					  -dIMG_NAME=\"$(PACKAGE_NAME)\" \
 					  -dIMG_PATH=$(IMG_PATH) \
 					  -dIMG_SIZE=$(IMG_SIZE) \
+					  -dMEM_MAP_BASE=$(MEM_MAP_BASE) \
 					  -dRSDP=$(RSDP) \
 					  -dSTACK_SIZE=$(STACK_SIZE) 
 
