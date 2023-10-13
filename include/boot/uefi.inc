@@ -104,7 +104,7 @@ __sysTable = _sysTable
 ;; Equates
 ;;-------------------------------------*
 	
-EFI_SUCCESS				=		0
+EFI_SUCCESS				=		0 
 EFI_LOAD_ERROR			=		1
 EFI_INVALID_PARAMETER	=		2
 EFI_UNSUPPORTED			=		3

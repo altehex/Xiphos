@@ -53,7 +53,7 @@ load_kernel:
 	test	EAX, EAX
 	jz		@f			
 
-	cmp		RAX, EFI_NOT_FOUND
+	cmp		EAX, EFI_NOT_FOUND
 	jne		.error
 	lea		RDX, [imgNotFoundMsg]
 	__eficall	EfiTextOut, output_string,	\
@@ -99,7 +99,7 @@ include "./mem_map.asm"
 ;; Exit EFI
 	__eficall	EfiBootServices, exit_bs,	\
 				[imgHandle], [memMapKey]
-	test		EAX, EAX
+	test	EAX, EAX
 	jnz 	__error
 
 ;; Load the kernel entry point
@@ -117,8 +117,6 @@ __error:
 
 	
 section		'.rodata'	data readable
-
-memMapSz		I64	MEM_MAP_SZ
 	
 ;; String table
 ;;-------------------------------------------
@@ -164,12 +162,12 @@ videoInfo		PTR
 acpiTablesSz	I64	; Is used to map ACPI tables from 0x00000000
 	
 ;; Memory map info
+memMapSz		IN		0
 memMapKey		IN
-memMapDescSz	IN
+memMapDescSz	IN		0
 memMapDescVer	I32
-	
-section		'.mmap'		data readable discardable	
-memMap		rq		1
+memMap			PTR		0
+
 	
 section		'.reloc'	fixups data discardable
 
