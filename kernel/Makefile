@@ -8,12 +8,11 @@ xiphos: $(PACKAGE_NAME).img
 	$(MKDIR) -p $(KERNEL_IMAGE_DIR)
 	$(CP) $^ $(KERNEL_IMAGE_DIR)/
 
-$(PACKAGE_NAME).img:: $(OBJ)
-	$(LD) $(LDFLAGS) -T $(LD_SCRIPT) $^ -o $@
+$(PACKAGE_NAME).img: $(OBJ)
+	$(OBJCOPY) -O binary -j .text $^ $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $^
-
 
 kernel.o: kernel.c
 

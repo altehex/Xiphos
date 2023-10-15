@@ -1,6 +1,7 @@
 # It's right after the system reserved memory
 # (for now. i'll make it higher half)
-export IMG_BASE	= 0x00100000
+export IMG_BASE		= 0x00100000
+export FRAMEBUFFER 	= 0xfffffffffc000000
 
 # Don't fucking use it
 export SYSTEM_RESERVED 		= 0x000A0000

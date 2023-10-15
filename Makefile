@@ -50,14 +50,15 @@ else
 	CPP     = g++
 	LD		= ld
 endif
-FASM = fasm
+FASM 	= fasm
+OBJCOPY = objcopy
 
 ifeq (1, $(CONFIG_DEBUG))
 	CC   += -g
 	FASM += -s $@.fas
 endif
 
-export CC LD FASM TARGET
+export CC LD FASM TARGET OBJCOPY
 #-(end of toolchain configuration)---
 
 

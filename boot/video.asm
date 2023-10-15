@@ -50,6 +50,12 @@ set_mode:
 				EfiVideoOut, R12
 	
 .clear_screen:	
-	
 	__eficall	EfiTextOut, clear_scr, EfiTextOut
+
+;; Get GOP framebuffer
+	mov		RAX, [EfiVideoOut]
+	mov		RAX, [RAX + _EfiVideoOut.mode]
+	mov		RAX, [RAX + EfiVideoOutMode.fbBase]
+	mov		[fbBase], RAX
+	
 ;; ......

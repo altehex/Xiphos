@@ -13,13 +13,15 @@ include "../include/boot/mem_map.inc"
 	add		R8, R8
 	add		R8, [memMapSz]
 	mov		[memMapSz], R8
-	
-	xor		RCX, RCX
+ 
+	xor		RCX, RCX	; AllocateAnyPages
 	add		R8, PAGE_SZ - 1
 	shr		R8, 12
 	lea		R9, [memMap]
 	__eficall	EfiBootServices, alloc_pages,	\
 				RCX, EFI_LOADER_DATA, R8, R9
+
+include "./paging.asm"
 	
 	lea		RCX, [memMapSz]
 	lea		R8, [memMapKey]
@@ -127,9 +129,11 @@ parse_mem_map:
 	mov		[dword MEM_MAP_BASE], EDX
 
 ;; Load ACPI tables region record at the beginning
-	mov		RAX, __RAM
+	;; Would be more correct, if i took the base of the second record
+	mov		EAX, __ACPI_TABLES
 	mov		[dword MEM_MAP_BASE + 4], EAX
-	mov		[qword MEM_MAP_BASE + 4 + 4], RAX ; RAX is still zero, as our ACPI region
+	xor		RAX, RAX
+	mov		[qword MEM_MAP_BASE + 4 + 4], RAX 
 	;; mov	RAX, [acpiDataSz]
 	;; mov	[qword MEM_MAP_BASE+4+12], RAX
     ;; mov  RDX, [qword MEM_MAP_BASE+4+20+4]	; second record offset

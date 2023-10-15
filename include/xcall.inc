@@ -8,7 +8,7 @@ STACK_ALIGN = 8
 ;; Caller-saved registers - RAX, RBX, RCX, RDX, RDI, RSI
 ;; Callee-saved registers - the rest of the registers
 ;; Some arguments are placed in a stack from right to left
-macro	__xcall		func, a1, a2, a3, a4, [args]
+macro	__xcall		func*, a1, a2, a3, a4, [args]
 {
 	if ~ a1 eq
 		if ~ a1 eq RCX

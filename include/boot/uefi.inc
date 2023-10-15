@@ -247,6 +247,11 @@ struc _EfiVideoOut {
 	.blt			PTR
 	.mode			PTR			; EfiVideoOutMode
 }
+
+struc _EfiMP {
+	.get_core_num	PTR
+	.get_proc_info	PTR
+}
 	
 	
 ;; Data structures
@@ -329,19 +334,19 @@ macro _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 	db  0x8E, 0x39, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B
 }
 
+macro _EFI_MP_SERVICES_PROTOCOL_GUID
+{
+	dd	0x3FDDA605
+	dw	0xA76E, 0x4F46
+	db	0xAD, 0x29, 0x12, 0xF4, 0x53, 0x1B, 0x3D, 0x08
+}
+
 	
 macro _EFI_ACPI_TABLE_GUID
 {
 	dd	0x8868E871
 	dw	0xE4F1, 0x11D3
 	db	0xBC, 0x22, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81
-}
-
-macro _EFI_DTB_TABLE_GUID
-{
-	dd	0xB1B621D5
-	dw	0xF19C, 0x41A5
-	db	0x83, 0x0B, 0xD9, 0x15, 0x2C, 0x69, 0xAA, 0xE0
 }
 
 	
@@ -393,6 +398,7 @@ TABLE	\
 	_EfiLoadedImg,			\
 	_EfiLoadFile,			\
 	_EfiVideoOut,			\
+	_EfiMP,					\
 	EfiConfTable,			\
 	EfiMemoryDescriptor,	\
 	EfiVideoOutMode,		\

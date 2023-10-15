@@ -92,6 +92,8 @@ _sub_EfiFile	equ imgFileHandle
 
 ;; System tables relocation 
 include "./reloc_tables.asm"
+
+include "./smp.asm"
 	
 ;; Get memory map
 include "./mem_map.asm"
@@ -103,7 +105,7 @@ include "./mem_map.asm"
 	jnz 	__error
 
 ;; Load the kernel entry point
-	mov		RAX, IMG_BASE + 0x1000
+	mov		RAX, IMG_BASE
 	push	RAX
 	ret
 
@@ -137,7 +139,8 @@ imgLoadErrorMsg du	"[ !! ] Failed to load the kernel image.", 13, 10, 0
 EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID:		_EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
 EFI_LOADED_IMAGE_PROTOCOL_GUID:			_EFI_LOADED_IMAGE_PROTOCOL_GUID
 EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID:	_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
-
+EFI_MP_SERVICES_PROTOCOL_GUID:			_EFI_MP_SERVICES_PROTOCOL_GUID 
+	
 EFI_RSDP_GUID:		_EFI_ACPI_TABLE_GUID	
 	
 	
@@ -152,22 +155,30 @@ EfiFile			PTR
 EfiFileSystem	PTR
 EfiLoadedImg	PTR
 EfiVideoOut		PTR
+EfiMP			PTR
 
 imgFileHandle	PTR
-imgSz			I64	IMG_SIZE
+imgSz			I64		IMG_SIZE
 
 videoInfoSz		IN
 videoInfo		PTR
+fbBase			PTR
 
-acpiTablesSz	I64	; Is used to map ACPI tables from 0x00000000
+acpiTablesSz	I64	; Is used to map ACPI tables region
+
+coreNum			IN
+activeCoreNum	IN
 	
 ;; Memory map info
-memMapSz		IN		0
+memMapSz		IN	
 memMapKey		IN
-memMapDescSz	IN		0
+memMapDescSz	IN	
 memMapDescVer	I32
-memMap			PTR		0
+memMap			PTR	
 
+pages			PTR	
+pageNum			I64
+	
 	
 section		'.reloc'	fixups data discardable
 
