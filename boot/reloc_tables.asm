@@ -24,7 +24,7 @@
 @@:	
 	;; Copy RSDP address
 	mov		RAX, [RAX + EfiConfTable.table]
-	mov		[qword RSDP], RAX
+	mov		[qword ACPI_TABLES_BASE], RAX
 ;; But it gotta copy the entire RSDP, XSDT et al.
 	
 ;; Make sure to accumulate the size of tables in acpitTablesSz

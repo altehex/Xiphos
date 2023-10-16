@@ -9,6 +9,7 @@ export SYSTEM_RESERVED_END	= 0x000FFFFF
 
 # Data tables (fetched at boot for the kernel to use)
 
-export RSDP			= 0x00000000
-					# 0x00000007
-export MEM_MAP_BASE	= 0x00000500
+export ACPI_TABLES_BASE		= 0x00000000
+							# 0x00000007
+export MEM_MAP_BASE			= 0x00000500
+export PML4_BASE 			= 0x00000700

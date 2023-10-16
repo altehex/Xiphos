@@ -10,14 +10,15 @@ IMG_SIZE = $(shell stat -L -c %s $(IMG_DIR)/$(PACKAGE_NAME).img)
 
 export STACK_SIZE = 1024
 
-export FASM_DEFINES = -dFRAMEBUFFER=$(FRAMEBUFFER) \
+export FASM_DEFINES = -dACPI_TABLES_BASE=$(ACPI_TABLES_BASE) \
+					  -dFRAMEBUFFER=$(FRAMEBUFFER) \
 					  -dIMG_BASE=$(IMG_BASE) \
 					  -dIMG_BASE_QUOTED=\"$(IMG_BASE)\" \
 					  -dIMG_NAME=\"$(PACKAGE_NAME)\" \
 					  -dIMG_PATH=$(IMG_PATH) \
 					  -dIMG_SIZE=$(IMG_SIZE) \
 					  -dMEM_MAP_BASE=$(MEM_MAP_BASE) \
-					  -dRSDP=$(RSDP) \
+					  -dPML4_BASE=$(PML4_BASE) \
 					  -dSTACK_SIZE=$(STACK_SIZE) 
 
 .PHONY := all

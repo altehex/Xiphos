@@ -46,35 +46,37 @@ macro __eficall interface*,	\
 	end if
 
 	if interface in	<_INTERFACES>
-	 	mov		RBX, [__sysTable]
-		mov		RBX, [RBX + EfiSystemTable.#interface]
+	 	mov		RAX, [__sysTable]
+		mov		RAX, [RAX + EfiSystemTable.#interface]
 	else
 		if ~ interface eq RBX
-			mov		RBX, [interface]
+			mov		RAX, [interface]
 		end if
 	end if
 
 	if ~ a1 eq
 		if a1 in <_INTERFACES> | a1 eq interface
-			mov		RCX, RBX
+			mov		RCX, RAX
 		else
 			mov		RCX, a1
 		end if
 	end if
 
-	mov		RBX, [RBX + _#interface#.#func]
+	mov		RAX, [RAX + _#interface#.#func]
 
+	common
 	if ~ a eq
 		mov		[return], RSP
 		and		ESP, 0xFFFFFFF0
-
-		reverse
-		push	a
-
-		common
 	end if
+
+	reverse
+	if ~ a eq
+		push	a
+	end if
+	common
 	
-	call	RBX
+	call	RAX
 	
 	if ~ a eq
 		mov		RSP, [return]
@@ -249,8 +251,13 @@ struc _EfiVideoOut {
 }
 
 struc _EfiMP {
-	.get_core_num	PTR
-	.get_proc_info	PTR
+	.get_core_num		PTR
+	.get_proc_info		PTR
+	.start_all_aps		PTR
+	.start_this_ap		PTR
+	.switch_bsp			PTR
+	.enable_disable_ap	PTR
+	.who_am_i			PTR
 }
 	
 	
@@ -310,7 +317,32 @@ struc EfiVideoOutModeInfo {
 	.pixInfo		EfiPixelBitmask
 	.pixPerLine		I32
 }
+
+struc EfiCpuPhysLocation {
+	.package		I32
+	.core			I32
+	.thread			I32
+}
+
+struc EfiCpuPhysLocation2 {
+	.package		I32
+	.module			I32
+	.tile			I32
+	.die			I32
+	.core			I32
+	.thread			I32
+}
+
+struc EfiExtProcInfo {
+	.location2		EfiCpuPhysLocation2
+}
 	
+struc EfiProcInfo {
+	.id				I64
+	.status			I32
+	.location		EfiCpuPhysLocation
+	.extInfo		EfiExtProcInfo
+}
 
 ;; UUIDs
 macro _EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
@@ -353,7 +385,15 @@ macro _EFI_ACPI_TABLE_GUID
 ;; More equates
 ;;---------------------------------*
 
-NULL	=	0x00
+NULL	=	0
+
+TRUE	=	1
+
+;; Task priority levels
+TPL_APPLICATION    = 4
+TPL_CALLBACK       = 8
+TPL_NOTIFY         = 16
+TPL_HIGH_LEVEL     = 31
 	
 ;; Color attributes
 EFI_LIGHTGRAY			= 	0x07
@@ -403,7 +443,11 @@ TABLE	\
 	EfiMemoryDescriptor,	\
 	EfiVideoOutMode,		\
 	EfiPixelBitmask,		\
-	EfiVideoOutModeInfo
+	EfiVideoOutModeInfo,	\
+	EfiCpuPhysLocation,		\
+	EfiCpuPhysLocation2,	\
+	EfiExtProcInfo,			\
+	EfiProcInfo
 	
 	
 end if	; ~_UEFI_INC_

@@ -99,11 +99,21 @@ include "./smp.asm"
 include "./mem_map.asm"
 	
 ;; Exit EFI
+ 	lea		RCX, [memMapSz]
+	lea		R8, [memMapKey]
+	xor		R9, R9
+	__eficall	EfiBootServices, get_memmap,	\
+				RCX, [memMap], R8, R9, NULL
+	
 	__eficall	EfiBootServices, exit_bs,	\
 				[imgHandle], [memMapKey]
+	
 	test	EAX, EAX
 	jnz 	__error
 
+	and		AL, 1
+	mov		[bspReady], AL
+	
 ;; Load the kernel entry point
 	mov		RAX, IMG_BASE
 	push	RAX
@@ -150,24 +160,28 @@ imgHandle		PTR
 sysTable		PTR
 return			PTR
 	
-;; Protocol table
 EfiFile			PTR
 EfiFileSystem	PTR
 EfiLoadedImg	PTR
-EfiVideoOut		PTR
-EfiMP			PTR
 
 imgFileHandle	PTR
 imgSz			I64		IMG_SIZE
 
+EfiVideoOut		PTR
 videoInfoSz		IN
 videoInfo		PTR
 fbBase			PTR
 
-acpiTablesSz	I64	; Is used to map ACPI tables region
-
+EfiMP			PTR
+__event			PTR
 coreNum			IN
 activeCoreNum	IN
+procNum			IN
+procInfo		EfiProcInfo
+	align	4
+bspReady		I8
+
+acpiTablesSz	I64	; Is used to map ACPI tables region
 	
 ;; Memory map info
 memMapSz		IN	
