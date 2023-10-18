@@ -27,6 +27,7 @@ macro __eficall interface*,	\
 				func*, 		\
  				a1, a2, a3, a4, [a]
 {
+	common
 	if ~ a4 eq
 		if ~ a4 eq R9
 			mov		R9, a4
@@ -64,7 +65,6 @@ macro __eficall interface*,	\
 
 	mov		RAX, [RAX + _#interface#.#func]
 
-	common
 	if ~ a eq
 		mov		[return], RSP
 		and		ESP, 0xFFFFFFF0

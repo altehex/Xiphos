@@ -12,17 +12,14 @@ struc __memRecord {
 	.sz		I64
 }
 
-struc __memMap {
-	 .sz	 I32
-	 .map	 PTR
-}
-
 ;; Memory types
-__RAM			=	0	; <-- Everything else, except runtime regions and unusable memory
-__ACPI_TABLES	= 	1	; <-- EfiACPIReclaimMemory
-__ACPI_NVS		= 	2	; <-- EfiACPIMemoryNVS
-__NON_VOLATILE  =   4   ; <-- EfiPersistentMemory
-
+__RAM			=	0	; Everything else, except runtime regions and unusable memory (we don't map them)
+__ACPI_TABLES	= 	1	; EfiACPIReclaimMemory
+__ACPI_NVS		= 	2	; EfiACPIMemoryNVS
+__NON_VOLATILE  =   3   ; EfiPersistentMemory
+__KERNEL        =   4	; For kernel image
+__MEMORY_MAP	=   5	; For memory map
+	
 	
 TABLE	\
 		__memRecord,	\

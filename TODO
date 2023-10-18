@@ -10,7 +10,7 @@ VGA:
 +----------------------*
 - Make a proper memory map(see the comments in boot/mem_map.asm)
 - Relocate all the ACPI tables(see boot/reloc_tables.asm)
-- Move the kernel to the higher half of the memory
+- Make feature checks in core_init
 
 
 |   UTILS

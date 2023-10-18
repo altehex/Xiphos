@@ -58,6 +58,7 @@ load_kernel:
 	lea		RDX, [imgNotFoundMsg]
 	__eficall	EfiTextOut, output_string,	\
 				EfiTextOut, RDX
+	jmp		$
 
 @@:
 _sub_EfiFile	equ imgFileHandle
@@ -89,7 +90,7 @@ _sub_EfiFile	equ imgFileHandle
 	call	RBX
 	
 	purge	_sub_EfiFile
-
+	
 ;; System tables relocation 
 include "./reloc_tables.asm"
 
@@ -120,12 +121,54 @@ include "./mem_map.asm"
 	ret
 
 
+;; Default error handler
 	use64
 __error:			
 	__eficall 	EfiTextOut, output_string, 	\ 
  				EfiTextOut, errorMsg
 	xor		RAX, RAX	; EFI_SUCCESS
 	ret					
+
+	
+CR4_OSFXSR		equ	01000000000b
+CR4_OSXMMEXCPT	equ	10000000000b
+	
+core_init:
+;; Wait until BSP finishes
+	mov		AL, byte [bspReady]
+	bt		AX, 0
+	pause
+	jz		core_init
+
+;; Enable SSE
+	mov		RAX, CR0
+	and		AX, 0xFFFB
+	or		AX, 0x2
+	mov		CR0, RAX
+	mov		RAX, CR4
+	or		AX, CR4_OSFXSR + CR4_OSXMMEXCPT
+	mov		CR4, RAX
+
+;; Enable AVX
+	xor		RCX, RCX
+	xgetbv
+	or		EAX, 7
+	xsetbv
+	
+;; Load PML4 table
+	mov		RAX, [pml4Base]
+	mov		CR3, RAX
+
+	xor		RSP, RSP
+	mov		RAX, RCX
+	shl		RAX, 10
+	sub		RSP, RAX
+
+;; Push kernel code
+	mov		RAX, IMG_BASE
+	push	RAX
+	mov		RDI, RCX
+	ret
 
 	
 section		'.rodata'	data readable
@@ -155,7 +198,7 @@ EFI_RSDP_GUID:		_EFI_ACPI_TABLE_GUID
 	
 	
 section 	'.bss'		data readable writeable discardable
-
+	
 imgHandle		PTR
 sysTable		PTR
 return			PTR
@@ -181,17 +224,19 @@ procInfo		EfiProcInfo
 	align	4
 bspReady		I8
 
+acpiTablesBase	PTR
 acpiTablesSz	I64	; Is used to map ACPI tables region
 	
 ;; Memory map info
+memMapBase		PTR
+	
 memMapSz		IN	
 memMapKey		IN
 memMapDescSz	IN	
 memMapDescVer	I32
 memMap			PTR	
 
-pages			PTR	
-pageNum			I64
+pml4Base		PTR
 	
 	
 section		'.reloc'	fixups data discardable

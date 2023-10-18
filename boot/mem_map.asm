@@ -2,6 +2,18 @@ include "../include/boot/mem_map.inc"
 	
 ;; ......
 
+;; How addresses are passed:
+;;------------------------------------*
+
+;;   [acpiTableBase = SYS_TABLES_BASE (0x00)]
+;; reloc_tables.asm ----+
+;;						|
+;;						V  [pml4Base = (acpiTableBase + acpiTablesSz + 8) & 0x...FFF8]
+;; 	                paging.asm ----+
+;;									|
+;;									V  [memMapBase = (pml4Base + pml4Sz + 8) & 0x...FFF8]
+;;								mem_map.asm
+	
 ;; Get memory map size and descriptor size
  	lea		RCX, [memMapSz]
 	xor		R8, R8
@@ -40,8 +52,11 @@ include "./paging.asm"
 	add		RCX, [memMapSz]
 	
 ;; RDX:	Our memory records
-	mov		RDX, MEM_MAP_BASE + 4 + 20
-;; Reserving 20 bytes for ACPI tables region record
+	mov		RDX, [memMapBase]
+	add		RDX, 20 + 20
+	mov		R15, RDX	; R15 holds the address of the first free RAM region record (see how it's used after .done) 
+;; Reserving first 20 bytes for the memory map region
+;; Second 20 bytes are for the ACPI tables region record
 
 ;; R8D: memory region type (EFI)
 ;; R9: memory region type, base or size
@@ -124,24 +139,24 @@ parse_mem_map:
 	jne 	parse_mem_map
 
 .done:
-;; Load memory map size at the beginning
-	sub		RDX, MEM_MAP_BASE + 4
-	mov		[dword MEM_MAP_BASE], EDX
-
+;; Make memory map region record
+	mov		RBX, [memMapBase]
+	mov		EAX, __MEMORY_MAP
+	mov		[RBX], EAX
+	mov		RAX, RBX
+	mov		[RBX + 4], RAX
+	sub		RDX, RAX
+	mov		[RBX + 4 + 8], RDX
+	
+	
 ;; Load ACPI tables region record at the beginning
-	;; Would be more correct, if i took the base of the second record
 	mov		EAX, __ACPI_TABLES
-	mov		[dword MEM_MAP_BASE + 4], EAX
+	add		RBX, 20
+	mov		[RBX], EAX
 	xor		RAX, RAX
-	mov		[qword MEM_MAP_BASE + 4 + 4], RAX 
-	;; mov	RAX, [acpiDataSz]
-	;; mov	[qword MEM_MAP_BASE+4+12], RAX
-    ;; mov  RDX, [qword MEM_MAP_BASE+4+20+4]	; second record offset
-	;; add  RDX, RAX
-	;; mov	[qword MEM_MAP_BASE+4+20+4], RDX
-	;; mov  RDX, [qword MEM_MAP_BASE+4+20+12]	; second record size
-	;; sub  RDX, RAX
-	;; mov	[qword MEM_MAP_BASE+4+20+12], RDX
+	mov		[RBX + 4], RAX 
+	mov		RAX, [acpiTablesSz]
+	mov		[RBX + 4 + 8], RAX
 	
 	mov		RDX, [memMapSz]
 	add		RDX, PAGE_SZ - 1
