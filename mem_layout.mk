@@ -1,5 +1,3 @@
-export FRAMEBUFFER 	= 0xfffffffffc000000
-
 export EFI_DIR  := $(SRC_ROOT)/build/efi
 export BOOT_DIR := $(EFI_DIR)/boot
 export IMG_DIR  := $(EFI_DIR)/xiphos

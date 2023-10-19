@@ -13,17 +13,15 @@ struc __memRecord {
 }
 
 ;; Memory types
-__RAM			=	0	; Everything else, except runtime regions and unusable memory (we don't map them)
-__ACPI_TABLES	= 	1	; EfiACPIReclaimMemory
-__ACPI_NVS		= 	2	; EfiACPIMemoryNVS
-__NON_VOLATILE  =   3   ; EfiPersistentMemory
-__KERNEL        =   4	; For kernel image
-__MEMORY_MAP	=   5	; For memory map
+__RAM			=	0			; Everything else, except runtime regions and unusable memory (we don't map them)
+__ACPI_TABLES	= 	1	  		; EfiACPIReclaimMemory
+__ACPI_NVS		= 	2			; EfiACPIMemoryNVS
+__NON_VOLATILE  =   3			; EfiPersistentMemory
+__KERNEL        =   4			; For kernel image
+__MEMORY_MAP	=   0x0D1E0D1E	; For memory map
 	
 	
-TABLE	\
-		__memRecord,	\
-		__memMap
+TABLE	__memRecord
 
 	
 end if 		; ~ defined _MEM_MAP_INC_

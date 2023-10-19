@@ -72,14 +72,18 @@ CWARNINGS = -Wall \
 
 LDFLAGS = -ffreestanding \
 		  -shared \
-		  -O2 \
 		  -nostdlib
+
+ifeq (1, $(CONFIG_DEBUG))
+	CWARNINGS += -Wpadded
+endif
 
 CFLAGS  += $(USER_CFLAGS) $(CWARNINGS)
 LDFLAGS += $(USER_LDFLAGS)
 CPPFLAGS := $(CFLAGS)
 
 INCLUDE := -I$(SRC_ROOT)/include
+
 
 export CFLAGS LDFLAGS INCLUDE
 #-(end of flags configuration)--------

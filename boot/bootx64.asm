@@ -111,16 +111,69 @@ include "./mem_map.asm"
 	
 	test	EAX, EAX
 	jnz 	__error
-
-	and		AL, 1
-	mov		[bspReady], AL
 	
-;; Load the kernel entry point
+	or		AL, 1
+	mov		[bspReady], AL
+
+CR4_OSFXSR		equ	0000000001000000000b
+CR4_OSXMMEXCPT	equ	0000000010000000000b
+CR4_OSXSAVE		equ 1000000000000000000b
+	
+core_init:
+;; Wait until BSP finishes
+	mov		AL, byte [bspReady]
+	pause
+	bt		AX, 0
+	jz		core_init
+
+;; Enable SSE
+	mov		RAX, CR0
+	and		AX, 0xFFFB
+	or		AX, 0x2
+	mov		CR0, RAX
+	mov		RAX, CR4
+	or		EAX, CR4_OSFXSR + CR4_OSXMMEXCPT + CR4_OSXSAVE
+	mov		CR4, RAX
+
+;; Enable AVX
+	xor		RCX, RCX
+	xgetbv
+	or		EAX, 7
+	xsetbv
+	
+;; ;; Load page directory address
+;; 	mov		RAX, [pml4Base]
+;; 	mov		CR3, RAX
+
+;; ;; Set up stack
+;; 	mov		RBX, [memMapBase]
+;; 	add		RBX, [RBX + 4 + 8]
+;; 	jmp		@f
+
+;; .find_free_region:
+;; 	sub		RBX, 20
+
+;; @@:
+;; 	mov		EAX, dword [RBX - 20]
+;; 	cmp		EAX, __RAM
+;; 	jne		.find_free_region
+
+;; 	mov		RSP, [RBX - 20 + 4]
+;; 	add		RSP, [RBX - 20 + 4 + 8]
+	
+;; 	mov		RAX, [coreNum]
+;; 	shl		RAX, 10
+;; 	sub		RSP, RAX
+;; 	and		SPL, 0xF0
+;; 	mov		RBP, RSP
+
+;; Push kernel code
 	mov		RAX, IMG_BASE
 	push	RAX
+	mov		RAX, [memMapBase]
 	ret
 
-
+	
 ;; Default error handler
 	use64
 __error:			
@@ -130,45 +183,6 @@ __error:
 	ret					
 
 	
-CR4_OSFXSR		equ	01000000000b
-CR4_OSXMMEXCPT	equ	10000000000b
-	
-core_init:
-;; Wait until BSP finishes
-	mov		AL, byte [bspReady]
-	bt		AX, 0
-	pause
-	jz		core_init
-
-;; Enable SSE
-	mov		RAX, CR0
-	and		AX, 0xFFFB
-	or		AX, 0x2
-	mov		CR0, RAX
-	mov		RAX, CR4
-	or		AX, CR4_OSFXSR + CR4_OSXMMEXCPT
-	mov		CR4, RAX
-
-;; Enable AVX
-	xor		RCX, RCX
-	xgetbv
-	or		EAX, 7
-	xsetbv
-	
-;; Load PML4 table
-	mov		RAX, [pml4Base]
-	mov		CR3, RAX
-
-	xor		RSP, RSP
-	mov		RAX, RCX
-	shl		RAX, 10
-	sub		RSP, RAX
-
-;; Push kernel code
-	mov		RAX, IMG_BASE
-	push	RAX
-	mov		RDI, RCX
-	ret
 
 	
 section		'.rodata'	data readable
@@ -235,8 +249,8 @@ memMapKey		IN
 memMapDescSz	IN	
 memMapDescVer	I32
 memMap			PTR	
-
-pml4Base		PTR
+	
+pml4Base			PTR
 	
 	
 section		'.reloc'	fixups data discardable

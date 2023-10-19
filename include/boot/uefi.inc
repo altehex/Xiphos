@@ -67,7 +67,7 @@ macro __eficall interface*,	\
 
 	if ~ a eq
 		mov		[return], RSP
-		and		ESP, 0xFFFFFFF0
+		and		SPL, 0xF0
 	end if
 
 	reverse

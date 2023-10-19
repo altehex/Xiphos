@@ -4,8 +4,7 @@ IMG_PATH = \"\\efi\\xiphos\\$(PACKAGE_NAME).img\"
 export STACK_SIZE 		= 1024
 export IMG_SIZE  		= $(shell stat -L -c %s $(IMG_DIR)/$(PACKAGE_NAME).img)
 
-export FASM_DEFINES = -dFRAMEBUFFER=$(FRAMEBUFFER) \
-					  -dIMG_BASE=$(IMG_BASE) \
+export FASM_DEFINES = -dIMG_BASE=$(IMG_BASE) \
 					  -dIMG_BASE_QUOTED=\"$(IMG_BASE)\" \
 					  -dIMG_NAME=\"$(PACKAGE_NAME)\" \
 					  -dIMG_PATH=$(IMG_PATH) \

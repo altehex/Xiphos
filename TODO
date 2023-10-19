@@ -8,9 +8,9 @@ VGA:
 
 |   BOOTLOADER
 +----------------------*
-- Make a proper memory map(see the comments in boot/mem_map.asm)
 - Relocate all the ACPI tables(see boot/reloc_tables.asm)
-- Make feature checks in core_init
+- Make feature checks
+- Add PML4 support
 
 
 |   UTILS

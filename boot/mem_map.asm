@@ -54,9 +54,9 @@ include "./paging.asm"
 ;; RDX:	Our memory records
 	mov		RDX, [memMapBase]
 	add		RDX, 20 + 20
-	mov		R15, RDX	; R15 holds the address of the first free RAM region record (see how it's used after .done) 
 ;; Reserving first 20 bytes for the memory map region
 ;; Second 20 bytes are for the ACPI tables region record
+;; Don't map paging tables region(no need to do it)
 
 ;; R8D: memory region type (EFI)
 ;; R9: memory region type, base or size
@@ -92,11 +92,9 @@ parse_mem_map:
 	
 .parse:
 	mov		[RDX], R9D
-	add		RDX, 4
 	mov		R9, [RAX + EfiMemoryDescriptor.physStart]
-	mov		[RDX], R9
+	mov		[RDX + 4], R9
 	
-	add		RDX, 8	; memRecord.sz
 	mov		R9, [RAX + EfiMemoryDescriptor.numOfPages]
 .merge:
 	add		RAX, RBX
@@ -126,9 +124,9 @@ parse_mem_map:
 	
 .next_type:
 	shl		R9, 12	; Multiply by PAGE_SZ
-	mov		[RDX], R9
+	mov		[RDX + 4 + 8] , R9
 
-	add 	RDX, 8
+	add 	RDX, 20
 	jmp		@f
 	
 .default:
@@ -139,7 +137,7 @@ parse_mem_map:
 	jne 	parse_mem_map
 
 .done:
-;; Make memory map region record
+;; Make memory map region record at the beginning
 	mov		RBX, [memMapBase]
 	mov		EAX, __MEMORY_MAP
 	mov		[RBX], EAX
@@ -148,8 +146,7 @@ parse_mem_map:
 	sub		RDX, RAX
 	mov		[RBX + 4 + 8], RDX
 	
-	
-;; Load ACPI tables region record at the beginning
+;; Load ACPI tables region record
 	mov		EAX, __ACPI_TABLES
 	add		RBX, 20
 	mov		[RBX], EAX
@@ -158,12 +155,19 @@ parse_mem_map:
 	mov		RAX, [acpiTablesSz]
 	mov		[RBX + 4 + 8], RAX
 	
+;; Fix the base and the size of the next entry
+	add		RDX, RAX
+	add		RDX, PML4_SZ + PDP_SZ + PD_SZ + PT_SZ
+	add		RBX, 20
+	mov		[RBX + 4], RDX
+	mov		RAX, [RBX + 4 + 8]
+	sub		RAX, RDX
+	mov		[RBX + 4 + 8], RAX
+	
 	mov		RDX, [memMapSz]
 	add		RDX, PAGE_SZ - 1
 	shr		RDX, 12	
 	__eficall	EfiBootServices, free_pages,	\
 				[memMap], RDX
-
-;; Now i gotta figure out how to map the entire RAM
 	
 ;; ......

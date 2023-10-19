@@ -24,10 +24,7 @@
 	add		RAX, EfiConfTable_ENTRY_SZ
 	loop	@b
 
-@@:
-	;; R15 holds the end address of tables(that's where the kernel is dispatched) 
-	xor		R15, R15
-	
+@@:	
 	;; Copy RSDP address
 	mov		RAX, [RAX + EfiConfTable.table]
 	mov		RBX, [acpiTablesBase]
@@ -35,7 +32,8 @@
 
 	add		RBX, 8
 	and		BL, 0xF8
-	mov		[memMapBase], RBX
+	mov		[pml4Base], RBX
+	mov		[acpiTablesSz], RBX
 	
 ;; But it gotta copy the entire RSDP, XSDT et al.
 	

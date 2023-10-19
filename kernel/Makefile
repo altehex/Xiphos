@@ -2,6 +2,7 @@ KERNEL_IMAGE_DIR=$(SRC_ROOT)/build/efi/xiphos
 LD_SCRIPT=$(SRC_ROOT)/kernel/kernel.lds
 
 OBJ = kernel.o
+LDS = kernel.lds
 
 .PHONY := xiphos
 xiphos: $(PACKAGE_NAME).img
@@ -9,10 +10,10 @@ xiphos: $(PACKAGE_NAME).img
 	$(CP) $^ $(KERNEL_IMAGE_DIR)/
 
 $(PACKAGE_NAME).img: $(OBJ)
-	$(OBJCOPY) -O binary -j .text $^ $@
+	$(LD) $(LDFLAGS) -T $(LDS) -o $@ $^
 
 %.o: %.c
-	$(CC) $(CFLAGS) -o $@ -c $^
+	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $^
 
 kernel.o: kernel.c
 

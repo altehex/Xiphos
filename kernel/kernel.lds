@@ -1,9 +1,8 @@
-
+OUTPUT_FORMAT("binary")
 ENTRY(__start)
 SECTIONS
 {
-	. = 0xFFFFFFFFFFE00000;
-
+	. = 0x100000;
 	.text : 
 	{
 		*(.text)

@@ -5,7 +5,6 @@
  * Integer types.
  */
 
-/* Fixed-size types */
 typedef unsigned char           U8;
 typedef unsigned short int      U16;
 typedef unsigned int            U32;
