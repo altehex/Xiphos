@@ -7,9 +7,5 @@ export SYS_DATA_BASE	= 0x00000000
 
 # System data tables in order:
 # - ACPI tables
-# - Paging tables
 # - Memory map
-
-# Don't fucking use it
-export SYSTEM_RESERVED 		= 0x000A0000
-export SYSTEM_RESERVED_END	= 0x000FFFFF
+# - Paging tables

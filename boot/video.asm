@@ -1,5 +1,5 @@
-vRes = 1080
-hRes = 1920
+V_RES = 1080
+H_RES = 1920
 
 ;; ......
 
@@ -12,35 +12,28 @@ hRes = 1920
 set_mode:
 	mov		RCX, [EfiVideoOut]
 	mov		RCX, [RCX + _EfiVideoOut.mode]
-	movsxd	RCX, [RCX + EfiVideoOutMode.maxMode]
-	dec		RCX
-
-	;; mov		R13, hRes
-	
+	mov		ECX, dword [RCX + EfiVideoOutMode.maxMode]
+	dec		ECX
 	
 .seek:
-	mov		R12, RCX
+	mov		R12D, ECX
 
-	mov		RDX, RCX
 	lea		R8, [videoInfoSz]
 	lea		R9, [videoInfo]
+	mov		RDX, RCX
 	__eficall	EfiVideoOut, query_mode,	\
 				EfiVideoOut, RDX, R8, R9
-	
-	mov		RSI, [videoInfo]
-	lodsd
-	lodsd
-	cmp		EAX, hRes
+
+	mov		RAX, [videoInfo]
+	cmp		dword [RAX + EfiVideoOutModeInfo.hRes], H_RES
 	jne		@f
-	lodsd
-	cmp		EAX, vRes
+	cmp		dword [RAX + EfiVideoOutModeInfo.vRes], V_RES
 	jne		@f
-	lodsd
-	test	EAX, EAX 
-	jnz		.done
+	cmp		dword [RAX + EfiVideoOutModeInfo.pixFmt], 1
+	je		.done
 
 @@:
-	mov		RCX, R12
+	mov		ECX, R12D
 	loop	.seek
 
 	jmp		.clear_screen

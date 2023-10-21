@@ -1,3 +1,4 @@
+
 #ifndef _MEM_MAP_H_
 #define _MEM_MAP_H_
 
@@ -20,7 +21,7 @@ typedef struct __PACKED__ {
 	U32     type;
 	void *  base;
 	U64     sz;
-} __memRecord;
+} MemRecord;
 
 	
 

@@ -1,19 +1,20 @@
 #include <mem_map.h>
 #include <types.h>
 
-__memRecord * __acpiRecord;
+#include <acpi.h>
 
-int
+
+void __NORETURN__
 __start(void)
 {
-	 __memRecord * __memMap;
+	 MemRecord * memMap;
 	
 	__asm__ __volatile__ (
 	    "mov    %%rax, %0"
-    : "=r"(__memMap) : : "memory");
+    : "=r"(memMap) : : "memory");
 
-	__acpiRecord = &__memMap[ACPI_TABLES_RECORD_INDEX];
 	
+	while (1) {
 	
-	while (1) { }
+	acpi_init(memMap); }
 }

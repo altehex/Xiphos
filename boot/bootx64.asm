@@ -8,6 +8,7 @@ include "../include/types.inc"
 include "../include/boot/uefi.inc"
 	
 MEM_MAP_SZ  = 65536
+PAGE_TABLES_SZ = 1024 * 8 * 6 + 8
 	
 section		'.text'		code executable readable
 	
@@ -18,9 +19,25 @@ __entry:
 	
 ;; Set up video (the snippet is inlined)
 include "./video.asm"
-					  
+
+	lea		RDX, [startupMsg]
 	__eficall 	EfiTextOut, output_string, 	\ 
-	 			EfiTextOut, startupMsg
+	 			EfiTextOut, RDX
+
+	mov		RBX, 1920 / (3 * 25) - 1
+@@:
+	dec		RBX
+
+	lea		RDX, [prettyLine1]
+	__eficall 	EfiTextOut, output_string, 	\ 
+	 			EfiTextOut, RDX
+	
+	cmp		RBX, 0
+	jnz		@b
+	
+	lea		RDX, [prettyLine2]
+	__eficall 	EfiTextOut, output_string, 	\ 
+	 			EfiTextOut, RDX
 	
 ;; Get the loaded image interface
 	lea		RDX, [EFI_LOADED_IMAGE_PROTOCOL_GUID]
@@ -90,14 +107,24 @@ _sub_EfiFile	equ imgFileHandle
 	call	RBX
 	
 	purge	_sub_EfiFile
+
+;; Zero out <1 MB memory
+	mov		RCX, 0xFFFFF / 8
+	xor		RAX, RAX
+	xor		RDI, RDI
+	rep	stosq
 	
 ;; System tables relocation 
 include "./reloc_tables.asm"
 
+;; Set up cores
 include "./smp.asm"
 	
 ;; Get memory map
 include "./mem_map.asm"
+
+;; Set up paging
+include "./paging.asm"
 	
 ;; Exit EFI
  	lea		RCX, [memMapSz]
@@ -112,8 +139,7 @@ include "./mem_map.asm"
 	test	EAX, EAX
 	jnz 	__error
 	
-	or		AL, 1
-	mov		[bspReady], AL
+	mov		byte [bspReady], 1
 
 CR4_OSFXSR		equ	0000000001000000000b
 CR4_OSXMMEXCPT	equ	0000000010000000000b
@@ -124,7 +150,7 @@ core_init:
 	mov		AL, byte [bspReady]
 	pause
 	bt		AX, 0
-	jz		core_init
+	jnc		core_init
 
 ;; Enable SSE
 	mov		RAX, CR0
@@ -140,7 +166,7 @@ core_init:
 	xgetbv
 	or		EAX, 7
 	xsetbv
-	
+
 ;; ;; Load page directory address
 ;; 	mov		RAX, [pml4Base]
 ;; 	mov		CR3, RAX
@@ -171,8 +197,9 @@ core_init:
 	mov		RAX, IMG_BASE
 	push	RAX
 	mov		RAX, [memMapBase]
+	
 	ret
-
+	
 	
 ;; Default error handler
 	use64
@@ -180,9 +207,7 @@ __error:
 	__eficall 	EfiTextOut, output_string, 	\ 
  				EfiTextOut, errorMsg
 	xor		RAX, RAX	; EFI_SUCCESS
-	ret					
-
-	
+	ret						
 
 	
 section		'.rodata'	data readable
@@ -191,8 +216,10 @@ section		'.rodata'	data readable
 ;;-------------------------------------------
 imgPath			du	IMG_PATH, 0
 	
-startupMsg  	du  "Starting up ", IMG_NAME, "...", 13, 10, \
-					"*-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-*", 13, 10, 0
+startupMsg  	du  "Starting up ", IMG_NAME, "...", 13, 10,	\
+					"*-+", 0
+prettyLine1		du	"--+", 0
+prettyLine2		du  "-*", 13, 10, 0
 loadingImgMsg	du	"[ ** ] Loading ", IMG_PATH, "...", 13, 10, 0
 imgIsLoadedMsg	du	"[ ** ] Loaded the kernel image at ", IMG_BASE_QUOTED, ".", 13, 10, 0
 relocTablesMsg	du	"[ ** ] Relocating system data tables...", 13, 10, 0

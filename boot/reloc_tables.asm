@@ -27,12 +27,13 @@
 @@:	
 	;; Copy RSDP address
 	mov		RAX, [RAX + EfiConfTable.table]
-	mov		RBX, [acpiTablesBase]
+	xor		RBX, RBX
 	mov		[RBX], RAX
 
 	add		RBX, 8
 	and		BL, 0xF8
-	mov		[pml4Base], RBX
+
+	mov		[memMapBase], RBX
 	mov		[acpiTablesSz], RBX
 	
 ;; But it gotta copy the entire RSDP, XSDT et al.

@@ -8,11 +8,15 @@ include "../include/boot/mem_map.inc"
 ;;   [acpiTableBase = SYS_TABLES_BASE (0x00)]
 ;; reloc_tables.asm ----+
 ;;						|
-;;						V  [pml4Base = (acpiTableBase + acpiTablesSz + 8) & 0x...FFF8]
-;; 	                paging.asm ----+
+;;						V  [memMapBase = (acpiTableBase + acpiTablesSz + 8) & 0x...FFF8]
+;;					mem_map.asm ----+
 ;;									|
-;;									V  [memMapBase = (pml4Base + pml4Sz + 8) & 0x...FFF8]
-;;								mem_map.asm
+;;									V [pml4Base = (memMapBase + memMapSz + 8) & 0x...FFF8]
+;; 	                			paging.asm
+
+
+
+
 	
 ;; Get memory map size and descriptor size
  	lea		RCX, [memMapSz]
@@ -32,8 +36,6 @@ include "../include/boot/mem_map.inc"
 	lea		R9, [memMap]
 	__eficall	EfiBootServices, alloc_pages,	\
 				RCX, EFI_LOADER_DATA, R8, R9
-
-include "./paging.asm"
 	
 	lea		RCX, [memMapSz]
 	lea		R8, [memMapKey]
@@ -53,7 +55,7 @@ include "./paging.asm"
 	
 ;; RDX:	Our memory records
 	mov		RDX, [memMapBase]
-	add		RDX, 20 + 20
+	add		RDX, 20 * 2
 ;; Reserving first 20 bytes for the memory map region
 ;; Second 20 bytes are for the ACPI tables region record
 ;; Don't map paging tables region(no need to do it)
@@ -95,7 +97,7 @@ parse_mem_map:
 	mov		R9, [RAX + EfiMemoryDescriptor.physStart]
 	mov		[RDX + 4], R9
 	
-	mov		R9, [RAX + EfiMemoryDescriptor.numOfPages]
+	mov		R9, qword [RAX + EfiMemoryDescriptor.numOfPages]
 .merge:
 	add		RAX, RBX
 	cmp		RAX, RCX
@@ -119,7 +121,7 @@ parse_mem_map:
 	jne		.next_type
 	
 .add:
-	add		R9, [RAX + EfiMemoryDescriptor.numOfPages]
+	mov		R9, [RAX + EfiMemoryDescriptor.numOfPages]
 	jmp		.merge
 	
 .next_type:
@@ -139,35 +141,42 @@ parse_mem_map:
 .done:
 ;; Make memory map region record at the beginning
 	mov		RBX, [memMapBase]
-	mov		EAX, __MEMORY_MAP
-	mov		[RBX], EAX
+	
+	mov		dword [RBX], __MEMORY_MAP
 	mov		RAX, RBX
-	mov		[RBX + 4], RAX
+	mov		qword [RBX + 4], RAX
 	sub		RDX, RAX
 	mov		[RBX + 4 + 8], RDX
 	
 ;; Load ACPI tables region record
-	mov		EAX, __ACPI_TABLES
-	add		RBX, 20
-	mov		[RBX], EAX
+	mov		dword [RBX], __ACPI_TABLES
 	xor		RAX, RAX
-	mov		[RBX + 4], RAX 
+	mov		qword [RBX + 20 + 4], RAX 
 	mov		RAX, [acpiTablesSz]
-	mov		[RBX + 4 + 8], RAX
+	mov		qword [RBX + 20 + 4 + 8], RAX
 	
 ;; Fix the base and the size of the next entry
 	add		RDX, RAX
-	add		RDX, PML4_SZ + PDP_SZ + PD_SZ + PT_SZ
-	add		RBX, 20
-	mov		[RBX + 4], RDX
-	mov		RAX, [RBX + 4 + 8]
+	add		RDX, PAGE_TABLES_SZ
+	mov		qword [RBX + 20 * 2 + 4], RDX
+	mov		RAX, [RBX + 20 * 2 + 4 + 8]
 	sub		RAX, RDX
-	mov		[RBX + 4 + 8], RAX
+	mov		qword [RBX + 20 * 2 + 4 + 8], RAX
 	
 	mov		RDX, [memMapSz]
 	add		RDX, PAGE_SZ - 1
 	shr		RDX, 12	
 	__eficall	EfiBootServices, free_pages,	\
 				[memMap], RDX
+
+	mov		RAX, [memMapBase]
+	mov		RBX, [RAX + 4]
+	mov		RAX, [RAX + 4 + 8]
+	add		RBX, RAX
+	add		RBX, 8
+	and		BL, 0xF8
+	mov		[pml4Base], RBX
+	mov		[memMapSz], RAX
+	
 	
 ;; ......

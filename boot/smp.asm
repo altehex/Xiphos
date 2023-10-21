@@ -11,11 +11,9 @@
 	__eficall	EfiMP, get_core_num,	\
 				EfiMP, RDX, R8
 
-	mov		RAX, [coreNum]
-	cmp		RAX, PAGE_SZ / 4
+	cmp		[coreNum], PAGE_SZ / 4
 	jle		@f
-	mov		RAX, PAGE_SZ / 4
-	mov		[coreNum], RAX
+	mov		[coreNum], PAGE_SZ / 4
 
 @@:
 	xor		RCX, RCX
@@ -33,15 +31,12 @@
 	__eficall	EfiMP, get_proc_info,	\
 				EfiMP, RBX, R8
 	
-	mov		EAX, dword [procInfo + EfiProcInfo.status]
-	test	EAX, 01b
-	jz		@f
+	bt		[procInfo + EfiProcInfo.status], 0
+	jc		@f
 
 	lea		RDX, [core_init]
-	mov		R8, RBX
-	mov		R9, [__event]
 	__eficall	EfiMP, start_this_ap,	\
-				EfiMP, RDX, R8, R9,		\
+				EfiMP, RDX, RBX, [__event],		\
 				0, procNum, NULL
 	
 @@:

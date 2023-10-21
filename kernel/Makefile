@@ -1,15 +1,17 @@
 KERNEL_IMAGE_DIR=$(SRC_ROOT)/build/efi/xiphos
 LD_SCRIPT=$(SRC_ROOT)/kernel/kernel.lds
 
-OBJ = kernel.o
+KOBJ = kernel.o
 LDS = kernel.lds
+
+INCLUDE += -I$(SRC_ROOT)/kernel
 
 .PHONY := xiphos
 xiphos: $(PACKAGE_NAME).img
 	$(MKDIR) -p $(KERNEL_IMAGE_DIR)
 	$(CP) $^ $(KERNEL_IMAGE_DIR)/
 
-$(PACKAGE_NAME).img: $(OBJ)
+$(PACKAGE_NAME).img: $(KOBJ)
 	$(LD) $(LDFLAGS) -T $(LDS) -o $@ $^
 
 %.o: %.c
