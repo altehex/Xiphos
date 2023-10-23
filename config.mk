@@ -6,5 +6,3 @@ CONFIG_LLVM = 0
 
 USER_CFLAGS   = -O2 -march=x86-64
 USER_LDFLAGS  = -O2
-
-include $(SRC_ROOT)/boot/config.mk

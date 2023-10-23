@@ -7,8 +7,6 @@ include "../include/size.inc"
 include "../include/types.inc"
 include "../include/boot/uefi.inc"
 	
-MEM_MAP_SZ  = 65536
-	
 section		'.text'		code executable readable
 	
 	use64
@@ -19,25 +17,6 @@ __entry:
 ;; Set up video (the snippet is inlined)
 include "./video.asm"
 
-	lea		RDX, [startupMsg]
-	__eficall 	EfiTextOut, output_string, 	\ 
-	 			EfiTextOut, RDX
-
-	mov		RBX, 1920 / (3 * 25) - 1
-@@:
-	dec		RBX
-
-	lea		RDX, [prettyLine1]
-	__eficall 	EfiTextOut, output_string, 	\ 
-	 			EfiTextOut, RDX
-	
-	cmp		RBX, 0
-	jnz		@b
-	
-	lea		RDX, [prettyLine2]
-	__eficall 	EfiTextOut, output_string, 	\ 
-	 			EfiTextOut, RDX
-	
 ;; Get the loaded image interface
 	lea		RDX, [EFI_LOADED_IMAGE_PROTOCOL_GUID]
 	lea		R8,	[EfiLoadedImg]
@@ -57,10 +36,6 @@ include "./video.asm"
 	
 ;; Load the kernel to RAM
 load_kernel:
-	lea		RDX, [loadingImgMsg]
-	__eficall	EfiTextOut,	output_string,	\
-				EfiTextOut, RDX
-
 	lea		RDX, [imgFileHandle]
 	lea		R8, [imgPath]
 	__eficall	EfiFile, open,			\
@@ -96,10 +71,6 @@ _sub_EfiFile	equ imgFileHandle
 	jmp		$
 
 @@:
-	lea		RDX, [imgIsLoadedMsg]
-	__eficall	EfiTextOut, output_string,	\
-				EfiTextOut, RDX
-
 	mov		RBX, [_sub_EfiFile]
 	mov		RCX, RBX
 	mov		RBX, [RBX + _EfiFile.close]
@@ -197,14 +168,6 @@ section		'.rodata'	data readable
 ;; String table
 ;;-------------------------------------------
 imgPath			du	IMG_PATH, 0
-	
-startupMsg  	du  "Starting up ", IMG_NAME, "...", 13, 10,	\
-					"*-+", 0
-prettyLine1		du	"--+", 0
-prettyLine2		du  "-*", 13, 10, 0
-loadingImgMsg	du	"[ ** ] Loading ", IMG_PATH, "...", 13, 10, 0
-imgIsLoadedMsg	du	"[ ** ] Loaded the kernel image at ", IMG_BASE_QUOTED, ".", 13, 10, 0
-relocTablesMsg	du	"[ ** ] Relocating system data tables...", 13, 10, 0
 
 ;; Error messages
 errorMsg		du	"[ !! ] An error occured.", 13, 10, 0

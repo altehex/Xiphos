@@ -201,9 +201,6 @@ struc _EfiBootServices {
 	.set_mem				PTR
 	.create_event_EX		PTR
 }
-	
-struc _EfiTextIn {
-}
 
 struc _EfiTextOut {
 	.reset				PTR
@@ -239,10 +236,6 @@ struc _EfiLoadedImg {
 	._res			PTR
 }
 
-struc _EfiLoadFile {
-	.load_file		PTR
-}
-
 struc _EfiVideoOut {
 	.query_mode		PTR
 	.set_mode		PTR
@@ -260,7 +253,6 @@ struc _EfiMP {
 	.who_am_i			PTR
 }
 	
-	
 ;; Data structures
 struc EfiConfTable {
 	.guid_q0		I64
@@ -276,22 +268,6 @@ struc EfiMemoryDescriptor {
 	.numOfPages		I64
 	.attrs			I64
 }
-
-;; Memory attributes
-EFI_MEMORY_UC 				equ		0x0000000000000001
-EFI_MEMORY_WC 				equ		0x0000000000000002
-EFI_MEMORY_WT 				equ		0x0000000000000004
-EFI_MEMORY_WB 				equ		0x0000000000000008
-EFI_MEMORY_UCE 				equ		0x0000000000000010
-EFI_MEMORY_WP 				equ		0x0000000000001000
-EFI_MEMORY_RP 				equ		0x0000000000002000
-EFI_MEMORY_XP 				equ		0x0000000000004000
-EFI_MEMORY_NV 				equ		0x0000000000008000
-EFI_MEMORY_MORE_RELIABLE 	equ		0x0000000000010000
-EFI_MEMORY_RO 				equ		0x0000000000020000
-EFI_MEMORY_SP 				equ		0x0000000000040000
-EFI_MEMORY_CPU_CRYPTO 		equ		0x0000000000080000
-EFI_MEMORY_RUNTIME 			equ		0x8000000000000000
 	
 struc EfiVideoOutMode {
 	.maxMode		I32
@@ -302,19 +278,12 @@ struc EfiVideoOutMode {
 	.fbSz			IN
 }
 
-struc EfiPixelBitmask {
-	.redMask		I32
-	.greenMask		I32
-	.blueMask		I32
-	._res			I32
-}
-
 struc EfiVideoOutModeInfo {
 	.ver			I32
 	.hRes			I32
 	.vRes			I32
 	.pixFmt			I32
-	.pixInfo		EfiPixelBitmask
+	.pixInfo		db	4
 	.pixPerLine		I32
 }
 
@@ -323,25 +292,11 @@ struc EfiCpuPhysLocation {
 	.core			I32
 	.thread			I32
 }
-
-struc EfiCpuPhysLocation2 {
-	.package		I32
-	.module			I32
-	.tile			I32
-	.die			I32
-	.core			I32
-	.thread			I32
-}
-
-struc EfiExtProcInfo {
-	.location2		EfiCpuPhysLocation2
-}
 	
 struc EfiProcInfo {
 	.id				I64
 	.status			I32
-	.location		EfiCpuPhysLocation
-	.extInfo		EfiExtProcInfo
+	;; Don't need next fieds
 }
 
 ;; UUIDs
@@ -389,20 +344,8 @@ NULL	=	0
 
 TRUE	=	1
 
-;; Task priority levels
-TPL_APPLICATION    = 4
-TPL_CALLBACK       = 8
-TPL_NOTIFY         = 16
-TPL_HIGH_LEVEL     = 31
+TPL_NOTIFY	=	16
 	
-;; Color attributes
-EFI_LIGHTGRAY			= 	0x07
-
-EFI_BACKGROUD_BLACK		=	0x00
-
-;; Revisions
-EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION	=	0x00010000
-
 ;; EFI_GRAPHICS_PIXEL_FORMAT
 PixelRedGreenBlueReserved8BitPerColor	equ		0
 PixelBlueGreenRedReserved8BitPerColor	equ		1
@@ -431,22 +374,16 @@ EFI_PERSISTENT		=	14
 TABLE	\
 	EfiSystemTable,			\
 	_EfiBootServices,		\
-	_EfiTextIn,				\
 	_EfiTextOut,			\
 	_EfiFileSystem,			\
 	_EfiFile,				\
 	_EfiLoadedImg,			\
-	_EfiLoadFile,			\
 	_EfiVideoOut,			\
 	_EfiMP,					\
 	EfiConfTable,			\
 	EfiMemoryDescriptor,	\
 	EfiVideoOutMode,		\
-	EfiPixelBitmask,		\
 	EfiVideoOutModeInfo,	\
-	EfiCpuPhysLocation,		\
-	EfiCpuPhysLocation2,	\
-	EfiExtProcInfo,			\
 	EfiProcInfo
 	
 	

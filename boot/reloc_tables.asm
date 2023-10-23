@@ -5,10 +5,6 @@
 	xor		RAX, RAX
 	mov		[acpiTablesBase], RAX
 	
-	lea		RDX, [relocTablesMsg]
-	__eficall	EfiTextOut, output_string,	\
-				EfiTextOut, RDX
-	
 ;; Get ACPI table address
 	mov		RAX, [sysTable] 					 ; ->sysTable
 	mov		RCX, [RAX + EfiSystemTable.entryNum] ; ->sysTable->num

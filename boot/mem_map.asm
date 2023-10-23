@@ -13,10 +13,6 @@ include "../include/boot/mem_map.inc"
 ;;									|
 ;;									V [pml4Base = (memMapBase + memMapSz + 8) & 0x...FFF8]
 ;; 	                			paging.asm
-
-
-
-
 	
 ;; Get memory map size and descriptor size
  	lea		RCX, [memMapSz]
@@ -26,7 +22,6 @@ include "../include/boot/mem_map.inc"
 				RCX, [memMap], R8, R9, NULL
 
 	mov		R8, [memMapDescSz]
-	add		R8, R8
 	add		R8, [memMapSz]
 	mov		[memMapSz], R8
  
@@ -150,7 +145,7 @@ parse_mem_map:
 	
 ;; Load ACPI tables region record
 	mov		dword [RBX], __ACPI_TABLES
-	xor		RAX, RAX
+	xor		RAX, RAX	; SYS_TABLES_BASE
 	mov		qword [RBX + 20 + 4], RAX 
 	mov		RAX, [acpiTablesSz]
 	mov		qword [RBX + 20 + 4 + 8], RAX

@@ -1,5 +1,7 @@
 export OS_NAME          = Xiphos
-export OS_VERSION       = 0.0
+	   OS_VERSION_MAJOR = 0
+	   OS_VERSION_MINOR = 1
+export OS_VERSION       = $(OS_VERSION_MAJOR).$(OS_VERSION_MINOR)
 export OS_EDITION       = α
 export OS_EDITION_LATIN = alpha
 export PACKAGE_NAME     = xiphos-$(OS_EDITION_LATIN)-$(OS_VERSION)
@@ -43,11 +45,9 @@ TARGET = x86_64-elf
 
 ifeq (1,$(CONFIG_LLVM))
 	CC		= clang $(VERBOSE) $(DEBUG) -target $(TARGET)
-	CPP     = clang++ $(VERBOSE) $(DEBUG) -target $(TARGET)
 	LD		= ld.lld $(VERBOSE)
 else
 	CC		= $(TARGET)-gcc
-	CPP     = g++
 	LD		= ld
 endif
 FASM 	= fasm
@@ -131,11 +131,11 @@ help:
 		@echo   "    clean       - remove generated files"
 		@echo   "    test        - for developers. Outputs make variables"
 
+test: MAKEFLAGS += -s
 test:
 		@echo   "Project name:         "$(OS_NAME) $(OS_EDITION)-$(OS_VERSION)
 		@echo   "Tarball name:         "$(TARNAME)
 		@echo 	"C compiler:           "$(CC)
-		@echo   "C++ compiler          "$(CPP)
 		@echo   "Linker:               "$(LD)
 		@echo   "CFLAGS:               "$(CFLAGS) 
 		@echo   "LDFLAGS:              "$(LDFLAGS)
