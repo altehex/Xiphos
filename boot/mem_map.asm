@@ -121,7 +121,7 @@ parse_mem_map:
 	jne		.next_type
 	
 .add:
-	mov		R9, [RAX + EfiMemoryDescriptor.numOfPages]
+	add		R9, [RAX + EfiMemoryDescriptor.numOfPages]
 	jmp		.merge
 	
 .next_type:
@@ -155,13 +155,9 @@ parse_mem_map:
 	mov		RAX, [acpiTablesSz]
 	mov		qword [RBX + 20 + 4 + 8], RAX
 	
-;; Fix the base and the size of the next entry
-	add		RDX, RAX
-	add		RDX, PAGE_TABLES_SZ
-	mov		qword [RBX + 20 * 2 + 4], RDX
-	mov		RAX, [RBX + 20 * 2 + 4 + 8]
-	sub		RAX, RDX
-	mov		qword [RBX + 20 * 2 + 4 + 8], RAX
+;; Fix the base and the size of the first __RAM entry
+	mov		qword [RBX + 20 * 2 + 4], IMG_BASE
+	sub		qword [RBX + 20 * 2 + 4 + 8], IMG_BASE
 	
 	mov		RDX, [memMapSz]
 	add		RDX, PAGE_SZ - 1
@@ -169,14 +165,13 @@ parse_mem_map:
 	__eficall	EfiBootServices, free_pages,	\
 				[memMap], RDX
 
-	mov		RAX, [memMapBase]
-	mov		RBX, [RAX + 4]
-	mov		RAX, [RAX + 4 + 8]
+	mov		RAX, [RBX + 4]
+	mov		RBX, [RBX + 4 + 8]
 	add		RBX, RAX
-	add		RBX, 8
-	and		BL, 0xF8
-	mov		[pml4Base], RBX
-	mov		[memMapSz], RAX
+	add		RAX, 0x1000
+	and		AX, 0xF000
+	mov		[pml4Base], RAX
+	mov		[memMapSz], RBX
 	
 	
 ;; ......

@@ -8,7 +8,6 @@ include "../include/types.inc"
 include "../include/boot/uefi.inc"
 	
 MEM_MAP_SZ  = 65536
-PAGE_TABLES_SZ = 1024 * 8 * 6 + 8
 	
 section		'.text'		code executable readable
 	
@@ -166,33 +165,16 @@ core_init:
 	xgetbv
 	or		EAX, 7
 	xsetbv
-
-;; ;; Load page directory address
-;; 	mov		RAX, [pml4Base]
-;; 	mov		CR3, RAX
-
-;; ;; Set up stack
-;; 	mov		RBX, [memMapBase]
-;; 	add		RBX, [RBX + 4 + 8]
-;; 	jmp		@f
-
-;; .find_free_region:
-;; 	sub		RBX, 20
-
-;; @@:
-;; 	mov		EAX, dword [RBX - 20]
-;; 	cmp		EAX, __RAM
-;; 	jne		.find_free_region
-
-;; 	mov		RSP, [RBX - 20 + 4]
-;; 	add		RSP, [RBX - 20 + 4 + 8]
 	
-;; 	mov		RAX, [coreNum]
-;; 	shl		RAX, 10
-;; 	sub		RSP, RAX
-;; 	and		SPL, 0xF0
-;; 	mov		RBP, RSP
-
+;; Load page directory address
+	mov		RAX, [pml4Base]
+	mov		CR3, RAX
+	
+;; Set up stack
+	mov		RSP, IMG_BASE + IMG_SIZE + 0x1000
+	and		SP, 0xF000
+	mov		RBP, RSP
+	
 ;; Push kernel code
 	mov		RAX, IMG_BASE
 	push	RAX

@@ -9,7 +9,8 @@ export FASM_DEFINES = -dIMG_BASE=$(IMG_BASE) \
 					  -dIMG_NAME=\"$(PACKAGE_NAME)\" \
 					  -dIMG_PATH=$(IMG_PATH) \
 					  -dIMG_SIZE=$(IMG_SIZE) \
-					  -dSTACK_SIZE=$(STACK_SIZE)
+					  -dSTACK_BASE=$(STACK_BASE) \
+					  -dSTACK_SIZE=$(STACK_SIZE) \
 					  -dSYS_DATA_BASE=$(SYS_DATA_BASE)
 
 .PHONY := all
