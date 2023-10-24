@@ -1,7 +1,7 @@
 KERNEL_IMAGE_DIR=$(SRC_ROOT)/build/efi/xiphos
 LD_SCRIPT=$(SRC_ROOT)/kernel/kernel.lds
 
-KOBJ = kernel.o
+KOBJ = kinit.o
 LDS = kernel.lds
 
 INCLUDE += -I$(SRC_ROOT)/kernel
@@ -17,7 +17,7 @@ $(PACKAGE_NAME).img: $(KOBJ)
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $^
 
-kernel.o: kernel.c
+kinit.o: kinit.c
 
 CLEAN = *.img *.o
 

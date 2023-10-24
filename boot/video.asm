@@ -3,10 +3,10 @@ H_RES = 1920
 
 ;; ......
 
-	lea		RCX, [EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID]
-	lea		R8, [EfiVideoOut]
+	xor		RDX, RDX
 	__eficall	EfiBootServices, locate_protocol,	\
-				RCX, NULL, R8
+				EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID, 	\
+				RDX, EfiVideoOut
 
 ;; Set 1920x1080x32 mode, if it's supported
 set_mode:
@@ -18,11 +18,10 @@ set_mode:
 .seek:
 	mov		R12D, ECX
 
-	lea		R8, [videoInfoSz]
-	lea		R9, [videoInfo]
 	mov		RDX, RCX
 	__eficall	EfiVideoOut, query_mode,	\
-				EfiVideoOut, RDX, R8, R9
+				EfiVideoOut, RDX,			\
+				videoInfoSz, videoInfo
 
 	mov		RAX, [videoInfo]
 	cmp		dword [RAX + EfiVideoOutModeInfo.hRes], H_RES
@@ -45,10 +44,11 @@ set_mode:
 .clear_screen:	
 	__eficall	EfiTextOut, clear_scr, EfiTextOut
 
-;; Get GOP framebuffer
-	mov		RAX, [EfiVideoOut]
-	mov		RAX, [RAX + _EfiVideoOut.mode]
-	mov		RAX, [RAX + EfiVideoOutMode.fbBase]
-	mov		[fbBase], RAX
+;; Not sure if i'll need it
+;; ;; Get GOP framebuffer
+;; 	mov		RAX, [EfiVideoOut]
+;; 	mov		RAX, [RAX + _EfiVideoOut.mode]
+;; 	mov		RAX, [RAX + EfiVideoOutMode.fbBase]
+;; 	mov		[fbBase], RAX
 	
 ;; ......

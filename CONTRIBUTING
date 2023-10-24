@@ -68,6 +68,13 @@ ABI:
 The main calling convention of the kernel is xcall. More info is in /include/xcall.inc.
 
 
+|   MAJOR FEATURES OF ALPHA EDITION
++------------------------------------------------------------------------------------------------------*
+- Basic video
+- Basic multitasking
+- Basic device management
+- Basic everything
+
 
 |   A LETTER TO SANTA CLAUS
 +------------------------------------------------------------------------------------------------------*

@@ -18,37 +18,32 @@ __entry:
 include "./video.asm"
 
 ;; Get the loaded image interface
-	lea		RDX, [EFI_LOADED_IMAGE_PROTOCOL_GUID]
-	lea		R8,	[EfiLoadedImg]
-	__eficall	EfiBootServices, hdl_protocol,	\
-				[imgHandle], RDX, R8
+	__eficall	EfiBootServices, hdl_protocol,					\
+				[imgHandle], EFI_LOADED_IMAGE_PROTOCOL_GUID,	\
+				EfiLoadedImg
 	
 ;; Get the file interface
 	mov		RCX, [EfiLoadedImg]
-	lea		RDX, [EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID]
-	lea		R8, [EfiFileSystem]
 	__eficall	EfiBootServices, hdl_protocol,			\
-				[RCX + _EfiLoadedImg.devHdl], RDX, R8
+				[RCX + _EfiLoadedImg.devHdl],			\
+				EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID,	\
+				EfiFileSystem
 
-	lea		RDX, [EfiFile]
 	__eficall	EfiFileSystem, open_vol,	\
-				EfiFileSystem, RDX
+				EfiFileSystem, EfiFile
 	
 ;; Load the kernel to RAM
 load_kernel:
-	lea		RDX, [imgFileHandle]
-	lea		R8, [imgPath]
 	__eficall	EfiFile, open,			\
-				EfiFile, RDX, R8,		\
-				EFI_FILE_MODE_READ,	0	
+				EfiFile, imgFileHandle,	\
+				imgPath, EFI_FILE_MODE_READ, 0	
 	test	EAX, EAX
 	jz		@f			
 
 	cmp		EAX, EFI_NOT_FOUND
 	jne		.error
-	lea		RDX, [imgNotFoundMsg]
 	__eficall	EfiTextOut, output_string,	\
-				EfiTextOut, RDX
+				EfiTextOut, imgNotFoundMsg
 	jmp		$
 
 @@:
@@ -57,7 +52,7 @@ _sub_EfiFile	equ imgFileHandle
 	mov		RBX, [_sub_EfiFile]
 	mov		RCX, RBX
 	mov		RBX, [RBX + _EfiFile.read]
-	lea		RDX, [imgSz]
+	mov		RDX, imgSz
 	mov		R8, IMG_BASE
 	call	RBX
 
@@ -97,11 +92,10 @@ include "./mem_map.asm"
 include "./paging.asm"
 	
 ;; Exit EFI
- 	lea		RCX, [memMapSz]
-	lea		R8, [memMapKey]
 	xor		R9, R9
 	__eficall	EfiBootServices, get_memmap,	\
-				RCX, [memMap], R8, R9, NULL
+				memMapSz, [memMap], memMapKey, 	\
+				R9, NULL
 	
 	__eficall	EfiBootServices, exit_bs,	\
 				[imgHandle], [memMapKey]
@@ -117,9 +111,8 @@ CR4_OSXSAVE		equ 1000000000000000000b
 	
 core_init:
 ;; Wait until BSP finishes
-	mov		AL, byte [bspReady]
 	pause
-	bt		AX, 0
+	bt		qword [bspReady], 0
 	jnc		core_init
 
 ;; Enable SSE
@@ -189,17 +182,17 @@ imgHandle		PTR
 sysTable		PTR
 return			PTR
 	
+EfiVideoOut		PTR
+videoInfoSz		IN
+videoInfo		PTR
+fbBase			PTR
+	
 EfiFile			PTR
 EfiFileSystem	PTR
 EfiLoadedImg	PTR
 
 imgFileHandle	PTR
 imgSz			I64		IMG_SIZE
-
-EfiVideoOut		PTR
-videoInfoSz		IN
-videoInfo		PTR
-fbBase			PTR
 
 EfiMP			PTR
 __event			PTR
@@ -213,7 +206,8 @@ bspReady		I8
 acpiTablesBase	PTR
 acpiTablesSz	I64	; Is used to map ACPI tables region
 	
-;; Memory map info
+pml4Base			PTR
+	
 memMapBase		PTR
 	
 memMapSz		IN	
@@ -222,7 +216,6 @@ memMapDescSz	IN
 memMapDescVer	I32
 memMap			PTR	
 	
-pml4Base			PTR
 	
 	
 section		'.reloc'	fixups data discardable

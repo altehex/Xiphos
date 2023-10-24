@@ -15,11 +15,10 @@ include "../include/boot/mem_map.inc"
 ;; 	                			paging.asm
 	
 ;; Get memory map size and descriptor size
- 	lea		RCX, [memMapSz]
 	xor		R8, R8
-	lea		R9, [memMapDescSz]
 	__eficall	EfiBootServices, get_memmap,	\
-				RCX, [memMap], R8, R9, NULL
+				memMapSz, [memMap], R8, 		\
+				memMapDescSz, NULL
 
 	mov		R8, [memMapDescSz]
 	add		R8, [memMapSz]
@@ -28,15 +27,12 @@ include "../include/boot/mem_map.inc"
 	xor		RCX, RCX	; AllocateAnyPages
 	add		R8, PAGE_SZ - 1
 	shr		R8, 12
-	lea		R9, [memMap]
 	__eficall	EfiBootServices, alloc_pages,	\
-				RCX, EFI_LOADER_DATA, R8, R9
+				RCX, EFI_LOADER_DATA, R8, memMap
 	
-	lea		RCX, [memMapSz]
-	lea		R8, [memMapKey]
-	lea		R9, [memMapDescSz]
 	__eficall	EfiBootServices, get_memmap,	\
-				RCX, [memMap], R8, R9, memMapDescVer
+				memMapSz, [memMap], memMapKey,	\
+				memMapDescSz, memMapDescVer
 	
 ;; RAX: EFI memory map descriptor
 	mov		RAX, [memMap]

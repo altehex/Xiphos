@@ -10,7 +10,7 @@
 	mov		RCX, [RAX + EfiSystemTable.entryNum] ; ->sysTable->num
 	mov		RAX, [RAX + EfiSystemTable.conf] 	 ; ->sysTable->conf
 	dec		RCX
-	mov		RBX, qword [EFI_RSDP_GUID] 	; *EFI_ACPI_TABLE_GUID
+	mov		RBX, [EFI_RSDP_GUID] 	; *EFI_ACPI_TABLE_GUID
 
 @@:
 	;; RSI = ->sysTable->conf + EfiConftable_ENTRY_SZ * n

@@ -76,7 +76,7 @@ pdp_1gb:
 	sub		R14, 1024
 	dec		R13
 	cmp		R13, 0
-	jge		pdp_1gb
+	jge		pdp_1gb	
 	
 done:	
 	

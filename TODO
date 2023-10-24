@@ -10,7 +10,12 @@ VGA:
 +----------------------*
 - Relocate all the ACPI tables(see boot/reloc_tables.asm)
 - Make feature checks
-- Add PML4 support
+- Add 2 MB paging
+
+
+|   SECURITY
++----------------------*
+- Prevent stack smashing
 
 
 |   UTILS
@@ -26,4 +31,5 @@ VGA:
 
 |   MISC
 +----------------------*
-- Make a nice readme.md
+- Make a nice readme.md (guess i'll do it after alpha-1.0)
+
