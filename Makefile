@@ -1,6 +1,6 @@
 export OS_NAME          = Xiphos
 	   OS_VERSION_MAJOR = 0
-	   OS_VERSION_MINOR = 1
+	   OS_VERSION_MINOR = 2
 export OS_VERSION       = $(OS_VERSION_MAJOR).$(OS_VERSION_MINOR)
 export OS_EDITION       = α
 export OS_EDITION_LATIN = alpha
