@@ -5,7 +5,8 @@ export KINIT_ALL = init.o
 KERNEL_OBJ = $(KINIT_ALL)
 KERNEL_LDS = kernel.lds
 
-INCLUDE += -I$(SRC_ROOT)/kernel
+INCLUDE += -I$(SRC_ROOT)/kernel	\
+		   -I$(SRC_ROOT)/libos
 
 .PHONY := xiphos
 xiphos: $(PACKAGE_NAME).img

@@ -78,16 +78,31 @@ _sub_EfiFile	equ imgFileHandle
 	xor		RAX, RAX
 	xor		RDI, RDI
 	rep	stosq
-	
-;; System tables relocation 
-include "./reloc_tables.asm"
 
 ;; Set up cores
 include "./smp.asm"
 	
+;; How addresses are passed:
+;;------------------------------------*
+
+;; [memMapBase = SYS_TABLES_BASE (0x00000000)] 
+;;	mem_map.asm ----+
+;;					|
+;;					V [gdtBase = (memMap[0].sz + 8) & 0xFFF8 ]
+;;				reloc_gdt.asm ----+
+;; 								  |
+;;								  V [idtBase = (gdtBase + GDT.sz + 8) & 0xFFF8]
+;;				 		       int.asm ---+
+;; 										  |
+;;							              V [pml4Base = (idtBase + IDT_SZ + 0x1000) & 0x...F000]
+;; 	                	              paging.asm
+	
 ;; Get memory map
 include "./mem_map.asm"
 
+;; Relocate GDT (UEFI have already set it up)
+include "./reloc_gdt.asm"
+	
 ;; Set up interrupts
 include "./int.asm"
 	
@@ -213,6 +228,7 @@ acpiTablesSz	I64	; Is used to map ACPI tables region
 	
 pml4Base		PTR
 idtBase			PTR
+gdtBase			PTR
 
 memMapBase		PTR
 	

@@ -6,6 +6,8 @@ IDT_DESC_SZ	equ 16	; Aligned
 IDT_SZ		equ 256 * GATE_SZ
 
 GATE_ATTR   equ 0x8E0000000000
+
+;; ......
 	
 ;; Load first 32 vectors
 	;; mov		RAX, [idtBase] <-- it is already loaded (see mem_map.asm)
@@ -53,3 +55,4 @@ GATE_ATTR   equ 0x8E0000000000
 	and 	AX, 0xF000
 	mov		[pml4Base], RAX
 	
+;; ......
