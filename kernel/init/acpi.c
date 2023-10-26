@@ -1,9 +1,10 @@
-#include <attrs.h>
+#include <acpi.h>
+
 #include <mem_map.h>
 #include <types.h>
 
 
-extern inline void __ALWAYS_INLINE__
+void
 acpi_init(MemRecord * mMap)
 {	
 	MemRecord * acpiRecord = &mMap[ACPI_TABLES_RECORD_INDEX];

@@ -47,9 +47,3 @@ IN		fix I64
 PTR		fix	I64
 
 end if	; ~_TYPES_INC_
-
-
-;; Bit masks
-
-16_BIT_MASK		equ 0xFFFF
-32_BIT_MASK		equ 0xFFFFFFFF

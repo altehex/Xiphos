@@ -48,7 +48,7 @@ ifeq (1,$(CONFIG_LLVM))
 	LD		= ld.lld $(VERBOSE)
 else
 	CC		= $(TARGET)-gcc
-	LD		= ld
+	LD		= $(CC)
 endif
 FASM 	= fasm
 OBJCOPY = objcopy
@@ -72,7 +72,8 @@ CWARNINGS = -Wall \
 
 LDFLAGS = -ffreestanding \
 		  -shared \
-		  -nostdlib
+		  -nostdlib \
+		  -lgcc
 
 ifeq (1, $(CONFIG_DEBUG))
 	CWARNINGS += -Wpadded
@@ -101,7 +102,7 @@ check_build_dir:
 .PHONY += all
 all: _kernel bootloader
 
-.PHONY += kernel
+.PHONY += _kernel
 _kernel:
 	$(MAKE) -C kernel
 

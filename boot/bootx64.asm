@@ -88,6 +88,9 @@ include "./smp.asm"
 ;; Get memory map
 include "./mem_map.asm"
 
+;; Set up interrupts
+include "./int.asm"
+	
 ;; Set up paging
 include "./paging.asm"
 	
@@ -123,7 +126,7 @@ core_init:
 	mov		RAX, CR4
 	or		EAX, CR4_OSFXSR + CR4_OSXMMEXCPT + CR4_OSXSAVE
 	mov		CR4, RAX
-
+	
 ;; Enable AVX
 	xor		RCX, RCX
 	xgetbv
@@ -142,13 +145,14 @@ core_init:
 ;; Push kernel code
 	mov		RAX, IMG_BASE
 	push	RAX
+	
 	mov		RAX, [memMapBase]
+	mov		RBX, corenum	; for xiphosCpuInfo
 	
 	ret
-	
+
 	
 ;; Default error handler
-	use64
 __error:			
 	__eficall 	EfiTextOut, output_string, 	\ 
  				EfiTextOut, errorMsg
@@ -193,10 +197,11 @@ EfiLoadedImg	PTR
 
 imgFileHandle	PTR
 imgSz			I64		IMG_SIZE
-
+	
 EfiMP			PTR
-__event			PTR
-coreNum			IN
+_event			PTR
+_arg			IN	0
+corenum	    	IN
 activeCoreNum	IN
 procNum			IN
 procInfo		EfiProcInfo
@@ -206,8 +211,9 @@ bspReady		I8
 acpiTablesBase	PTR
 acpiTablesSz	I64	; Is used to map ACPI tables region
 	
-pml4Base			PTR
-	
+pml4Base		PTR
+idtBase			PTR
+
 memMapBase		PTR
 	
 memMapSz		IN	
@@ -215,7 +221,6 @@ memMapKey		IN
 memMapDescSz	IN	
 memMapDescVer	I32
 memMap			PTR	
-	
 	
 	
 section		'.reloc'	fixups data discardable

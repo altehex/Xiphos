@@ -11,8 +11,11 @@ include "../include/boot/mem_map.inc"
 ;;						V  [memMapBase = (acpiTableBase + acpiTablesSz + 8) & 0x...FFF8]
 ;;					mem_map.asm ----+
 ;;									|
-;;									V [pml4Base = (memMapBase + memMapSz + 8) & 0x...FFF8]
-;; 	                			paging.asm
+;;									V [idtBase = (memMapBase + memMapSz + 8) & 0xFFF8]
+;;								 int.asm ---+
+;; 											|
+;;											V [pml4Base = (idtBase + IDT_SZ + 0x1000) & 0x...F000]
+;; 	                					paging.asm
 	
 ;; Get memory map size and descriptor size
 	xor		R8, R8
@@ -147,6 +150,7 @@ parse_mem_map:
 	mov		qword [RBX + 20 + 4 + 8], RAX
 	
 ;; Fix the base and the size of the first __RAM entry
+;; (the first 1 MB is for system data)
 	mov		qword [RBX + 20 * 2 + 4], IMG_BASE
 	sub		qword [RBX + 20 * 2 + 4 + 8], IMG_BASE
 	
@@ -158,11 +162,10 @@ parse_mem_map:
 
 	mov		RAX, [RBX + 4]
 	mov		RBX, [RBX + 4 + 8]
-	add		RBX, RAX
-	add		RAX, 0x1000
-	and		AX, 0xF000
-	mov		[pml4Base], RAX
+	add		RAX, RBX
+	add		RAX, 8
+	and		AL, 0xF8
+	mov		[idtBase], RAX
 	mov		[memMapSz], RBX
-	
 	
 ;; ......

@@ -27,7 +27,7 @@ else
 	${PRINTF}     "${PROMPT_SIGN} Install GCC cross-compiler?\n"
 	${PRINTF}     "*-+--+-( ${YES} )-+-( ${NO_DEFAULT} )-+--+-> "
 	read -n 1 INSTALL_GCC
-	${PRINTF}        ""
+	${PRINTF}        "\n"
 	if [[ $INSTALL_GCC == 'Y' ]] || [[ $INSTALL_GCC == 'y' ]]; then
 	   ./install_gcc.sh
 	fi
@@ -42,6 +42,6 @@ ${PRINTF}     "${OK_SIGN} OK\n"
 ${PRINTF}     "${PROMPT_SIGN} Run make?\n"
 ${PRINTF}     "*-+--+-( ${YES} )-+-( ${NO_DEFAULT} )-+--+-> "
 read -n 1 RUN_MAKE
-${PRINTF}    ""
+${PRINTF}    "\n"
 
 [[ $RUN_MAKE == 'y' ]] || [[ $RUN_MAKE == 'Y' ]] && make -C .. all && ${PRINTF} ${PRETTY_LINE}

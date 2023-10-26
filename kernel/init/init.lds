@@ -1,12 +1,8 @@
-OUTPUT_FORMAT("binary")
-ENTRY(kinit)
 SECTIONS
 {
-	. = 0x100000;
-	.text : 
+	.init :
 	{
-		*(.init)
-		*(.text)
+		*(.init.*)
 	}
 
 	.data : 

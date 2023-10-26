@@ -11,6 +11,7 @@ VGA:
 - Relocate all the ACPI tables(see boot/reloc_tables.asm)
 - Make feature checks
 - Add 2 MB paging
+- Fix StartupThisAP in smp.asm, so BSP won't jump into abyss
 
 
 |   SECURITY
