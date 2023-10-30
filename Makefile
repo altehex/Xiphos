@@ -14,6 +14,9 @@ export SRC_ROOT := $(shell pwd)
 include $(SRC_ROOT)/config.mk
 include $(SRC_ROOT)/mem_layout.mk
 
+# Useful macros
+include $(SRC_ROOT)/utils/macros.mk
+
 
 MAKEFLAGS += -rR
 
@@ -22,21 +25,15 @@ export LC_COLLATE = C
 export LC_NUMERIC = C
 
 RM      = rm -f
-CP      = cp
+CP      = cp -r
 MKDIR   = mkdir
 MV		= mv
-
-VERBOSE := 
-DEBUG :=
-ifeq (1, $(CONFIG_VERBOSE))
-	VERBOSE := --verbose
-endif
 
 ifeq (1, $(CONFIG_QUIET))
 	MAKEFLAGS += -s
 endif
 
-export VERBOSE RM CP MKDIR MV
+export RM CP MKDIR MV
 
 
 # Toolchain configuration 
@@ -44,22 +41,21 @@ export VERBOSE RM CP MKDIR MV
 TARGET = x86_64-elf
 
 ifeq (1,$(CONFIG_LLVM))
-	CC		= clang $(VERBOSE) $(DEBUG) -target $(TARGET)
-	LD		= ld.lld $(VERBOSE)
+	CC		:= clang -target $(TARGET)
+	LD		:= ld.lld
 else
-	CC		= $(TARGET)-gcc
-	LD		= $(CC)
+	CC		:= $(TARGET)-gcc
+	LD		:= $(TARGET)-ld
 endif
 FASM 	= fasm
 OBJCOPY = objcopy
 
-ifeq (1, $(CONFIG_DEBUG))
-	CC   += -g
+ifeq (1,$(CONFIG_DEBUG))
+	CC   += -g -dp -fopt-info-optimized-note -flto-report
 	FASM += -s $@.fas
 endif
 
-export CC LD FASM TARGET OBJCOPY
-#-(end of toolchain configuration)---
+export CC LD FASM OBJCOPY TARGET
 
 
 # Flags configuration 
@@ -68,12 +64,13 @@ CFLAGS = -std=c17 \
 		 -funsigned-char
 
 CWARNINGS = -Wall \
-		    -Wextra
+		    -Wextra \
+			-Wpedantic
 
 LDFLAGS = -ffreestanding \
 		  -shared \
 		  -nostdlib \
-		  -lgcc
+		  --gc-sections
 
 ifeq (1, $(CONFIG_DEBUG))
 	CWARNINGS += -Wpadded
@@ -81,13 +78,12 @@ endif
 
 CFLAGS  += $(USER_CFLAGS) $(CWARNINGS)
 LDFLAGS += $(USER_LDFLAGS)
-CPPFLAGS := $(CFLAGS)
 
-INCLUDE := -I$(SRC_ROOT)/include
+INCLUDE := -I$(SRC_ROOT) \
+		   -I$(SRC_ROOT)/include
 
 
 export CFLAGS LDFLAGS INCLUDE
-#-(end of flags configuration)--------
 
 
 # Targets
@@ -111,12 +107,14 @@ bootloader:
 	$(MAKE) -C boot
 
 .PHONY += dist
-dist:
-	# tar: compress the kernel image and the bootloader
+dist: # tar: compress the kernel image and the bootloader
 
+clean: MAKEFLAGS += -s
 clean:
+	$(MAKE) clean -C api
 	$(MAKE) clean -C boot
 	$(MAKE) clean -C kernel
+	$(MAKE) clean -C libos
 	$(RM) -r build
 
 help: MAKEFLAGS += -s

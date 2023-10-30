@@ -1,4 +1,3 @@
-
 #ifndef _MEM_MAP_H_
 #define _MEM_MAP_H_
 
@@ -23,6 +22,9 @@ typedef struct __PACKED__ {
 	U64     sz;
 } MemRecord;
 
+
+static __UNUSED__
+MemRecord * xiphosMemMap = 0x0000000000000000;
 	
 
 #endif /* ! _MEM_MAP_H_ */

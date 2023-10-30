@@ -14,9 +14,5 @@ typedef signed char             I8;
 typedef signed short int        I16;
 typedef signed int              I32;
 
-#ifdef __SIZEOF_INT128__
-typedef unsigned __int128   U128;
-typedef signed   __int128   I128;
-#endif
 
 #endif /* !_TYPES_H_ */

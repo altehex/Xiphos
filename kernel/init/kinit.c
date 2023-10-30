@@ -2,29 +2,19 @@
 #include <types.h>
 
 #include <acpi.h>
-#include <cpu.h>
 #include <irq.h>
 
+#ifndef CONFIG_HEADLESS
+#   include <api/video/xiphos_std_vesa_api/setup_vesa.h>
+#endif
 
-void __NORETURN__
+
+void __NORETURN__ __KINIT__(kinit)
 kinit(void)
 {
-	 MemRecord * memMap;
-
-	/* Copy memory map base */
-	__asm__ __volatile__ (
-	    "mov    %%rax, %0"
-    : "=r"(memMap) : : );
-
-	/* Copy CpuInfo */
-	CpuInfo * cpuInfoOnBoot;
-	__asm__ __volatile__ (
-	    "mov    %%rbx, %0"					  
-    : "=r"(cpuInfoOnBoot) : : );
-	setup_cpuinfo(cpuInfoOnBoot);
-
-	/* Set up interrupts */
-	/* setup_irqs(); */
-
+#ifndef CONFIG_HEADLESS
+	setup_vesa();
+#endif
+	
 	while (1) {}
 }

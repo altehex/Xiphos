@@ -1,13 +1,15 @@
-OUTPUT_FORMAT("binary")
-ENTRY(kinit)
+ENTRY(kinit);
 SECTIONS
 {
-	. = 0x100000;
+	kinit = 0x100000;
 	.text : 
 	{
-		*(.init)
-		*(.text)
+		*(.init .init.*)
+		*(.text .text.*)
+		*(.libos .libos.*)
+		*(.plt .plt.*)
 	}
+	. = ALIGN(4K); 
 
 	.data : 
 	{
@@ -25,3 +27,4 @@ SECTIONS
 		*(.bss)
 	}
 }
+OUTPUT_FORMAT("binary")

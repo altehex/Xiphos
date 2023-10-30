@@ -3,11 +3,10 @@
 
 
 #include <attrs.h>
-#include <mem_map.h>
 
 
 void __KINIT_ACPI__
-acpi_init(MemRecord *);
+acpi_init();
 
 
 #endif /* ! _ACPI_H_ */

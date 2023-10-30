@@ -160,10 +160,6 @@ core_init:
 ;; Push kernel code
 	mov		RAX, IMG_BASE
 	push	RAX
-	
-	mov		RAX, [memMapBase]
-	mov		RBX, corenum	; for xiphosCpuInfo
-	
 	ret
 
 	

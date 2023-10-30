@@ -3,7 +3,6 @@
 
 
 #include <attrs.h>
-#include <cpu.h>
 #include <types.h>
 
 
@@ -35,8 +34,8 @@ __set_gate(Gate64 * entry,
 		   U8       type)
 {
 	entry->offsetLow  = (U64)offset & 0xFFFF;
-	entry->sel        = xiphosCpuInfo.codeSeg;
-	entry->ist        = 0b000;
+	/* entry->sel        = getCodeSeg(); */
+	entry->ist        = 0;
 	entry->type       = type;
 	entry->offsetMid  = ((U64)offset >> 16) & 0xFFFF;
 	entry->offsetHigh = ((U64)offset >> 32) & 0xFFFFFFFF00000000;
