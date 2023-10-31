@@ -1,11 +1,13 @@
 KINIT_SOURCE_NAMES = kinit acpi irq
 
-KINIT_LDS =  init.lds
-KINIT_OBJ := $(foreach OBJ, $(KINIT_SOURCE_NAMES), $(OBJ).o)
-KINIT_API =  $(API_CONSOLE)
+KINIT_LDS   =  init.lds
+KINIT_OBJ   := $(foreach OBJ, $(KINIT_SOURCE_NAMES), $(OBJ).o)
+KINIT_API   := $(API_CONSOLE)
+KINIT_LIBOS := $(LIBOS_VGA)
 
 INCLUDE += -I$(SRC_ROOT)/kernel/init \
-		   $(foreach API, $(KINIT_API), -I$(SRC_ROOT)/api/$(API))
+		   $(foreach API, $(KINIT_API), -I$(SRC_ROOT)/api/$(API)) \
+		   $(foreach LIBOS, $(KINIT_LIBOS), -I$(SRC_ROOT)/libos/$(LIBOS)) \
 
 .PHONY = all
 all: $(KINIT_ALL)

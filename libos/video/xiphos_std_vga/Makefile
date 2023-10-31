@@ -1,5 +1,7 @@
 .PHONY = all
-all:
+all: 
+
+
 
 .PHONY += clean
 clean:

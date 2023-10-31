@@ -1,7 +1,7 @@
 #include <attrs.h>
 
 #ifndef CONFIG_NO_LOGS_AT_STARTUP
-#   include <api/console/xiphos_std_console/xiphos_std_console.h>
+#   include <setup_console.h>
 #endif
 
 

@@ -2,7 +2,7 @@
 #define _XIPHOS_STD_VGA_H_
 
 
-#include <asm.h>
+#include <define.h>
 
 
 #endif /* ! _XIPHOS_STD_VGA_H_ */
