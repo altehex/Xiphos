@@ -2,22 +2,15 @@
 
 # Video
 #----------------------------------*
-export API_VESA = xiphos_std_vesa_api
-export LIBOS_VESA = xiphos_std_vesa
+export API_CONSOLE = console/xiphos_std_console  # text mode API
 
-CONFIG_HEADLESS = 0	# No graphics support
+export LIBOS_VGA   = video/xiphos_std_vga        # VGA library
 
-export _NAMES_API = video/$(API_VIDEO)
-export _NAMES_LIBOS_ = video/$(LIBOS_VIDEO)
-export _NAMES_CONFIG_ = CONFIG_HEADLESS
+CONFIG_HEADLESS = 0 			# 1 for no graphics support
+CONFIG_NO_LOGS_AT_STARTUP = 0	# Should the logs be printed at startup
 
-KERNEL_CONFIG_DEFINES := \
-	$(foreach DEF, $(_NAMES_CONFIG_), $(intcmp $($(DEF)),1,,-D$(DEF)))
+# Don't touch this
+export _NAMES_Y_N_CONFIG_ = CONFIG_HEADLESS CONFIG_NO_LOGS_AT_STARTUP 
 
-KERNEL_API_DEFINES := \
-	$(foreach DEF, $(_NAMES_API_), -I$(SRC_ROOT)/api/$(DEF))
-
-KERNEL_LIBOS_DEFINES := \
-	$(foreach DEF, $(_NAMES_LIBOS_), -I$(SRC_ROOT)/libos/$(DEF))
-
-export KERNEL_USER_CONFIG := $(KERNEL_CONFIG_DEFINES) $(KERNEL_LIBOS_DEFINES) $(KERNEL_API_DEFINES)
+export KERNEL_CONFIG_DEFINES := \
+	$(foreach DEF, $(_NAMES_Y_N_CONFIG_), $(intcmp $($(DEF)),1,,-D$(DEF)))

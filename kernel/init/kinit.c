@@ -1,19 +1,15 @@
-#include <mem_map.h>
-#include <types.h>
+#include <attrs.h>
 
-#include <acpi.h>
-#include <irq.h>
-
-#ifndef CONFIG_HEADLESS
-#   include <api/video/xiphos_std_vesa_api/setup_vesa.h>
+#ifndef CONFIG_NO_LOGS_AT_STARTUP
+#   include <api/console/xiphos_std_console/xiphos_std_console.h>
 #endif
 
 
 void __NORETURN__ __KINIT__(kinit)
 kinit(void)
 {
-#ifndef CONFIG_HEADLESS
-	setup_vesa();
+#ifndef CONFIG_NO_LOGS_AT_STARTUP
+	setup_console();
 #endif
 	
 	while (1) {}

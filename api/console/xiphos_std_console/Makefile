@@ -1,0 +1,29 @@
+API_NAME = xiphos_std_console
+API_CATEGORY = console
+
+XIPHOS_STD_CONSOLE_ALL = $(API_NAME).o
+XIPHOS_STD_CONSOLE_SOURCE_NAMES = 
+
+XIPHOS_STD_CONSOLE_OBJ = $(foreach OBJ, $(XIPHOS_STD_CONSOLE_SOURCE_NAMES), $(OBJ).o)
+XIPHOS_STD_CONSOLE_LDS = $(API_NAME).lds
+
+XIPHOS_STD_CONSOLE_INCLUDE = $(INCLUDE) \
+							 -I$(SRC_ROOT)/api/$(API_CATEGORY)/$(API_NAME)
+
+.PHONY += all
+all: $(XIPHOS_STD_CONSOLE_ALL)
+
+$(XIPHOS_STD_CONSOLE_ALL): $(XIPHOS_STD_CONSOLE_OBJ)
+# $(LD) --relocatable -T $(XIPHOS_STD_CONSOLE_LDS) $^ -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(XIPHOS_STD_CONSOLE_INCLUDE) -o $@ -c $^
+
+# $(foreach NAME, $(XIPHOS_STD_CONSOLE_SOURCE_NAMES), \
+# 	$(eval $(NAME).o: $(NAME).c))
+
+CLEAN = *.o *.c.*
+
+.PHONY += clean
+clean:
+	$(RM) $(CLEAN)

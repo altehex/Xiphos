@@ -1,5 +1,5 @@
-LIBOSES =  xiphos_std_vga
-DIRS    := $(foreach DIR, $(LIBOSES), $(SRC_ROOT)/libos/video/$(DIR))
+APIS =  xiphos_std_console
+DIRS := $(foreach DIR, $(APIS), $(SRC_ROOT)/api/console/$(DIR))
 
 .PHONY = all 
 all: $(DIRS)
