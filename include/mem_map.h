@@ -1,5 +1,5 @@
-#ifndef _MEM_MAP_H_
-#define _MEM_MAP_H_
+#ifndef _XIPHOS_MEM_MAP_H_
+#define _XIPHOS_MEM_MAP_H_
 
 
 #include <attrs.h>
@@ -27,4 +27,4 @@ static __UNUSED__
 MemRecord * xiphosMemMap = 0x0000000000000000;
 	
 
-#endif /* ! _MEM_MAP_H_ */
+#endif /* ! _XIPHOS_MEM_MAP_H_ */

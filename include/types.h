@@ -1,9 +1,7 @@
-#ifndef _TYPES_H_
-#define _TYPES_H_
+#ifndef _XIPHOS_TYPES_H_
+#define _XIPHOS_TYPES_H_
 
-/*
- * Integer types.
- */
+/* Integer types. */
 
 typedef unsigned char           U8;
 typedef unsigned short int      U16;
@@ -15,4 +13,4 @@ typedef signed short int        I16;
 typedef signed int              I32;
 
 
-#endif /* !_TYPES_H_ */
+#endif /* ! _XIPHOS_TYPES_H_ */

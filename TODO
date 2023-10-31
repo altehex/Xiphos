@@ -22,16 +22,20 @@ VGA:
 |   UTILS
 +----------------------*
 - SIZE_OF macro in fasm
-- Working macros.mk
 
 
 |	BUILD SYSTEM
 +----------------------*
 - Improve check.sh (so it won't reevaluate if files exist twice)
 - Add other systems to install_gcc.sh
+- Create the dist rule
 
 
 |   MISC
 +----------------------*
 - Make a nice readme.md (guess i'll do it after alpha-1.0)
 
+
+| Goal for alpha-0.3
++----------------------*
+- Initialize VGA, add basic text mode output. Add something to kinit

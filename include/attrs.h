@@ -1,5 +1,5 @@
-#ifndef _ATTRS_H_
-#define _ATTRS_H_
+#ifndef _XIPHOS_ATTRS_H_
+#define _XIPHOS_ATTRS_H_
 
 
 #define __ALIGN__(n)        __attribute__ ((aligned(n)))
@@ -17,7 +17,8 @@
 #define __KINIT_IRQ__   __KINIT__(irq)
 #define __KINIT_VIDEO__ __KINIT__(video)
 
+#define __API__(s)      __SECTION__(.api.s)
 #define __LIBOS__(s)    __SECTION__(.libos.s)
 
 
-#endif /* ! _ATTRS_H_ */
+#endif /* ! _XIPHOS_ATTRS_H_ */

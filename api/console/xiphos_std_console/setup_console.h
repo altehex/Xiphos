@@ -1,10 +1,13 @@
 #ifndef _SETUP_CONSOLE_H_
 #define _SETUP_CONSOLE_H_
 
-#include <attrs.h>
+
+#include <include/attrs.h>
+
+#include <libos/video/xiphos_std_vga/xiphos_std_vga.h>
 
 
-inline void
+inline __ALWAYS_INLINE__ void
 setup_console()
 {
 	

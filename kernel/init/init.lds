@@ -4,6 +4,8 @@ SECTIONS
 	.init :
 	{
 		*(.init.kinit .init.*)
+		*(.api .api.*)
+		*(.libos .libos.*)
 		*(.plt .plt.*)
 	}
 	/* https://www.redhat.com/zh/blog/linkers-warnings-about-executable-stacks-and-segments */
