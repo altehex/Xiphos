@@ -1,5 +1,5 @@
-#ifndef _XIPHOS_STD_VGA_CRT_H_
-#define _XIPHOS_STD_VGA_CRT_H_
+#ifndef _XSTDVGA_CRT_H_
+#define _XSTDVGA_CRT_H_
 
 
 #include "attrs.h"
@@ -11,4 +11,4 @@ void __LIBOS_XSTDVGA__
 xstdvga_set_max_scanline(U8);
 
 
-#endif /* ! _XIPHOS_STD_VGA_CRT_H_ */
+#endif /* ! _XSTDVGA_CRT_H_ */

@@ -1,5 +1,5 @@
-#ifndef _XIPHOS_STD_VGA_DEFINE_H_
-#define _XIPHOS_STD_VGA_DEFINE_H_
+#ifndef _XSTDVGA_DEFINE_H_
+#define _XSTDVGA_DEFINE_H_
 
 
 #include <include/types.h>
@@ -51,4 +51,4 @@
 #define VGA_INPUT_STATUS_1_COLOR        (U16) 0x3DA
 
 
-#endif /* ! _XIPHOS_STD_VGA_DEFINE_H_ */
+#endif /* ! _XSTDVGA_DEFINE_H_ */

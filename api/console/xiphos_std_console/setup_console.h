@@ -1,5 +1,5 @@
-#ifndef _XIPHOS_STD_CONSOLE_SETUP_CONSOLE_H_
-#define _XIPHOS_STD_CONSOLE_SETUP_CONSOLE_H_
+#ifndef _XSTDCON_SETUP_CONSOLE_H_
+#define _XSTDCON_SETUP_CONSOLE_H_
 
 
 #include <include/attrs.h>
@@ -21,4 +21,4 @@ void __ALIAS__(xstdcon_setup_console) __WEAK__
 setup_console();
 
 
-#endif /* ! _XIPHOS_STD_CONSOLE_SETUP_CONSOLE_H_ */
+#endif /* ! _XSTDCON_SETUP_CONSOLE_H_ */

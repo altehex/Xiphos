@@ -1,5 +1,5 @@
-#ifndef _XIPHOS_STD_VGA_H_
-#define _XIPHOS_STD_VGA_H_
+#ifndef _XSTDVGA_H_
+#define _XSTDVGA_H_
 
 
 #include <crt.h>
@@ -7,4 +7,4 @@
 #include <io.h>
 
 
-#endif /* ! _XIPHOS_STD_VGA_H_ */
+#endif /* ! _XSTDVGA_H_ */

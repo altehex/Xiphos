@@ -1,9 +1,9 @@
-#ifndef _XIPHOS_STD_CONSOLE_H_
-#define _XIPHOS_STD_CONSOLE_H_
+#ifndef _XSTDCON_H_
+#define _XSTDCON_H_
 
 
 #include <font.h>
 #include <setup_console.h>
 
 
-#endif /* ! _XIPHOS_STD_CONSOLE_H_ */
+#endif /* ! _XSTDCON_H_ */

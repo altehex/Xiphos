@@ -136,16 +136,6 @@ out_to_dx_dword(__IN__ U16 port,
 	: [port]"r"(__port), [dword]"r"(__dword));
 }
 
-#define out_to_imm8(_1, _2)  _Generic((_2), \
-							          U8:  out_to_imm8_byte, \
-							          U16: out_to_imm8_word, \
-							          U32: out_to_imm8_dword) (_1, _2)
-
-#define out_to_dx(_1, _2)     _Generic((_2), \
-							          U8:  out_to_dx_byte, \
-							          U16: out_to_dx_word, \
-							          U32: out_to_dx_dword) (_1, _2)
-
 #define out(_1, _2)   _Generic((_1), \
 							   U8:  _Generic((_2), \
 							                 U8:  out_to_imm8_byte, \
