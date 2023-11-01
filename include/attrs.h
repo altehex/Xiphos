@@ -2,8 +2,9 @@
 #define _XIPHOS_ATTRS_H_
 
 
-#include <macro.h>
-
+#define __IN__
+#define __OUT__
+#define __OPTIONAL__
 
 #define __ALIAS__(s)        __attribute__ ((alias(#s)))
 #define __ALIGN__(n)        __attribute__ ((aligned(n)))

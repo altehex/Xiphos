@@ -3,7 +3,7 @@ KERNEL_IMAGE_NAME := $(PACKAGE_NAME).img
 
 export KINIT_ALL = init.o
 
-KERNEL_OBJ := $(KINIT_ALL)
+KERNEL_OBJ := $(KINIT_ALL) $(API_OBJ) $(LIBOS_OBJ)
 KERNEL_LDS = kernel.lds
 
 export KERNEL_INCLUDE := $(INCLUDE) \

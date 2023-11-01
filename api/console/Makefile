@@ -1,14 +1,14 @@
 APIS =  xiphos_std_console
-DIRS := $(foreach DIR, $(APIS), $(SRC_ROOT)/api/console/$(DIR))
 
 .PHONY = all 
-all: $(DIRS)
+all: $(APIS)
 
-.PHONY += $(DIRS)
-$(DIRS): _force
+.PHONY += $(APIS)
+$(APIS): _force
 	$(MAKE) -C $@
+	$(CP) $@/$@.o $(SRC_ROOT)/api/obj
 
-CLEAN_DIRS := $(foreach DIR, $(DIRS), $(addsuffix .clean,$(DIR)))
+CLEAN_DIRS := $(foreach DIR, $(APIS), $(addsuffix .clean,$(DIR)))
 
 .PHONY += clean $(CLEAN_DIRS)
 clean: $(CLEAN_DIRS)

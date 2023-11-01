@@ -1,5 +1,4 @@
-LIBOSES =  xiphos_std_vga
-DIRS    := $(foreach DIR, $(LIBOSES), $(SRC_ROOT)/libos/video/$(DIR))
+DIRS    := xiphos_std_vga
 
 .PHONY = all 
 all: $(DIRS)
@@ -7,6 +6,7 @@ all: $(DIRS)
 .PHONY += $(DIRS)
 $(DIRS): _force
 	$(MAKE) -C $@
+	$(CP) $@/$@.o $(SRC_ROOT)/libos/obj
 
 CLEAN_DIRS := $(foreach DIR, $(DIRS), $(addsuffix .clean,$(DIR)))
 

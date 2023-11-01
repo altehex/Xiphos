@@ -4,9 +4,9 @@ SECTIONS
 	{
 		*(.init.*)
 	}
-	.api :
+	.libos :
 	{
-		*(.api.xstdcon) *(.api) *(.api.*)
+		*(.libos.xstdvga) *(.libos) *(.libos.*)
 	}
 	. = ALIGN(4K);
 

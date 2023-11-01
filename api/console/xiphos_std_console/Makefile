@@ -1,29 +1,33 @@
-API_NAME = xiphos_std_console
+include $(SRC_ROOT)/utils/macro.mk
+
+API_NAME     = xiphos_std_console
 API_CATEGORY = console
 
 XIPHOS_STD_CONSOLE_ALL = $(API_NAME).o
-XIPHOS_STD_CONSOLE_SOURCE_NAMES = 
+XIPHOS_STD_CONSOLE_SOURCE_NAMES = font mode
 
-XIPHOS_STD_CONSOLE_OBJ = $(foreach OBJ, $(XIPHOS_STD_CONSOLE_SOURCE_NAMES), $(OBJ).o)
-XIPHOS_STD_CONSOLE_LDS = $(API_NAME).lds
+XIPHOS_STD_CONSOLE_VGA_LIBOS = xiphos_std_vga
+XIPHOS_STD_CONSOLE_LIBOSES := video/$(XIPHOS_STD_CONSOLE_VGA_LIBOS)
 
-XIPHOS_STD_CONSOLE_INCLUDE = $(INCLUDE) \
-							 -I$(SRC_ROOT)/api/$(API_CATEGORY)/$(API_NAME)
+XIPHOS_STD_CONSOLE_OBJ := $(call OBJ_WRAP, $(XIPHOS_STD_CONSOLE_SOURCE_NAMES))
+XIPHOS_STD_CONSOLE_LDS := $(API_NAME).lds
 
-.PHONY += all
+XIPHOS_STD_CONSOLE_INCLUDE := $(INCLUDE) \
+							 -I$(call PWD) \
+							 $(call PREFIX_INCLUDE_WRAP, \
+							  	$(XIPHOS_STD_CONSOLE_LIBOSES), $(SRC_ROOT)/libos)
+
+.PHONY = all
 all: $(XIPHOS_STD_CONSOLE_ALL)
 
 $(XIPHOS_STD_CONSOLE_ALL): $(XIPHOS_STD_CONSOLE_OBJ)
-# $(LD) --relocatable -T $(XIPHOS_STD_CONSOLE_LDS) $^ -o $@
+	$(LD) --relocatable -T $(XIPHOS_STD_CONSOLE_LDS) $^ -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(XIPHOS_STD_CONSOLE_INCLUDE) -o $@ -c $^
 
-# $(foreach NAME, $(XIPHOS_STD_CONSOLE_SOURCE_NAMES), \
-# 	$(eval $(NAME).o: $(NAME).c))
-
 CLEAN = *.o *.c.*
 
 .PHONY += clean
-clean:
+clean: 
 	$(RM) $(CLEAN)

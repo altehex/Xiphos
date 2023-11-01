@@ -1,13 +1,14 @@
 KINIT_SOURCE_NAMES = kinit acpi irq
 
-KINIT_LDS   =  init.lds
-KINIT_OBJ   := $(foreach OBJ, $(KINIT_SOURCE_NAMES), $(OBJ).o)
-KINIT_API   := $(API_CONSOLE)
-KINIT_LIBOS := $(LIBOS_VGA)
+KINIT_LDS     =  init.lds
+KINIT_API     := console/$(API_CONSOLE)
+KINIT_LIBOS   := video/$(LIBOS_VGA)
+KINIT_OBJ     := $(foreach OBJ, $(KINIT_SOURCE_NAMES), $(OBJ).o)
 
+VPATH = .:$(SRC_ROOT)/api
 INCLUDE += -I$(SRC_ROOT)/kernel/init \
 		   $(foreach API, $(KINIT_API), -I$(SRC_ROOT)/api/$(API)) \
-		   $(foreach LIBOS, $(KINIT_LIBOS), -I$(SRC_ROOT)/libos/$(LIBOS)) \
+		   $(foreach LIBOS, $(KINIT_LIBOS), -I$(SRC_ROOT)/libos/$(LIBOS))
 
 .PHONY = all
 all: $(KINIT_ALL)
@@ -19,9 +20,6 @@ $(KINIT_ALL): $(KINIT_OBJ)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDE) -c $^ -o $@ 
-
-# $(foreach NAME, $(KINIT_SOURCE_NAMES), \
-# 	$(eval $(NAME).o: $(NAME).c))
 
 CLEAN = *.o *.c.*
 

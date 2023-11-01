@@ -9,7 +9,9 @@ TARNAME := $(PACKAGE_NAME).tar.xz
 ISONAME := $(PACKAGE_NAME).iso
 
 
-export SRC_ROOT := $(shell pwd)
+include utils/macro.mk
+
+export SRC_ROOT := $(call PWD)
 
 # User settings
 include $(SRC_ROOT)/config.mk
@@ -100,7 +102,7 @@ $(DIRS): check_build_dir
 	$(MAKE) -C $@
 
 .PHONY += check_build_dir
-check_build_dir:
+check_build_dir: _force
 	[[ -e build ]] || mkdir build
 
 .PHONY += dist
@@ -109,7 +111,7 @@ dist: # tar: compress the kernel image and the bootloader
 CLEAN_DIRS := $(foreach DIR,$(DIRS),$(addsuffix .clean,$(DIR)))
 
 .PHONY += $(CLEAN_DIRS) clean
-# clean: MAKEFLAGS += -s
+clean: MAKEFLAGS += -s
 clean: $(CLEAN_DIRS)
 	$(RM) -r build
 
@@ -142,3 +144,5 @@ test:
 		@echo	""
 		@echo   "User settings:"
 		@echo   "* LLVM flag:            "$(CONFIG_LLVM)
+
+_force: ;

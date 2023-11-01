@@ -1,6 +1,6 @@
 #include <attrs.h>
 
-#ifndef CONFIG_NO_LOGS_AT_STARTUP
+#if !defined CONFIG_NO_LOGS_AT_STARTUP || CONFIG_HEADLESS
 #   include <setup_console.h>
 #endif
 
@@ -8,9 +8,9 @@
 void __NORETURN__ __KINIT__(kinit)
 kinit(void)
 {
-#ifndef CONFIG_NO_LOGS_AT_STARTUP
+#if !defined CONFIG_NO_LOGS_AT_STARTUP || CONFIG_HEADLESS
 	setup_console();
 #endif
 	
-	while (1) {}
+	int1();
 }
