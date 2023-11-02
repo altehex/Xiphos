@@ -171,7 +171,7 @@ __error:
 	ret						
 
 	
-section		'.rodata'	data readable
+section		'.data'	data readable
 	
 ;; String table
 ;;-------------------------------------------
@@ -190,8 +190,6 @@ EFI_MP_SERVICES_PROTOCOL_GUID:			_EFI_MP_SERVICES_PROTOCOL_GUID
 	
 EFI_RSDP_GUID:		_EFI_ACPI_TABLE_GUID	
 	
-	
-section 	'.bss'		data readable writeable discardable
 	
 imgHandle		PTR
 sysTable		PTR

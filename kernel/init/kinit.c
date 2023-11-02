@@ -12,5 +12,5 @@ kinit(void)
 	setup_console();
 #endif
 	
-	int1();
+	while (1) {}
 }
