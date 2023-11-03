@@ -20,7 +20,9 @@
 #define VGA_CRT_CONTROLLER_MONO_ADDRESS (U16) 0x3B4
 #define VGA_CRT_CONTROLLER_MONO_DATA    (U16) 0x3B5
 
+#define VGA_OVERFLOW_INDEX              (U8) 0x07
 #define VGA_MAX_SCANLINE_INDEX          (U8) 0x09
+#define VGA_V_DISPLAY_END_INDEX         (U8) 0x12
 
 /* Graphics controller */
 #define VGA_GRAPHICS_CONTROLLER_ADDRESS (U16) 0x3CE
@@ -50,5 +52,11 @@
 #define VGA_INPUT_STATUS_1_MONO         (U16) 0x3BA
 #define VGA_INPUT_STATUS_1_COLOR        (U16) 0x3DA
 
+
+/* Misc */
+#define SAME    (U16) -1 /*  Is used to specify whether
+						  *  a bit should be changed.
+						  */
+							  
 
 #endif /* ! _XSTDVGA_DEFINE_H_ */

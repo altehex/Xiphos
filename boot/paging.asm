@@ -34,7 +34,7 @@ PAGE_FLAGS_PDP	equ	10000111b
 	cmp		RCX, 1023	; The number of entries is limited to 1024
 	;; It most likely will not exceed 1-2 entries, but what if?
 	;; What if some dumbass gonna fire up this baby on a supercomputer.
-	jle		@f
+	jbe		@f
 	mov		RCX, 1023
 @@:
 	mov		R13, RCX	; We're gonna need the number of entries later

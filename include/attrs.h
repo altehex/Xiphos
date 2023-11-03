@@ -9,6 +9,7 @@
 #define __ALIAS__(s)        __attribute__ ((alias(#s)))
 #define __ALIGN__(n)        __attribute__ ((aligned(n)))
 #define __ALWAYS_INLINE__   __attribute__ ((always_inline))
+#define __CONST__           __attribute__ ((const))
 #define __CONSTRUCTOR__     __attribute__ ((constructor))
 #define __NORETURN__        __attribute__ ((noreturn))
 #define __PACKED__          __attribute__ ((packed))

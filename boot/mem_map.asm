@@ -47,7 +47,7 @@ parse_mem_map:
 	mov		R8D, dword [RAX]
 	
 	cmp		R8D, EFI_BS_DATA
-	jle		@f
+	jbe		@f
 	cmp		R8D, EFI_FREE
 	jne		.non_free
 @@:
@@ -88,7 +88,7 @@ parse_mem_map:
 .free_merge:
 	mov		R8D, dword [RAX]
 	cmp		R8D, EFI_BS_DATA
-	jle		.add
+	jbe		.add
 	cmp		R8D, EFI_FREE
 	je		.add
 	

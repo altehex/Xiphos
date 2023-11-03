@@ -18,7 +18,7 @@
 
 	xor		RBX, RBX
 	cmp		[corenum], PAGE_SZ / 4
-	jle		startup_cores
+	jbe		startup_cores
 	mov		[corenum], PAGE_SZ / 4
 startup_cores:
 	__eficall	EfiMP, get_proc_info,	\

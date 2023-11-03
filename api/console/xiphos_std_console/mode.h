@@ -60,13 +60,15 @@ static VgaGraphicsMode G1280x1024x32K = { .height = 1280, .width = 1024, .colorD
 static VgaGraphicsMode G1280x1024x64K = { .height = 1280, .width = 1024, .colorDepth = D64K };
 static VgaGraphicsMode G1280x1024x16M = { .height = 1280, .width = 1024, .colorDepth = D16M };
 
-VgaGraphicsMode __API_XSTDCON__
+
+__API_XSTDCON__ VgaGraphicsMode
 xstdcon_get_mode();
-void __API_XSTDCON__
+__API_XSTDCON__ void 
 xstdcon_set_mode_mparm(U16, U16, U8, U8);
 
+
 /* Inlined because it just sets up the args for xstdcon_set_mode_mparm */
-inline void
+static inline void
 xstdcon_set_mode_struct(VgaGraphicsMode * mode)
 {
 	xstdcon_set_mode_mparm(mode->height,
@@ -75,15 +77,20 @@ xstdcon_set_mode_struct(VgaGraphicsMode * mode)
 						   SYMBOL_SIZE_DEFAULT);
 }
 
-
 #define xstdcon_set_mode(_1, ...)  _Generic((_1), \
 											VgaGraphicsMode *: xstdcon_set_mode_struct, \
 											U16:               xstdcon_set_mode_mparm) (_1, ##__VA_ARGS__)
 
-inline void
-xstdcon_set_symbol_sz(sz)
+static inline void
+xstdcon_set_symbol_sz(U8 sz)
 {
 	xstdvga_set_max_scanline(sz - 1);
+}
+
+static inline void
+xstdcon_set_height(U16 height)
+{
+	xstdvga_set_v_display(height - 1);
 }
 		
 

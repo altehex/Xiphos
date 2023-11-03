@@ -8,56 +8,106 @@
 
 /* Operand ordering is the same as in Intel syntax */
 
-inline __ALWAYS_INLINE__ U8
-in_byte(__IN__ U8 port)
+static inline U8
+in_from_imm8_byte(U8 port)
 {
 	register U8 byte __asm__ ("al");
 	
 	__asm__ __volatile__
 	(
-	    "in      %[port], %0;"
-    : "=r"(byte)
+	    "in      %[port], %[byte]"
+    : [byte]"=r"(byte)
 	: [port]"N"(port));
 
 	return byte;
 }
 
-inline __ALWAYS_INLINE__ U16
-in_word(__IN__ U8 port)
+static inline U16
+in_from_imm8_word(U8 port)
 {
 	register U16 word __asm__ ("ax");
 	
 	__asm__ __volatile__
 	(
-	    "in      %[port], %0;"
-    : "=r"(word)
+	    "in      %[port], %[word]"
+    : [word]"=r"(word)
 	: [port]"N"(port));
 
 	return word;
 }
 
-inline __ALWAYS_INLINE__ U32
-in_dword(__IN__ U8 port)
+static inline U32
+in_from_imm8_dword(U8 port)
 {
 	register U32 dword __asm__ ("eax");
 	
 	__asm__ __volatile__
 	(
-	    "in      %[port], %0;"
-    : "=r"(dword)
+	    "in      %[port], %[dword]"
+    : [dword]"=r"(dword)
 	: [port]"N"(port));
 
 	return dword;
 }
 
-#define in(_1, _2)   _1 = _Generic((_1), \
-								   U8:  in_byte,	\
-								   U16: in_word,	\
-								   U32: in_dword) (_2)
+static inline U8
+in_from_dx_byte(U16 port)
+{
+	register U16 __port __asm__ ("dx") = port;
+	register U8 byte __asm__ ("al");
+	
+	__asm__ __volatile__
+	(
+	    "in      %[port], %[byte]"
+    : [byte]"=r"(byte)
+	: [port]"r"(__port));
 
-inline __ALWAYS_INLINE__ void
-out_to_imm8_byte(__IN__ U8 port,
-		         __IN__ U8 byte)
+	return byte;
+}
+
+static inline U16
+in_from_dx_word(U16 port)
+{
+	register U16 __port __asm__ ("dx") = port;
+	register U16 word __asm__ ("ax");
+	
+	__asm__ __volatile__
+	(
+	    "in      %[port], %0"
+    : [word]"=r"(word)
+	: [port]"r"(__port));
+
+	return word;
+}
+
+static inline U32
+in_from_dx_dword(U16 port)
+{
+	register U16 __port __asm__ ("dx") = port;
+	register U32 dword __asm__ ("eax");
+	
+	__asm__ __volatile__
+	(
+	    "in      %[port], %[dword]"
+    : [dword]"=r"(dword)
+	: [port]"r"(__port));
+
+	return dword;
+}
+
+#define in(_1, _2)   _1 = _Generic((_2), \
+		                           U8:  _Generic((_1), \
+						                         U8:  in_from_imm8_byte,	\
+							                     U16: in_from_imm8_word,	\
+								                 U32: in_from_imm8_dword), \
+                                   U16: _Generic((_1), \
+												 U8:  in_from_dx_byte, \
+												 U16: in_from_dx_word, \
+												 U32: in_from_dx_dword)) (_2)
+
+static inline void
+out_to_imm8_byte(U8 port,
+		         U8 byte)
 {
 	register U8 __byte __asm__ ("al") = byte;
 	
@@ -68,9 +118,9 @@ out_to_imm8_byte(__IN__ U8 port,
 	: [port]"N"(port), [byte]"r"(__byte));
 }
 
-inline __ALWAYS_INLINE__ void
-out_to_imm8_word(__IN__ U8  port,
-		         __IN__ U16 word)
+static inline void
+out_to_imm8_word(U8  port,
+		         U16 word)
 {
 	register U16 __word __asm__ ("ax") = word;
 		
@@ -81,9 +131,8 @@ out_to_imm8_word(__IN__ U8  port,
 	: [port]"N"(port), [word]"r"(__word));
 }
 
-inline __ALWAYS_INLINE__ void
-out_to_imm8_dword(__IN__ U8  port,
-		          __IN__ U32 dword)
+static inline void
+out_to_imm8_dword(U8  port, U32 dword)
 {
 	register U32 __dword __asm__ ("eax") = dword;
 	
@@ -94,9 +143,8 @@ out_to_imm8_dword(__IN__ U8  port,
 	: [port]"N"(port), [dword]"r"(__dword));
 }
 
-inline __ALWAYS_INLINE__ void
-out_to_dx_byte(__IN__ U16 port,
-		       __IN__ U8  byte)
+static inline void
+out_to_dx_byte(U16 port, U8  byte)
 {
 	register U16 __port __asm__ ("dx") = port;
 	register U8  __byte __asm__ ("al") = byte;
@@ -108,9 +156,8 @@ out_to_dx_byte(__IN__ U16 port,
 	: [port]"r"(__port), [byte]"r"(__byte));
 }
 
-inline __ALWAYS_INLINE__ void
-out_to_dx_word(__IN__ U16 port,
-		       __IN__ U16 word)
+static inline void
+out_to_dx_word(U16 port, U16 word)
 {
 	register U16 __port __asm__ ("dx") = port;
 	register U16 __word __asm__ ("ax") = word;
@@ -122,9 +169,8 @@ out_to_dx_word(__IN__ U16 port,
 	: [port]"r"(__port), [word]"r"(__word));
 }
 
-inline __ALWAYS_INLINE__ void
-out_to_dx_dword(__IN__ U16 port,
-		        __IN__ U32 dword)
+static inline void
+out_to_dx_dword(U16 port, U32 dword)
 {
 	register U16 __port __asm__ ("dx")   = port;
 	register U32 __dword __asm__ ("eax") = dword;
@@ -146,7 +192,7 @@ out_to_dx_dword(__IN__ U16 port,
 							                 U16: out_to_dx_word, \
 							                 U32: out_to_dx_dword)) (_1, _2)
 
-inline __ALWAYS_INLINE__ void
+static inline void
 int1(void)
 {
 	__asm__ __volatile__

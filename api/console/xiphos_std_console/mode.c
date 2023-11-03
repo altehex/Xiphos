@@ -18,4 +18,5 @@ xstdcon_set_mode_mparm(U16 height,
 					   U8  symbolSz)
 {
 	xstdcon_set_symbol_sz(symbolSz);
+	xstdcon_set_height(height);
 }

@@ -12,10 +12,7 @@ section		'.text'		code executable readable
 	use64
 __entry:
 	EFI_INIT	imgHandle, sysTable
-	jc		__error
-	
-;; Set up video (the snippet is inlined)
-include "./video.asm"
+	jc		error
 
 ;; Get the loaded image interface
 	__eficall	EfiBootServices, hdl_protocol,					\
@@ -119,7 +116,7 @@ include "./paging.asm"
 				[imgHandle], [memMapKey]
 	
 	test	EAX, EAX
-	jnz 	__error
+	jnz 	error
 	
 	mov		byte [bspReady], 1
 
@@ -164,11 +161,11 @@ core_init:
 
 	
 ;; Default error handler
-__error:			
+error:			
 	__eficall 	EfiTextOut, output_string, 	\ 
  				EfiTextOut, errorMsg
 	xor		RAX, RAX	; EFI_SUCCESS
-	ret						
+	ret
 
 	
 section		'.data'	data readable
@@ -178,12 +175,11 @@ section		'.data'	data readable
 imgPath			du	IMG_PATH, 0
 
 ;; Error messages
-errorMsg		du	"[ !! ] An error occured.", 13, 10, 0
-imgNotFoundMsg	du	"[ !! ] The kernel image is not present.", 13, 10, 0
-imgLoadErrorMsg du	"[ !! ] Failed to load the kernel image.", 13, 10, 0
+errorMsg		du	"!!! An error occured.", 13, 10, 0
+imgNotFoundMsg	du	"!!! The kernel image is not present.", 13, 10, 0
+imgLoadErrorMsg du	"!!! Failed to load the kernel image.", 13, 10, 0
 	
 ;; UUID table
-EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID:		_EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
 EFI_LOADED_IMAGE_PROTOCOL_GUID:			_EFI_LOADED_IMAGE_PROTOCOL_GUID
 EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID:	_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 EFI_MP_SERVICES_PROTOCOL_GUID:			_EFI_MP_SERVICES_PROTOCOL_GUID 
@@ -194,11 +190,6 @@ EFI_RSDP_GUID:		_EFI_ACPI_TABLE_GUID
 imgHandle		PTR
 sysTable		PTR
 return			PTR
-	
-EfiVideoOut		PTR
-videoInfoSz		IN
-videoInfo		PTR
-fbBase			PTR
 	
 EfiFile			PTR
 EfiFileSystem	PTR
