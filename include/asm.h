@@ -6,6 +6,11 @@
 #include <types.h>
 
 
+/* To use with in() */
+#define BYTE    (U8)  0xFF
+#define WORD    (U16) 0xFFFF
+
+
 /* Operand ordering is the same as in Intel syntax */
 
 static inline U8
@@ -95,15 +100,15 @@ in_from_dx_dword(U16 port)
 	return dword;
 }
 
-#define in(_1, _2)   _1 = _Generic((_2), \
-		                           U8:  _Generic((_1), \
-						                         U8:  in_from_imm8_byte,	\
-							                     U16: in_from_imm8_word,	\
-								                 U32: in_from_imm8_dword), \
-                                   U16: _Generic((_1), \
-												 U8:  in_from_dx_byte, \
-												 U16: in_from_dx_word, \
-												 U32: in_from_dx_dword)) (_2)
+#define in(_1, _2)   _Generic((_2), \
+		                      U8:  _Generic((_1), \
+						                    U8:  in_from_imm8_byte,	\
+					                        U16: in_from_imm8_word,	\
+							                U32: in_from_imm8_dword), \
+                              U16: _Generic((_1), \
+											U8:  in_from_dx_byte, \
+											U16: in_from_dx_word, \
+											U32: in_from_dx_dword)) (_2)
 
 static inline void
 out_to_imm8_byte(U8 port,

@@ -8,7 +8,11 @@
 VgaGraphicsMode
 xstdcon_get_mode()
 {
+	VgaGraphicsMode currMode;
+
+	/* WIP */
 	
+	return currMode;
 }
 
 void

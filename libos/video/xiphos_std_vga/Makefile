@@ -4,9 +4,9 @@ LIBOS_NAME     = xiphos_std_vga
 LIBOS_CATEGORY = video
 
 XSTDVGA_ALL := $(LIBOS_NAME).o
-XSTDVGA_SOURCE_NAMES = # Nothing to link for now
+XSTDVGA_SOURCE_NAMES = memory
 
-XSTDVGA_OBJ := _force $(call OBJ_WRAP, $(XSTDVGA_SOURCE_NAMES))
+XSTDVGA_OBJ := $(call OBJ_WRAP, $(XSTDVGA_SOURCE_NAMES))
 XSTDVGA_LDS := $(LIBOS_NAME).lds
 
 XSTDVGA_INCLUDE := $(INCLUDE) \
@@ -15,11 +15,8 @@ XSTDVGA_INCLUDE := $(INCLUDE) \
 .PHONY = all
 all: $(XSTDVGA_ALL)
 
-$(XSTDVGA_ALL): _force $(XSTDVGA_OBJ)
-	touch $(XSTDVGA_ALL)
-# $(LD) --relocatable -T $(XSTDVGA_LDS) $^ -o $@
-
-_force: ;
+$(XSTDVGA_ALL): $(XSTDVGA_OBJ)
+	$(LD) --relocatable -T $(XSTDVGA_LDS) $^ -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(XSTDVGA_INCLUDE) -o $@ -c $^
