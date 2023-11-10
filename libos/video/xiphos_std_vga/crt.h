@@ -8,15 +8,24 @@
 #include <include/attrs.h>
 #include <include/types.h>
 
+
+/* Skeleton for register setting functions */
+#define SET_CRT_REG_FUNCTION(index, calcFunc, ...)                              \
+	xstdvga_select_crt_reg(index);                                              \
+    U8 __reg_old = xstdvga_in_from_reg();                                       \
+    U16 __port; __asm__ __volatile__ ( "mov %%dx, %0" : "=g"(__port) : : "dx"); \
+    xstdvga_out_to_reg(__port, calcFunc(__reg_old, ##__VA_ARGS__))              \
+
+
 /* 
- *  Changes value of the Max Scanline register of CRT controller.
+ *  Changes value of Max Scanline register of CRT controller.
  *--------------------------------------------------------------------*
  */ 
 static inline void
 xstdvga_set_max_scanline(U8 maxScanline)
 {
 	xstdvga_select_crt_reg(VGA_MAX_SCANLINE_INDEX);
-	xstdvga_out_to_crt_reg(maxScanline);
+	xstdvga_out_to_reg(maxScanline);
 }
 
 /*
@@ -27,46 +36,49 @@ xstdvga_set_max_scanline(U8 maxScanline)
  *  The rest of the args should be 0, 1 or SAME.
  */
 static __CONST__ U8
-__calculate_overflow(U8 overflow, U16 VRS, U16 VDE, U16 VT, U16 LC, U16 SVB)
+__calculate_overflow(U8 overflow, U16 vrs, U16 vde, U16 vt, U16 lc, U16 svb)
 {
-	return (VRS == SAME ?
-			    overflow & (VGA_VRS9 | VGA_VRS8)
+	return (vrs == SAME ?
+			    overflow & ((1 << VGA_VRS9) | (1 << VGA_VRS8))
 		        :
-			    ((VRS & 0x100) >> 6) | ((VRS & 0x200) >> 1)) |
-		   (VDE == SAME ?
-			    overflow & (VGA_VDE9 | VGA_VDE8)
+			    ((vrs & 0x100) >> 6) | ((vrs & 0x200) >> 1)) |
+		   (vde == SAME ?
+			    overflow & ((1 << VGA_VDE9) | (1 << VGA_VDE8))
 		        :
-	     	    ((VDE & 0x100) >> 7) | ((VDE & 0x200) >> 2)) |
-		   (VT  == SAME ?
-			    overflow & (VGA_VT9 | VGA_VT8)
+	     	    ((vde & 0x100) >> 7) | ((vde & 0x200) >> 2)) |
+		   (vt  == SAME ?
+			    overflow & ((1 << VGA_VT9) | (1 << VGA_VT8))
 		        :
-			    ((VT & 0x100) >> 8) | ((VT & 0x200) >> 3))   |
-		   (LC  == SAME ?
-			    overflow & VGA_LC8
+			    ((vt & 0x100) >> 8) | ((vt & 0x200) >> 3))   |
+		   (lc  == SAME ?
+			    overflow & (1 << VGA_LC8)
 		        :
-		        (LC & 0x100) >> 4)                           |
-		   (SVB == SAME ?
-			    overflow & VGA_SVB8
+		        (lc & 0x100) >> 4)                           |
+		   (svb == SAME ?
+			    overflow & (1 << VGA_SVB8)
 		        :
-		        (SVB & 0x100) >> 5);
+		        (svb & 0x100) >> 5);
 }
 
 /*
  *  Changes the value of Overflow register
  *--------------------------------------------------------------------*
- *  VRS: Vertical Retrace Start  (sets bits 8-9)
- *  VDE: Vertical Display End    (sets bits 8-9)
- *  VT:  Vertical Total          (sets bits 8-9)
- *  LC:  Line Compare            (sets bit 8)
- *  SVB: Start Vertical Blinking (sets bit 8)
+ *  vrs: Vertical Retrace Start  (sets bits 8-9)
+ *  vde: Vertical Display End    (sets bits 8-9)
+ *  vt:  Vertical Total          (sets bits 8-9)
+ *  lc:  Line Compare            (sets bit 8)
+ *  svb: Start Vertical Blinking (sets bit 8)
  *  All the args should be 0, 1 or SAME.
  */
 static inline void
-xstdvga_set_overflow(U16 VRS, U16 VDE, U16 VT, U16 LC, U16 SVB)
+xstdvga_set_overflow(const U16 vrs,
+					 const U16 vde,
+					 const U16 vt,
+					 const U16 lc,
+					 const U16 svb)
 {
-	xstdvga_select_crt_reg(VGA_OVERFLOW_INDEX);
-	U8 overflow = xstdvga_in_from_crt_reg();
-	xstdvga_out_to_crt_reg(__calculate_overflow(overflow, VRS, VDE, VT, LC, SVB));
+	SET_CRT_REG_FUNCTION(VGA_OVERFLOW_INDEX, __calculate_overflow,
+						 vrs, vde, vt, lc, svb);
 }    
 
 /*
@@ -77,7 +89,36 @@ static inline void
 xstdvga_set_v_display_end(U8 scanlineNumLow8)
 {
 	xstdvga_select_crt_reg(VGA_V_DISPLAY_END_INDEX);
-	xstdvga_out_to_crt_reg(scanlineNumLow8);
+	xstdvga_out_to_reg(scanlineNumLow8);
+}
+
+static __CONST__ U8
+__calculate_vertical_retrace(const U8 vRetrace,
+							 const U8 protect,
+							 const U8 bandwidth,
+							 const U8 vRetraceEnd)
+{
+	return (protect == SAME ?
+			    vRetrace & (1 << VGA_PROTECT)
+			    :
+			    protect << VGA_PROTECT)     |
+		   (bandwidth == SAME ?
+			    vRetrace & (1 << VGA_BANDWIDTH)
+			    :
+			    bandwidth << VGA_BANDWIDTH) |
+		   (vRetraceEnd == SAME ?
+			    vRetrace & 0xF
+			    :
+			    vRetraceEnd);
+}
+	
+static inline void
+xstdvga_set_vertical_retrace(const U8 protect,
+							 const U8 bandwidth,
+							 const U8 vRetraceEnd)
+{
+	SET_CRT_REG_FUNCTION(VGA_VERTICAL_RETRACE_INDEX, __calculate_vertical_retrace,
+						 protect, bandwidth, vRetraceEnd);
 }
 
 /*
@@ -85,7 +126,7 @@ xstdvga_set_v_display_end(U8 scanlineNumLow8)
  *--------------------------------------------------------------------*
  */
 static inline void
-xstdvga_set_v_display(U16 scanlineNum)
+xstdvga_set_v_display(const U16 scanlineNum)
 {
 	xstdvga_set_v_display_end((U8)scanlineNum);
 	xstdvga_set_overflow(SAME, scanlineNum, SAME, SAME, SAME);

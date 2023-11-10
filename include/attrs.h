@@ -13,8 +13,11 @@
 #define __CONSTRUCTOR__     __attribute__ ((constructor))
 #define __NORETURN__        __attribute__ ((noreturn))
 #define __PACKED__          __attribute__ ((packed))
+#define __PURE__            __attribute__ ((pure))
 #define __SECTION__(s)      __attribute__ ((section(#s)))
+#define __SENTINEL__(n)     __attribute__ ((sentinel(n)))
 #define __UNUSED__          __attribute__ ((unused))
+#define __USED__            __attribute__ ((used))
 #define __WEAK__            __attribute__ ((weak))
 #define __WEAKREF__(s)      __attribute__ ((weakref(#s)))
 

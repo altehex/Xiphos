@@ -9,6 +9,13 @@
 #include <include/types.h>
 
 
+/*
+ *  Calculates the value of Miscellaneous Output register based on changed bits
+ *  (for xstdvga_set_misc_out()).
+ *--------------------------------------------------------------------*
+ *  miscOut: old Miscellaneous Output register value
+ *  The rest of the args should be 0, 1, SAME or something else if it's not a bit.
+ */
 static __CONST__ U8
 __calculate_misc_out(const U8 miscOut,
 					 const U8 vsyncp,
@@ -44,6 +51,18 @@ __calculate_misc_out(const U8 miscOut,
 			    ioas << VGA_IOAS);
 }
 
+/* 
+ *  Changes value of Miscellaneous Output Register
+ *--------------------------------------------------------------------*
+ *  vsyncp:      Vertical Sync Polarity
+ *  hsyncp:      Horizontal Sync Polarity
+ *  oePage:      Odd/Even Page Select
+ *  clockSelect: Clock Select (display timing)
+ *  ramEn:       RAM Enable
+ *  ioas:        Input/Output Address Select
+ *  All the args should be 0, 1 or SAME. clockSelect is the exception, as
+ *  it can be VGA_CLOCK_25MHZ or VGA_CLOCK_28MHZ.
+ */ 
 static inline void
 xstdvga_set_misc_out(const U8 vsyncp,
 					 const U8 hsyncp,

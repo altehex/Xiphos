@@ -3,24 +3,24 @@
 
 
 #include <define.h>
+#include <graphics.h>
 #include <memory.h>
 #include <sequencer.h>
 
-
-/* Inlined because it should be called one time at startup */
-static inline U32
+/*
+ *  VGA hardware set up on boot
+ *---------------------------------------------------------*
+ *  textGraphics: 1 for text mode
+ */
+static inline void
 xstdvga_setup_video()
 {
-	/* Permit write operations for every plane */
-	xstdvga_set_map_mask(1, 1, 1, 1);
-
-	/* Clear all planes */
-	for (int planeNum = VGA_PLANE_0; planeNum <= VGA_PLANE_3; planeNum++)
-		xstdvga_clear_plane(planeNum);
+/* Inlined because it should be called one time at startup */
 	
-	while (1) {}
-	
-	return xstdvga_get_mem_base();
+	xstdvga_set_vertical_retrace(0, SAME, SAME);     /* Permit write operations to CRT registers 0-7 */
+	xstdvga_set_sequencer_mem_mode(SAME, SAME, 1);   /* Enable extended memory */
+	xstdvga_set_misc_out(SAME, SAME, SAME, SAME, 1, 1); /* Enable access to display buffer, color mode */
+	while(1){}
 }
 
 static inline void __ALIAS__(xstdvga_setup_video)

@@ -7,7 +7,7 @@
 #include <include/attrs.h>
 #include <include/types.h>
 
-#include <libos/video/xiphos_std_vga/xiphos_std_vga.h>
+#include <xiphos_std_vga.h>
 
 
 /* Color depth in bits */
@@ -18,74 +18,48 @@
 #define D64K  16
 #define D16M  24
 
-/* Symbol size */
+#define TEXT      0
+#define GRAPHICS  1
+
+#define AUTO (U16) -1 
+
 #define SYMBOL_SIZE_DEFAULT   8    
 
 
-typedef const struct __PACKED__ {
+typedef struct __PACKED__ {
 	U16     height;
 	U16     width;
 	U8      colorDepth;
-} VgaGraphicsMode;
-
-/* VGA modes */
-static VgaGraphicsMode G320x200x16    = { .height = 320,  .width = 200, .colorDepth = D16 };
-static VgaGraphicsMode G640x200x16    = { .height = 640,  .width = 200, .colorDepth = D16 };
-static VgaGraphicsMode G640x350x16    = { .height = 640,  .width = 350, .colorDepth = D16 };
-static VgaGraphicsMode G640x480x16    = { .height = 640,  .width = 480, .colorDepth = D16 };
-static VgaGraphicsMode G320x200x256   = { .height = 320,  .width = 200, .colorDepth = D256 };
-static VgaGraphicsMode G320x240x256   = { .height = 320,  .width = 240, .colorDepth = D256 };
-static VgaGraphicsMode G320x400x256   = { .height = 320,  .width = 400, .colorDepth = D256 };
-static VgaGraphicsMode G360x480x256   = { .height = 360,  .width = 480, .colorDepth = D256 };
-static VgaGraphicsMode G640x480x2     = { .height = 640,  .width = 480, .colorDepth = D2 };
-
-/* SVGA modes */
-static VgaGraphicsMode G640x480x256   = { .height = 640,  .width = 480,  .colorDepth = D256 };
-static VgaGraphicsMode G800x600x256   = { .height = 800,  .width = 600,  .colorDepth = D256 };
-static VgaGraphicsMode G1024x768x256  = { .height = 1024, .width = 768,  .colorDepth = D256 };
-static VgaGraphicsMode G1280x1024x256 = { .height = 1280, .width = 1024, .colorDepth = D256 };
-static VgaGraphicsMode G320x200x32K   = { .height = 320,  .width = 200,  .colorDepth = D32K };
-static VgaGraphicsMode G320x200x64K   = { .height = 320,  .width = 200,  .colorDepth = D64K };
-static VgaGraphicsMode G320x200x16M   = { .height = 320,  .width = 200,  .colorDepth = D16M };
-static VgaGraphicsMode G640x480x32K   = { .height = 640,  .width = 480,  .colorDepth = D32K };
-static VgaGraphicsMode G640x480x64K   = { .height = 640,  .width = 480,  .colorDepth = D64K };
-static VgaGraphicsMode G640x480x16M   = { .height = 640,  .width = 480,  .colorDepth = D16M };
-static VgaGraphicsMode G800x600x32K   = { .height = 800,  .width = 600,  .colorDepth = D32K };
-static VgaGraphicsMode G800x600x64K   = { .height = 800,  .width = 600,  .colorDepth = D64K };
-static VgaGraphicsMode G800x600x16M   = { .height = 800,  .width = 600,  .colorDepth = D16M };
-static VgaGraphicsMode G1024x768x32K  = { .height = 1024, .width = 768,  .colorDepth = D32K };
-static VgaGraphicsMode G1024x768x64K  = { .height = 1024, .width = 768,  .colorDepth = D64K };
-static VgaGraphicsMode G1024x768x16M  = { .height = 1024, .width = 768,  .colorDepth = D16M };
-static VgaGraphicsMode G1280x1024x32K = { .height = 1280, .width = 1024, .colorDepth = D32K };
-static VgaGraphicsMode G1280x1024x64K = { .height = 1280, .width = 1024, .colorDepth = D64K };
-static VgaGraphicsMode G1280x1024x16M = { .height = 1280, .width = 1024, .colorDepth = D16M };
+	U8      graphics;       /* True for graphics mode */
+} xstdcon_VgaMode;
 
 
-__API_XSTDCON__ VgaGraphicsMode
-xstdcon_get_mode();
+static __USED__ xstdcon_VgaMode xiphosDebugTextMode =
+{
+	.height     = AUTO,
+	.width      = AUTO,
+	.colorDepth = (U8) AUTO,
+	.graphics   = TEXT
+};
+
+	
 __API_XSTDCON__ void 
-xstdcon_set_mode_mparm(U16, U16, U8, U8);
+xstdcon_set_mode_mparm(const U16, const U16, const U8, const U8);
 
 
 /* Inlined because it just sets up the args for xstdcon_set_mode_mparm */
 static inline void
-xstdcon_set_mode_struct(VgaGraphicsMode * mode)
+xstdcon_set_mode_struct(const xstdcon_VgaMode * mode)
 {
 	xstdcon_set_mode_mparm(mode->height,
 						   mode->width,
 						   mode->colorDepth,
-						   SYMBOL_SIZE_DEFAULT);
+						   mode->graphics);
 }
 
 #define xstdcon_set_mode(_1, ...)  _Generic((_1), \
-											VgaGraphicsMode *: xstdcon_set_mode_struct, \
+											xstdcon_VgaMode *: xstdcon_set_mode_struct, \
 											U16:               xstdcon_set_mode_mparm) (_1, ##__VA_ARGS__)
-
-static inline void
-xstdcon_set_symbol_sz(U8 sz)
-{
-	xstdvga_set_max_scanline(sz - 1);
-}
 
 static inline void
 xstdcon_set_height(U16 height)

@@ -2,25 +2,23 @@
 
 #include <include/types.h>
 
-#include <libos/video/xiphos_std_vga/xiphos_std_vga.h>
+#include <xiphos_std_vga.h>
 
-
-VgaGraphicsMode
-xstdcon_get_mode()
-{
-	VgaGraphicsMode currMode;
-
-	/* WIP */
-	
-	return currMode;
-}
 
 void
-xstdcon_set_mode_mparm(U16 height,
-					   U16 width,
-					   U8  colorDepth,
-					   U8  symbolSz)
+xstdcon_set_mode_mparm(const U16 height,
+					   const U16 width,
+					   const U8  colorDepth,
+					   const U8  textGraphics)
 {
-	xstdcon_set_symbol_sz(symbolSz);
-	xstdcon_set_height(height);
+    /* Set text/graphics mode */
+	xstdvga_set_map_mask(1, 1, 1, textGraphics);                   /* Permit write operations for planes */
+	xstdvga_set_misc_graphics((!textGraphics) * VGA_MEM_MAP_32K_2, /* Set memory map (32K at 0xB8000 for text mode) */
+							  SAME, textGraphics);
+
+    /* Set video resolution */
+	if (height != AUTO)
+		xstdcon_set_height(height);
+
+		xstdcon_set_height(360);
 }

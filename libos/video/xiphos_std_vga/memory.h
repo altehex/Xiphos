@@ -9,7 +9,6 @@
 #include <include/types.h> 
 
 
-__LIBOS_XSTDVGA__ void xstdvga_clear_plane(U8);
 __LIBOS_XSTDVGA__ U64 xstdvga_get_mem_base();
 
 

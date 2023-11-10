@@ -5,21 +5,22 @@
 #include <font.h>
 #include <mode.h>
 
-#include <libos/video/xiphos_std_vga/xiphos_std_vga.h>
+#include <xiphos_std_vga.h>
 
 #include <include/attrs.h>
 
 
 /* Inlined because it should be called one time at startup */
 static inline void
-xstdcon_setup_console()
+xstdcon_setup_boot_stdout()
 {
-	xstdcon_set_mode(&G360x480x256); /* Change to SELECTED_VIDEO_MODE */
+	libos_setup_video();
+	xstdcon_set_mode(&xiphosDebugTextMode); 
 	xstdcon_set_font(/* FONT */);	
 }
 
-static inline void __ALIAS__(xstdcon_setup_console)
-api_setup_console();
+static inline void __ALIAS__(xstdcon_setup_boot_stdout)
+api_setup_boot_stdout();
 
 
 #endif /* ! _XSTDCON_SETUP_CONSOLE_H_ */
