@@ -1,4 +1,4 @@
-DIRS    := xiphos_std_vga
+DIRS = xiphos_std_vga
 
 .PHONY = all 
 all: $(DIRS)

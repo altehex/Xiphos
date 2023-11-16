@@ -128,8 +128,8 @@ parse_mem_map:
 	
 ;; Fix the base and the size of the first __RAM entry
 ;; (the first 1 MB is for system data)
-	mov		qword [RBX + 20 + 4], IMG_BASE
-	sub		qword [RBX + 20 + 4 + 8], IMG_BASE
+	mov		qword [RBX + 20 + 4], IMG_BASE + IMG_SIZE
+	sub		qword [RBX + 20 + 4 + 8], IMG_BASE + IMG_SIZE
 	
 	mov		RDX, [memMapSz]
 	add		RDX, PAGE_SZ - 1

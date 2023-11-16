@@ -18,7 +18,7 @@ __ACPI_TABLES	= 	1	  		; EfiACPIReclaimMemory
 __ACPI_NVS		= 	2			; EfiACPIMemoryNVS
 __NON_VOLATILE  =   3			; EfiPersistentMemory
 __KERNEL        =   4			; For kernel image
-__MEMORY_MAP	=   0x0D1E0D1E	; For memory map
+__MEMORY_MAP	=   0x50414D4D	; For memory map
 	
 	
 TABLE	__memRecord

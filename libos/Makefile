@@ -1,4 +1,4 @@
-DIRS = video
+DIRS = serial video
 
 .PHONY = all
 all: $(DIRS)

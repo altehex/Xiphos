@@ -1,4 +1,4 @@
-ENTRY(kinit);
+ENTRY(xiphos_init);
 SECTIONS
 {
 	kinit = 0x100000;

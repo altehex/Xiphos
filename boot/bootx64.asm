@@ -105,6 +105,9 @@ include "./int.asm"
 	
 ;; Set up paging
 include "./paging.asm"
+
+;; Get XSDP
+include "./setup_args.asm"
 	
 ;; Exit EFI
 	xor		R9, R9
@@ -153,6 +156,10 @@ core_init:
 	mov		RSP, IMG_BASE + IMG_SIZE + 0x1000
 	and		SP, 0xF000
 	mov		RBP, RSP
+
+;; Setup kinit arguments (cdecl)
+	mov     RDI, [xsdp]
+	mov	    RSI, [corenum]
 	
 ;; Push kernel code
 	mov		RAX, IMG_BASE
@@ -185,7 +192,8 @@ EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID:	_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 EFI_MP_SERVICES_PROTOCOL_GUID:			_EFI_MP_SERVICES_PROTOCOL_GUID 
 	
 EFI_RSDP_GUID:		_EFI_ACPI_TABLE_GUID	
-	
+
+xsdp            PTR
 	
 imgHandle		PTR
 sysTable		PTR
@@ -207,9 +215,6 @@ procNum			IN
 procInfo		EfiProcInfo
 	align	4
 bspReady		I8
-
-acpiTablesBase	PTR
-acpiTablesSz	I64	; Is used to map ACPI tables region
 	
 pml4Base		PTR
 idtBase			PTR

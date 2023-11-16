@@ -9,7 +9,7 @@
 #include <include/types.h> 
 
 
-__LIBOS_XSTDVGA__ U64 xstdvga_get_mem_base();
+__LIBOS_XSTDVGA__ extern void * xstdvga_get_mem_base();
 
 
 static inline void

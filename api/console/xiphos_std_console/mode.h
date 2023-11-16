@@ -33,15 +33,6 @@ typedef struct __PACKED__ {
 	U8      graphics;       /* True for graphics mode */
 } xstdcon_VgaMode;
 
-
-static __USED__ xstdcon_VgaMode xiphosDebugTextMode =
-{
-	.height     = AUTO,
-	.width      = AUTO,
-	.colorDepth = (U8) AUTO,
-	.graphics   = TEXT
-};
-
 	
 __API_XSTDCON__ void 
 xstdcon_set_mode_mparm(const U16, const U16, const U8, const U8);
@@ -65,6 +56,15 @@ static inline void
 xstdcon_set_height(U16 height)
 {
 	xstdvga_set_v_display(height - 1);
+}
+
+/*
+ *  Does a fast mode setting for stdout console at boot
+ */
+static inline void
+xstdcon_set_mode_boot_stdout()
+{
+	
 }
 		
 

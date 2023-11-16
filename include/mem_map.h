@@ -8,12 +8,12 @@
 
 #define ACPI_TABLES_RECORD_INDEX    1
 
-#define __RAM              0
-#define __ACPI_TABLES      1
-#define __ACPI_NVS         2
-#define __NON_VOLATILE     3
-#define __KERNEL           4	
-#define __MEMORY_MAP	   0x0D1E0D1E
+#define MMAP_RAM              0
+#define MMAP_ACPI_TABLES      1
+#define MMAP_ACPI_NVS         2
+#define MMAP_NON_VOLATILE     3
+#define MMAP_KERNEL           4	
+#define MMAP_MEMORY_MAP	      0x50414D4D
 
 
 typedef struct __PACKED__ {
@@ -23,7 +23,7 @@ typedef struct __PACKED__ {
 } MemRecord;
 
 
-static __UNUSED__
+static volatile __UNUSED__
 MemRecord * xiphosMemMap = 0x0000000000000000;
 	
 

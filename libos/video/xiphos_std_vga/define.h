@@ -121,9 +121,9 @@
 /*
  *  --- Misc ---
  */
-#define VGA_MEM_BASE_0  0x000A0000
-#define VGA_MEM_BASE_1  0x000B0000
-#define VGA_MEM_BASE_2  0x000B8000
+#define VGA_MEM_BASE_0  (PTR) 0x000A0000
+#define VGA_MEM_BASE_1  (PTR) 0x000B0000
+#define VGA_MEM_BASE_2  (PTR) 0x000B8000
 #define VGA_TEXT_BASE   (char *) VGA_MEM_BASE_2
 #define VGA_PLANE_SZ    0x00010000
 

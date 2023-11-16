@@ -1,9 +1,10 @@
-ENTRY(kinit);
+ENTRY(xiphos_init);
 SECTIONS
 {
 	.init :
 	{
-		*(.init.kinit .init.*)
+		*(.init.xiphos_init .init.*)
+		*(.subsys) *(.subsys.*)
 		*(.api .api.*)
 		*(.libos .libos.*)
 		*(.plt .plt.*)

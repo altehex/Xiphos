@@ -1,18 +1,22 @@
 KERNEL_IMAGE_DIR  := $(SRC_ROOT)/build/efi/xiphos
 KERNEL_IMAGE_NAME := $(PACKAGE_NAME).img
 
-export KINIT_ALL = init.o
+export XINIT_ALL  = init.o
+export XMEM_ALL   = mem.o
+export XSCHED_ALL = sched.o
 
-KERNEL_OBJ := $(KINIT_ALL) $(API_OBJ) $(LIBOS_OBJ)
+KERNEL_SUBSYS = devman # shaman netman etc.
+SUBSYS_OBJ := $(foreach SUBSYS,$(KERNEL_SUBSYS), \
+			   $(SRC_ROOT)/subsys/$(SUBSYS).o)
+
+KERNEL_OBJ := $(XINIT_ALL) $(XMEM_ALL) $(XSCHED_ALL) $(API_OBJ) $(LIBOS_OBJ) $(SUBSYS_OBJ)
 KERNEL_LDS = kernel.lds
 
-export KERNEL_INCLUDE := $(INCLUDE) \
-						 -I$(SRC_ROOT)/kernel
+export INCLUDE += -I$(SRC_ROOT)/kernel
 
-CFLAGS += $(KERNEL_USER_CONFIG)
+CFLAGS += $(KERNEL_CONFIG_DEFINES)
 
-_DIRS = init
-DIRS = $(foreach DIR, $(_DIRS),$(SRC_ROOT)/kernel/$(DIR))
+DIRS = mem sched init
 
 .PHONY = all
 all: $(KERNEL_IMAGE_NAME)

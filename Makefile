@@ -1,6 +1,6 @@
 export OS_NAME          =  Xiphos
 	   OS_VERSION_MAJOR =  0
-	   OS_VERSION_MINOR =  2.5
+	   OS_VERSION_MINOR =  2.2
 export OS_VERSION       := $(OS_VERSION_MAJOR).$(OS_VERSION_MINOR)
 export OS_EDITION       =  α
 export OS_EDITION_LATIN =  alpha
@@ -62,11 +62,12 @@ export CC LD FASM OBJCOPY TARGET
 # Flags configuration 
 #---------------------------------*
 CFLAGS = -std=c17 \
-		 -funsigned-char
+		 -funsigned-char \
+         -nostdlib \
+         -nolibc
 
 CWARNINGS = -Wall \
-		    -Wextra \
-			-Wpedantic
+		    -Wextra 
 
 LDFLAGS = -ffreestanding \
 		  -shared \
@@ -81,7 +82,8 @@ CFLAGS  += $(USER_CFLAGS) $(CWARNINGS)
 LDFLAGS += $(USER_LDFLAGS)
 
 INCLUDE := -I$(SRC_ROOT) \
-		   -I$(SRC_ROOT)/include
+		   -I$(SRC_ROOT)/include \
+		   -I$(SRC_ROOT)/libc
 
 
 export CFLAGS LDFLAGS INCLUDE
@@ -90,7 +92,7 @@ export CFLAGS LDFLAGS INCLUDE
 # Targets
 #-------------------------------*
 # The ordering is important (boot is last and kernel is second-to-last)
-_DIRS = api libos kernel boot
+_DIRS = api libos devman kernel boot
 DIRS := $(foreach DIR,$(_DIRS),$(SRC_ROOT)/$(DIR))
 
 .PHONY = all
@@ -104,6 +106,7 @@ $(DIRS): check_build_dir
 .PHONY += check_build_dir
 check_build_dir: _force
 	[[ -e build ]] || mkdir build
+	[[ -e subsys ]] || mkdir subsys
 
 .PHONY += dist
 dist: # tar: compress the kernel image and the bootloader
@@ -114,6 +117,7 @@ CLEAN_DIRS := $(foreach DIR,$(DIRS),$(addsuffix .clean,$(DIR)))
 clean: MAKEFLAGS += -s
 clean: $(CLEAN_DIRS)
 	$(RM) -r build
+	$(RM) -r subsys
 
 $(CLEAN_DIRS):
 	$(MAKE) clean -C $(basename $@)

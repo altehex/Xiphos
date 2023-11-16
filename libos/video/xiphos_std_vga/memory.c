@@ -6,7 +6,7 @@
 #include <include/types.h>
 
 
-U64
+void *
 xstdvga_get_mem_base()
 {
 	xstdvga_select_graphics_reg(VGA_MISC_GRAPHICS_INDEX);

@@ -32,9 +32,5 @@
 	mov		[memMapBase], RBX
 	mov		[acpiTablesSz], RBX
 	
-;; But it gotta copy the entire RSDP, XSDT et al.
-	
-;; Make sure to accumulate the size of tables in acpitTablesSz
-;; It's important to make a proper memory map
 
 ;; ......

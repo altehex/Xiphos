@@ -1,24 +1,24 @@
-KINIT_SOURCE_NAMES = kinit acpi irq
+XINIT_SOURCE_NAMES = xinit
 
-KINIT_LDS     =  init.lds
-KINIT_API     := console/$(API_CONSOLE)
-KINIT_LIBOS   := video/$(LIBOS_VGA)
-KINIT_OBJ     := $(foreach OBJ, $(KINIT_SOURCE_NAMES), $(OBJ).o)
+XINIT_LDS     =  init.lds
+XINIT_API     := console/$(API_CONSOLE)
+XINIT_LIBOS   := video/$(LIBOS_VGA) serial/bus/$(LIBOS_PCIE)
+XINIT_OBJ     := $(foreach OBJ, $(XINIT_SOURCE_NAMES), $(OBJ).o)
 
-INCLUDE += -I$(SRC_ROOT)/kernel/init \
-		   $(foreach API, $(KINIT_API), -I$(SRC_ROOT)/api/$(API)) \
-		   $(foreach LIBOS, $(KINIT_LIBOS), -I$(SRC_ROOT)/libos/$(LIBOS))
+XINIT_INCLUDE := $(INCLUDE) \
+				 -I$(SRC_ROOT)/kernel/init \
+		   		 $(foreach API, $(XINIT_API), -I$(SRC_ROOT)/api/$(API)) \
+		   		 $(foreach LIBOS, $(XINIT_LIBOS), -I$(SRC_ROOT)/libos/$(LIBOS))
 
 .PHONY = all
-all: $(KINIT_ALL)
+all: $(XINIT_ALL)
 	$(CP) $^ $(SRC_ROOT)/kernel
 
-# Don't forget to try to use vpath for api and libos objects
-$(KINIT_ALL): $(KINIT_OBJ)
-	$(LD) --relocatable -T $(KINIT_LDS) $^ -o $@
+$(XINIT_ALL): $(XINIT_OBJ)
+	$(LD) --relocatable -T $(XINIT_LDS) $^ -o $@
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDE) -c $^ -o $@ 
+	$(CC) $(CFLAGS) $(XINIT_INCLUDE) -c $^ -o $@ 
 
 CLEAN = *.o *.c.*
 
