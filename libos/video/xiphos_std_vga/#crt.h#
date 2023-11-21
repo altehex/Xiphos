@@ -1,3 +1,4 @@
+
 #ifndef _XSTDVGA_CRT_H_
 #define _XSTDVGA_CRT_H_
 
@@ -39,6 +40,22 @@ enum Index {
 	CRTC_MODE_CONTROL,
 	LINE_COMPARE
 };
+
+typedef struct __PACKED__ {
+	BIT_FIELD   vrs9:   1,
+		        vde9:   1,
+		        vt9:    1,
+		        lc8:    1,
+		        svb8:   1,
+		        vrs8:   1,
+		        vde8:   1,
+		        vt8:    1;
+} Overflow;
+
+typedef struct __PACKED__ {
+	U8          index;
+    Overflow    reg;
+} VgaCrtOverfowReg;
 
 
 /* Skeleton for register setting functions */

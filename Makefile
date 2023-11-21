@@ -64,7 +64,9 @@ export CC LD FASM OBJCOPY TARGET
 CFLAGS = -std=c17 \
 		 -funsigned-char \
          -nostdlib \
-         -nolibc
+         -nolibc \
+         -mno-red-zone \
+	     -ffreestanding
 
 CWARNINGS = -Wall \
 		    -Wextra 

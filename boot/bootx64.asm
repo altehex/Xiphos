@@ -97,7 +97,7 @@ include "./smp.asm"
 ;; Get memory map
 include "./mem_map.asm"
 
-;; Relocate GDT (UEFI have already set it up)
+;; Relocate GDT (UEFI has already set it up)
 include "./reloc_gdt.asm"
 	
 ;; Set up interrupts
@@ -153,12 +153,12 @@ core_init:
 	mov		CR3, RAX
 	
 ;; Set up stack
-	mov		RSP, IMG_BASE + IMG_SIZE + 0x1000
+	mov		RSP, IMG_BASE + IMG_SIZE + 0x2000
 	and		SP, 0xF000
 	mov		RBP, RSP
 
-;; Setup kinit arguments (cdecl)
-	mov     RDI, [xsdp]
+;; Setup kinit arguments (sysv amd64 abi)
+	mov     RDI, RBP
 	mov	    RSI, [corenum]
 	
 ;; Push kernel code

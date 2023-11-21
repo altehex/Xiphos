@@ -3,6 +3,7 @@
 
 
 #include "attrs.h"
+#include "kernel.h"
 #include "types.h"
 
 #include <libc/stdlib.h>
@@ -19,57 +20,83 @@ typedef struct __PACKED__ {
 } Context;
 
 /*
+ *  We use arrays for cores and kernels because we don't
+ *  need to allocate more memory for them after startup.
+ *  Thread lists, on the other hand, can't be statically
+ *  defined.
+ *  This is a subject to change because the OS might support
+ *  CPU hot-plugging im the future.
+ *
+ *  *  What if we use this construction?
+ *  * 
+ *  *  [ CoreCtrl ]<-->[ CoreCtrl ]<--> ...
+ *  *        |               |
+ *  *  [ Initial ]     [ One hot-plugged CPU ]
+ *  *  [  cores  ]     [ or an array of hot- ]
+ *  *                  [     plugged CPUs    ]
+ *
+ *  How it looks like now:
+ *
+ *  [ Kern 0 ] [ Kern 1 ] ... [ Kern N ]
+ *       |          |              |
  *  [ Core 0 ] [ Core 1 ] ... [ Core N ]
  *                  |
- *                  V
  *          [ ThreadCtrl 0 ]<--> ... <-->[ ThreadCtrl N ]
  *                  |
- *                  V
  *            [ Thread 0 ]
  */
 
-typedef struct _ThreadCtrl ThreadCtrl;
-typedef struct _Thread     Thread;
+typedef struct _Core         Core;
+typedef struct _ThreadCtrl   ThreadCtrl;
+typedef struct _Thread       Thread;
 
 typedef struct __PACKED__ {
-	U16             id;
-	U16             flags;
+	unsigned  __pad: 32;
+} CoreFlags;
+
+struct __PACKED__
+_Core {
+	/* CoreFlags       flags; */
+	XiphosKernel *  kernel;
 	ThreadCtrl *    threadCtrl;
-} Core;
+};
 
-typedef struct __PACKED__ {
-	U16             id;
-	U16             flags;
-	ThreadCtrl *    next;
-	ThreadCtrl *    prev;
-	Core *          core;
-	Thread *        thread;
-} _ThreadCtrl;
+struct __PACKED__
+_ThreadCtrl {
+	U16          id;
+	U16          flags;
+	ThreadCtrl * next;
+	ThreadCtrl * prev;
+	Core *       core;
+	Thread *     thread;
+};
 
-typedef struct __PACKED__ {
-	Context         context;
-	FUNC            func;
-	PTR             args;
-	ThreadCtrl *    threadCtrl;
-} _Thread;
+ThreadCtrl          __sentinelThreadCtrl = {0, 0, 0, 0, 0, 0};
+static ThreadCtrl * sentinelThreadCtrl   = &__sentinelThreadCtrl;
+
+struct __PACKED__
+_Thread {
+	Context       context;
+	FUNC          func;
+	PTR           args;
+	ThreadCtrl *  threadCtrl;
+};
 
 
-static inline Core *
+static Core * xiphosCores; /* Global core array */
+
+
+static inline void
 enumerate_cores(U64 coreNum)
 {
-	Core *     currentCore;
-	Core *     corePool;
+	xiphosCores = (Core *) malloc(sizeof(Core) * coreNum);
 
-	corePool     = (Core *) malloc(sizeof(Core) * coreNum);
-	
-	for (; coreNum >= 0; coreNum--) {
-		currentCore = &corePool[coreNum];
-
-		currentCore->id    = (U16) coreNum;
-		currentCore->flags = 0x0000;
+	for (; coreNum != MAX_U64; coreNum--) {
+		xiphosCores[coreNum].kernel     = sentinelKernel;
+		xiphosCores[coreNum].threadCtrl = sentinelThreadCtrl;
 	}
-
-    return corePool;
+		
+	/* TBD */
 }
 
 

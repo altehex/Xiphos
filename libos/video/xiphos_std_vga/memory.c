@@ -21,3 +21,11 @@ xstdvga_get_mem_base()
 			return VGA_MEM_BASE_0;
 	}
 }
+
+
+#include "crt.h"
+
+void
+test() {
+	xstdvga_set_overflow(SAME, 360, 78, SAME, SAME);
+}

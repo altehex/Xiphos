@@ -7,7 +7,7 @@
 
 void
 xstdcon_set_mode_mparm(const U16 height,
-					   const U16 width,
+					   __UNUSED__ const U16 width,
 					   const U8  colorDepth,
 					   const U8  textGraphics)
 {

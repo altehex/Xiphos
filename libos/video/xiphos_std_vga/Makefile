@@ -1,7 +1,6 @@
 include $(SRC_ROOT)/utils/macro.mk
 
 LIBOS_NAME     = xiphos_std_vga
-LIBOS_CATEGORY = video
 
 ALL := $(LIBOS_NAME).o
 SOURCE_NAMES = memory setup_video

@@ -1,24 +1,31 @@
 #include "acpi.h"
 
 #include <include/acpi.h>
+#include <include/attrs.h>
 #include <include/types.h>
 
 
 void
-acpi_init(AcpiXsdp * xsdp)
+acpi_init(__UNUSED__ AcpiXsdp * xsdp)
 {
 	return;
 }
 
 
 PTR
-acpi_locate_table(U32 sig, AcpiXsdt * xsdt)
+acpi_locate_table(CHARPTR sig, AcpiXsdt * xsdt)
 {
 	AcpiTableDesc * acpiTable;
 	U32             currSig;
+	U32             _sig;
 
-	for (acpiTable = (AcpiTableDesc *) xsdt->entries; sig != currSig; acpiTable += sizeof(U64))
-		currSig = (U32) *(acpiTable->sig);
+	/* FIXME: Does it even work? */
+	_sig = (U32) *sig;
+	acpiTable = (AcpiTableDesc *) xsdt->entries;
+	do {
+	    currSig = (U32) *(acpiTable->sig);
+		acpiTable += sizeof(U64);
+	} while (_sig != currSig);
 	
 	return acpiTable;
 }

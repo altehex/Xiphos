@@ -10,7 +10,7 @@
 
 
 __XINIT_ACPI__ void acpi_init(AcpiXsdp *);
-__DEVMAN__ PTR acpi_locate_table(U32, AcpiXsdt *);
+__DEVMAN__ PTR acpi_locate_table(__NONSTRING__ CHARPTR, AcpiXsdt *);
 
 
 #endif /* ! _XDEVMAN_ACPI_H_ */

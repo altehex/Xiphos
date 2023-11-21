@@ -23,8 +23,11 @@ typedef struct __PACKED__ {
 } MemRecord;
 
 
-static volatile __UNUSED__
-MemRecord * xiphosMemMap = 0x0000000000000000;
-	
+/* NOTE: GCC emits ud2 without __USED__ attribute */
+static __USED__ MemRecord * xiphosMemMap = 0x0000000000000000;
+
+
+U64 get_total_memory(void);
+
 
 #endif /* ! _XIPHOS_MEM_MAP_H_ */

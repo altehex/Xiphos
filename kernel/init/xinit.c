@@ -2,24 +2,28 @@
 #include <attrs.h>
 #include <types.h>
 #include <mp.h>
+#include <settings.h>
 
+#include <mem/init.h>
 #include <sched/idle.h>
 
-#include <devman/acpi.h>
+/* #include <devman/init.h> */
+/* #include <netman/init.h> */
+/* #include <secman/init.h> */
+/* #include <shaman/init.h> */
 
-#if !defined CONFIG_NO_LOGS_AT_STARTUP || CONFIG_HEADLESS
+#if !defined DISPLAY_OFF
 #   include <setup_console.h>
 #endif
 
 
 __NORETURN__ __XINIT__(xiphos_init) void
-xiphos_init(AcpiXsdp * xsdp, U64 coreNum)
+xiphos_init(PTR kernelStackBase, U64 coreNum)
 {
-	Core * xiphosCores; /* Global core array */
-
-	xiphosCores = enumerate_cores(coreNum);
+	alloc_init(kernelStackBase);    /* Allocator initialization. */
+	enumerate_cores(coreNum);     /* Create Core structures */
 	
-#if !defined CONFIG_NO_LOGS_AT_STARTUP || CONFIG_HEADLESS
+#if !defined DISPLAY_OFF
 	setup_boot_stdout();
 #endif
 
@@ -40,8 +44,7 @@ xiphos_init(AcpiXsdp * xsdp, U64 coreNum)
 	 *     - Netman
 	 *     - Secman
 	 *     - Shaman
-	 *     - Emuman (if en
-	 abled)
+	 *     - Emuman (if enabled)
 	 * - Starting services
 	 */
 

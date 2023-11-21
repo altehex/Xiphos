@@ -40,7 +40,10 @@ VGA:
 
 | Goal for alpha-0.3
 +----------------------*
-- Initialize VGA, add basic text mode output.
+- Basic PCI/PCIe support
+- VGA initialization, basic text mode output (just for logging).
 - Kernel initialization on every core.
 - Basic memory allocation.
 - Basic parallelism.
+
+

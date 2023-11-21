@@ -6,8 +6,11 @@
 #include <include/types.h>
 
 
-__WEAK__ PTR _malloc(SIZE32);
+__HOT__ __WEAK__ __MALLOC_LIKE__ PTR _malloc(SIZE32);
+__HOT__ __WEAK__ void _free(PTR);
 
+
+#define free(_1)   _free(_1)
 #define malloc(_1) _malloc(_1)
 
 

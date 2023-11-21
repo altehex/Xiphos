@@ -21,7 +21,7 @@
 	{                                        \
 		register SIZE __in __asm__ (#A_REG); \
                                              \
-		__asm__ __volatile__                 \
+		__asm__                              \
 		(                                    \
 			"in      %[port], %[in]"         \
 		: [in]"=r"(__in)                     \
@@ -41,7 +41,7 @@ DECL_IN_FROM_IMM8(dword, eax)
 		register U16 __port __asm__ ("dx") = port; \
 		register SIZE __in __asm__ (#A_REG);       \
                                                    \
-		__asm__ __volatile__                       \
+		__asm__                                    \
 		(                                          \
 			"in      %[port], %[in]"               \
 		: [in]"=r"(__in)                           \
@@ -60,7 +60,7 @@ DECL_IN_FROM_DX(dword, eax)
 	{                                               \
 		register SIZE __out __asm__ (#A_REG) = out; \
                                                     \
-		__asm__ __volatile__                        \
+		__asm__                                     \
 		(                                           \
 			"out     %[out], %[port]"               \
 		:                                           \
@@ -78,7 +78,7 @@ DECL_OUT_TO_IMM8(dword, eax)
 		register U16   __port __asm__ ("dx")  = port; \
 		register SIZE  __out __asm__ (#A_REG) = out;  \
                                                       \
-		__asm__ __volatile__                          \
+		__asm__                                       \
 		(                                             \
 			"out     %[out], %[port]"                 \
 		:                                             \

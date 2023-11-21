@@ -20,7 +20,7 @@ xstdvga_select_reg(U16 port, U8 index)
 	register U8  byte __asm__ ("al");
 	register U16 __port __asm__ ("dx") = port;
 
-	__asm__ __volatile__
+	__asm__
 	(
 	    "mov     %[index], %%al;"
 		"out     %%al, %%dx;"
@@ -35,7 +35,7 @@ xstdvga_in_from_reg()
 {
 	register U8 byte __asm__ ("al");
 	
-	__asm__ __volatile__
+	__asm__
 	(
 	    "in     %%dx, %%al"
 	: "=r"(byte)
@@ -51,7 +51,7 @@ xstdvga_out_to_reg_with_port_arg(U16 port, U8 byte)
 	register U8  __byte __asm__ ("al") = byte;
 	register U16 __port __asm__ ("dx") = port;
 	
-	__asm__ __volatile__
+	__asm__
 	(
 	    "out    %%al, %%dx"
     :
@@ -63,7 +63,7 @@ xstdvga_out_to_reg_without_port_arg(U8 byte)
 {
 	register U8  __byte __asm__ ("al") = byte;
 	
-	__asm__ __volatile__
+	__asm__
 	(
 	    "out    %%al, %%dx"
     :

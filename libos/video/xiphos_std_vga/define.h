@@ -149,6 +149,16 @@
 					   *  changed.
 					   */
 
+#define BIT0      0x0001
+#define BIT1      0x0002
+#define BIT2      0x0004
+#define BIT3      0x0008
+#define BIT4      0x0010
+#define BIT5      0x0020
+#define BIT6      0x0040
+#define BIT7      0x0080
+#define BIT8      0x0100
+#define BIT9      0x0200
 							  
 
 #endif /* ! _XSTDVGA_DEFINE_H_ */

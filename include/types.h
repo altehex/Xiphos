@@ -18,6 +18,7 @@ typedef signed long int         I64;
 /* Universal pointer */
 typedef void *                  PTR;
 typedef U32                     PTR32;
+typedef char *                  CHARPTR;
 
 /* Universal function pointer */
 typedef PTR (*FUNC)(PTR);
@@ -31,6 +32,12 @@ typedef U8      OFFSET8;
 
 typedef U32     PORT32;
 typedef U32     SIZE32;
+
+/*
+ *  Macros
+ */
+
+#define MAX_U64  (U64) -1
 
 
 #endif /* ! _XIPHOS_TYPES_H_ */

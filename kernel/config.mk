@@ -1,5 +1,11 @@
 # APIs act as a frontend, while libOSes are a backend
 
+
+# Memory
+#----------------------------------*
+export CONFIG_MALLOC = xiphos_std_free_list_malloc    # Malloc implementation(should be in kernel/mem/)
+
+
 # Bus
 #----------------------------------*
 export LIBOS_PCIE = xiphos_std_pci_express
@@ -20,10 +26,11 @@ CONFIG_NO_LOGS_AT_STARTUP = 1	# Should the logs be printed at startup
 
 # Don't touch this
 #----------------------------------*
-export _NAMES_Y_N_CONFIG_ = CONFIG_HEADLESS CONFIG_NO_LOGS_AT_STARTUP 
+export __NAMES_Y_N_CONFIG = CONFIG_HEADLESS CONFIG_NO_LOGS_AT_STARTUP 
+export __NAMES_VAR_CONFIG = CONFIG_MALLOC
 
 export KERNEL_CONFIG_DEFINES := \
-	$(foreach DEF,$(_NAMES_Y_N_CONFIG_),$(intcmp $($(DEF)),1,,-D$(DEF)))
+	$(foreach DEF,$(__NAMES_Y_N_CONFIG),$(intcmp $($(DEF)),1,,-D$(DEF)))
 
 export API_OBJ :=  \
 	$(foreach API, $(API_LIST),$(SRC_ROOT)/api/obj/$(API).o)

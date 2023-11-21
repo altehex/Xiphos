@@ -1,0 +1,9 @@
+#ifndef _XIPHOS_SETTINGS_H_
+#define _XIPHOS_SETTINGS_H_
+
+
+#define DISPLAY_OFF \
+	CONFIG_NO_LOGS_AT_STARTUP || CONFIG_HEADLESS
+
+
+#endif /* ! _XIPHOS_SETTINGS_H_ */
