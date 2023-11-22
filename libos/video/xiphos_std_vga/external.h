@@ -9,47 +9,54 @@
 #include <include/types.h>
 
 
+#define MISC_OUT_READ               (U16) 0x3CC
+#define MISC_OUT_WRITE              (U16) 0x3C2
+
 /*
- *  Calculates the value of Miscellaneous Output register based on changed bits
- *  (for xstdvga_set_misc_out()).
- *--------------------------------------------------------------------*
- *  miscOut: old Miscellaneous Output register value
- *  The rest of the args should be 0, 1, SAME or something else if it's not a bit.
- */
-static __CONST__ U8
-__calculate_misc_out(const U8 miscOut,
-					 const U8 vsyncp,
-					 const U8 hsyncp,
-					 const U8 oePage,
-					 const U8 clockSelect,
-					 const U8 ramEn,
-					 const U8 ioas)
+ * Miscellaneous Output Register I/O
+ *--------------------------------------------------------------------*/
+static inline __PURE__ U8
+xstdvga_in_from_misc_out_reg()
 {
-	return (vsyncp == SAME ?
-			    miscOut & (1 << VGA_VSYNCP)
-			    :
-			    vsyncp << VGA_VSYNCP)      |
-		   (hsyncp == SAME ?
-			    miscOut & (1 << VGA_HSYNCP)
-			    :
-			    hsyncp << VGA_HSYNCP)      |
-		   (oePage == SAME ?
-			    miscOut & (1 << VGA_OE_PAGE)
-			    :
-			    oePage << VGA_OE_PAGE)      |
-		   (clockSelect == SAME ?
-			    miscOut & (1 << VGA_CLOCK_SEL)
-			    :
-			    clockSelect << VGA_CLOCK_SEL) |
-		   (ramEn == SAME ?
-			    miscOut & (1 << VGA_RAM_EN)
-			    :
-			    ramEn << VGA_RAM_EN)       |
-		   (ioas == SAME ?
-			    miscOut & (1 << VGA_IOAS)
-			    :
-			    ioas << VGA_IOAS);
+	register U8 byte __asm__ ("al");
+	
+	__asm__
+	(
+	    "mov    %1, %%dx;"
+	    "in     %%dx, %%al;" 
+		"sub    %2, %%dx"    /* Prepare for write */
+	: "=r"(byte)
+	: "g"(MISC_OUT_READ), "g"(MISC_OUT_READ - MISC_OUT_WRITE)
+	: "dx");
+
+	return byte;
 }
+
+#define VSYNCP_BIT  BIT7
+#define HSYNCP_BIT  BIT6
+#define OEP_BIT     BIT5
+#define CS_BIT      BIT3 | BIT2
+#define RAMEN_BIT   BIT1
+#define IOAS_BIT    BIT0
+
+#define MISC_OUT_MASK1(VSYNCP, HSYNCP, OEP, CS, RAMEN, IOAS) \
+	(VSYNCP == SAME ? VSYNCP_BIT : 0 ) | \
+	(HSYNCP == SAME ? HSYNCP_BIT : 0 ) | \
+	(OEP    == SAME ? OEP_BIT    : 0 ) | \
+	(CS     == SAME ? CS_BIT     : 0 ) | \
+	(RAMEN  == SAME ? RAMEN_BIT  : 0 ) | \
+	(IOAS   == SAME ? IOAS_BIT   : 0 )
+
+#define MISC_OUT_MASK2(VSYNCP, HSYNCP, OEP, CS, RAMEN, IOAS) \
+	(VSYNCP != SAME ? VSYNCP << 7 : 0 ) | \
+	(HSYNCP != SAME ? HSYNCP << 6 : 0 ) | \
+	(OEP    != SAME ? OEP << 5    : 0 ) | \
+	(CS     != SAME ? CS << 2     : 0 ) | \
+	(RAMEN  != SAME ? RAMEN << 1  : 0 ) | \
+	(IOAS   != SAME ? IOAS << 0   : 0 )
+
+#define CLOCK_25MHZ 0
+#define CLOCK_28MHZ 1
 
 /* 
  *  Changes value of Miscellaneous Output Register
@@ -61,7 +68,7 @@ __calculate_misc_out(const U8 miscOut,
  *  ramEn:       RAM Enable
  *  ioas:        Input/Output Address Select
  *  All the args should be 0, 1 or SAME. clockSelect is the exception, as
- *  it can be VGA_CLOCK_25MHZ or VGA_CLOCK_28MHZ.
+ *  it can be CLOCK_25MHZ or CLOCK_28MHZ.
  */ 
 static inline void
 xstdvga_set_misc_out(const U8 vsyncp,
@@ -71,15 +78,31 @@ xstdvga_set_misc_out(const U8 vsyncp,
 					 const U8 ramEn,
 					 const U8 ioas)
 {
-	U8 miscOut = xstdvga_in_from_misc_out_reg();
-	xstdvga_out_to_misc_out_reg(__calculate_misc_out(miscOut,
-													 vsyncp,
-													 hsyncp,
-													 oePage,
-													 clockSelect,
-													 ramEn,
-													 ioas));
+	U8 _MISC_OUT = xstdvga_in_from_misc_out_reg();
+	xstdvga_out_to_reg(APPLY_MASKS(MISC_OUT, vsyncp, hsyncp,
+								   oePage, clockSelect, ramEn, ioas));
 }
-	
+
+
+/*
+ *  Status registers I/O
+ */
+
+#define VGA_INPUT_STATUS_0              (U16) 0x3C2
+
+static inline __PURE__ U8
+xstdvga_in_from_in_status_0()
+{
+	return in(BYTE, VGA_INPUT_STATUS_0);
+}
+
+#define VGA_INPUT_STATUS_1_COLOR        (U16) 0x3DA
+
+static inline __PURE__ U8
+xstdvga_in_from_in_status_1()
+{
+	return in(BYTE, VGA_INPUT_STATUS_1_COLOR);
+}
+
 
 #endif /* ! _XSTDVGA_EXTERNAL_H_ */

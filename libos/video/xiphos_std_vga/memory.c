@@ -1,5 +1,6 @@
 #include "memory.h"
 
+
 #include <define.h>
 #include <graphics.h>
 
@@ -9,7 +10,7 @@
 void *
 xstdvga_get_mem_base()
 {
-	xstdvga_select_graphics_reg(VGA_MISC_GRAPHICS_INDEX);
+	xstdvga_select_reg(GRAPHICS_CTRL_ADDRESS, MISC_GRAPHICS);
 	U8 memMap = xstdvga_in_from_reg() >> 2;
 	
 	switch (memMap) {
@@ -20,12 +21,4 @@ xstdvga_get_mem_base()
 		default:
 			return VGA_MEM_BASE_0;
 	}
-}
-
-
-#include "crt.h"
-
-void
-test() {
-	xstdvga_set_overflow(SAME, 360, 78, SAME, SAME);
 }

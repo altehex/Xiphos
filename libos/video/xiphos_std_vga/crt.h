@@ -10,10 +10,11 @@
 
 
 /* Registers */
-/* #define VGA_CRT_CONTROLLER_COLOR_ADDRESS (U16) 0x3D4 */
-/* #define VGA_CRT_CONTROLLER_COLOR_DATA    (U16) 0x3D5 */
+#define CRT_CTRL_COLOR_ADDRESS (U16) 0x3D4
+#define CRT_CTRL_COLOR_DATA    (U16) 0x3D5 /* Not used yet */
 
-enum Index {
+
+enum CrtIndex {
 	HORIZONTAL_TOTAL,
 	END_HORIZONTAL_DISPLAY,
 	START_HORIZONTAL_BLANKING,
@@ -32,6 +33,7 @@ enum Index {
 	CURSOR_LOCATION_LOW,
 	VERTICAL_RETRACE_START,
 	VERTICAL_RETRACE_END,
+	VERTICAL_DISPLAY_END,
 	OFFSET,
 	UNDERLINE_LOCATION,
 	START_VERTICAL_BLANKING,
@@ -41,52 +43,37 @@ enum Index {
 };
 
 
-/* Skeleton for register setting functions */
-#define SET_CRT_REG_FUNCTION(index, calcFunc, ...)                              \
-	xstdvga_select_crt_reg(index);                                              \
-    U8 __reg_old = xstdvga_in_from_reg();                                       \
-    U16 __port; __asm__ __volatile__ ( "mov %%dx, %0" : "=g"(__port) : : "dx"); \
-    xstdvga_out_to_reg(__port, calcFunc(__reg_old, ##__VA_ARGS__))              
+#define SET_CRT_REG_FUNCTION(INDEX, ...) \
+	SET_REG_ADDR_DATA(CRT_CTRL_COLOR_ADDRESS, INDEX, ##__VA_ARGS__)
 
-#define __APPLY_MASKS(INDEX, ...) \
-	(U8) ((_##INDEX & (INDEX##_MASK1(__VA_ARGS__))) | (INDEX##_MASK2(__VA_ARGS__)))
-
-#define _SET_CRT_REG_FUNCTION(INDEX, ...) \
-	xstdvga_select_crt_reg(INDEX);        \
-	U8 _##INDEX = xstdvga_in_from_reg();  \
-	xstdvga_out_to_reg(__APPLY_MASKS(INDEX, ##__VA_ARGS__))
 
 /* 
- *  Changes value of Max Scanline register of CRT controller.
+ *  Changes value of Max Scanline register of the CRT controller.
  *--------------------------------------------------------------------*
  */ 
 static inline void
 xstdvga_set_max_scanline(U8 maxScanline)
 {
-	xstdvga_select_crt_reg(VGA_MAX_SCANLINE_INDEX);
+	xstdvga_select_reg(CRT_CTRL_COLOR_ADDRESS, MAXIMUM_SCAN_LINE);
 	xstdvga_out_to_reg(maxScanline);
 }
 
-/*  The code below is way better and doesn't mess up DX.
- *  Should've done it like this in the first place.
- */
-
 #define OVERFLOW_MASK1(VRS, VDE, VT, LC, SVB) \
-	(VRS == SAME ? BIT7 | BIT2 : 0) |                \
-    (VDE == SAME ? BIT6 | BIT1 : 0) |                \
-	(VT  == SAME ? BIT5 | BIT0 : 0) |                \
-	(LC  == SAME ? BIT4 : 0) |                \
-	(SVB == SAME ? BIT3 : 0)
+	(VRS == SAME ? BIT7 | BIT2 : 0) |         \
+    (VDE == SAME ? BIT6 | BIT1 : 0) |         \
+	(VT  == SAME ? BIT5 | BIT0 : 0) |         \
+	(LC  == SAME ? BIT4        : 0) |         \
+	(SVB == SAME ? BIT3        : 0)
 
-#define OVERFLOW_MASK2(VRS, VDE, VT, LC, SVB)                         \
+#define OVERFLOW_MASK2(VRS, VDE, VT, LC, SVB)                       \
 	(VRS != SAME ? ((VRS & BIT9) >> 2) | ((VRS & BIT8) >> 6) : 0) | \
 	(VDE != SAME ? ((VDE & BIT9) >> 3) | ((VDE & BIT8) >> 7) : 0) | \
 	(VT  != SAME ? ((VT  & BIT9) >> 4) | ((VT  & BIT8) >> 8) : 0) | \
-	(LC  != SAME ? ((LC  & BIT8) >> 4) : 0) |                        \
-	(SVB != SAME ? ((SVB & BIT8) >> 5) : 0)
+	(LC  != SAME ? ((LC  & BIT8) >> 4)                       : 0) | \
+	(SVB != SAME ? ((SVB & BIT8) >> 5)                       : 0)
 
 /*
- *  Changes the value of Overflow register
+ *  Changes the value of Overflow register of the CRT controller.
  *--------------------------------------------------------------------*
  *  vrs: Vertical Retrace Start  (sets bits 8-9)
  *  vde: Vertical Display End    (sets bits 8-9)
@@ -95,7 +82,6 @@ xstdvga_set_max_scanline(U8 maxScanline)
  *  svb: Start Vertical Blinking (sets bit 8)
  *  All the args should be 0, 1 or SAME.
  */
-
 static inline void
 xstdvga_set_overflow(const U16 vrs,
 					 const U16 vde,
@@ -103,47 +89,41 @@ xstdvga_set_overflow(const U16 vrs,
 					 const U16 lc,
 					 const U16 svb)
 {
-	_SET_CRT_REG_FUNCTION(OVERFLOW, vrs, vde, vt, lc, svb);
+	SET_CRT_REG_FUNCTION(OVERFLOW, vrs, vde, vt, lc, svb);
 }    
 
 /*
- *  Changes the value of Vertical Display End register.
+ *  Changes the value of Vertical Display End register of the CRT controller.
  *--------------------------------------------------------------------*
  */
 static inline void
 xstdvga_set_v_display_end(U8 scanlineNumLow8)
 {
-	xstdvga_select_crt_reg(VGA_V_DISPLAY_END_INDEX);
+	xstdvga_select_reg(CRT_CTRL_COLOR_ADDRESS, VERTICAL_DISPLAY_END);
 	xstdvga_out_to_reg(scanlineNumLow8);
 }
 
-static __CONST__ U8
-__calculate_vertical_retrace(const U8 vRetrace,
-							 const U8 protect,
-							 const U8 bandwidth,
-							 const U8 vRetraceEnd)
-{
-	return (protect == SAME ?
-			    vRetrace & (1 << VGA_PROTECT)
-			    :
-			    protect << VGA_PROTECT)     |
-		   (bandwidth == SAME ?
-			    vRetrace & (1 << VGA_BANDWIDTH)
-			    :
-			    bandwidth << VGA_BANDWIDTH) |
-		   (vRetraceEnd == SAME ?
-			    vRetrace & 0xF
-			    :
-			    vRetraceEnd);
-}
-	
+
+#define VERTICAL_RETRACE_END_MASK1(P, BW, VRE)      \
+	(P   == SAME ? BIT7                      : 0) | \
+	(BW  == SAME ? BIT6                      : 0) | \
+	(VRE == SAME ? BIT3 | BIT2 | BIT1 | BIT0 : 0)
+
+#define VERTICAL_RETRACE_END_MASK2(P, BW, VRE)              \
+	(P   != SAME ? P << 7                            : 0) | \
+	(BW  != SAME ? BW << 6                           : 0) | \
+	(VRE != SAME ? VRE & (BIT3 | BIT2 | BIT1 | BIT0) : 0)
+
+/*
+ *  Changes the value of Vertical Retrace End register of the CRT controller.
+ *--------------------------------------------------------------------*
+ */
 static inline void
-xstdvga_set_vertical_retrace(const U8 protect,
-							 const U8 bandwidth,
-							 const U8 vRetraceEnd)
+xstdvga_set_vertical_retrace_end(const U8 protect,
+							     const U8 bandwidth,
+							     const U8 vRetraceEnd)
 {
-	SET_CRT_REG_FUNCTION(VGA_VERTICAL_RETRACE_INDEX, __calculate_vertical_retrace,
-						 protect, bandwidth, vRetraceEnd);
+	SET_CRT_REG_FUNCTION(VERTICAL_RETRACE_END, protect, bandwidth, vRetraceEnd);
 }
 
 /*

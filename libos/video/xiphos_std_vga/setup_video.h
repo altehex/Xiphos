@@ -22,8 +22,7 @@ static inline void
 xstdvga_setup_video()
 {
 /* Inlined because it should be called one time at startup */
-	
-	xstdvga_set_vertical_retrace(0, SAME, SAME);        /* Permit write operations to CRT registers 0-7 */
+	xstdvga_set_vertical_retrace_end(0, SAME, SAME);    /* Permit write operations to CRT registers 0-7 */
 	xstdvga_set_sequencer_mem_mode(SAME, SAME, 1);      /* Enable extended memory */
 	xstdvga_set_misc_out(SAME, SAME, SAME, SAME, 1, 1); /* Enable access to display buffer, color mode */
 }

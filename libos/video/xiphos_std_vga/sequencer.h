@@ -9,108 +9,41 @@
 #include <include/types.h>
 
 
-#define SET_SEQ_REG_FUNCTION(index, calcFunc, ...)                              \
-	xstdvga_select_sequencer_reg(index);                                        \
-    U8 __reg_old = xstdvga_in_from_reg();                                       \
-    U16 __port; __asm__ __volatile__ ( "mov %%dx, %0" : "=g"(__port) : : "dx"); \
-    xstdvga_out_to_reg(__port, calcFunc(__reg_old, ##__VA_ARGS__))              \
+#define SEQUENCER_ADDRESS           (U16) 0x3C4
+#define SEQUENCER_DATA              (U16) 0x3C5
 
 
+enum SeqIndex {
+	RESET,
+	CLOCK_MODE,
+	MAP_MASK,
+	CHAR_MAP_SELECT,
+	SEQUENCER_MEMORY_MODE
+};
+
+
+#define SET_SEQ_REG_FUNCTION(INDEX, ...) \
+	SET_REG_ADDR_DATA(SEQUENCER_ADDRESS, INDEX, ##__VA_ARGS__)
+
+
+/* 
+ *  Changes value of Reset register of the sequencer.
+ *--------------------------------------------------------------------*/ 
 static inline void
 xstdvga_set_reset(const U8 sync,
 				  const U8 async)
 {
-	xstdvga_select_sequencer_reg(VGA_RESET_INDEX);
+	xstdvga_select_reg(SEQUENCER_ADDRESS, RESET);
 	xstdvga_out_to_reg((U8) ((sync == 1 ? sync << 1 : 0) | (async == 1 ? async : 0)));
 }
 
-static __CONST__ U8
-__calculate_character_map_select(const U8 charMapSel,
-								 const U8 charSetA,
-								 const U8 charSetB)
-{
-	return (charSetA == SAME ?
-			    charMapSel & ((1 << VGA_CSAS2) | (3 << VGA_CSAS1))
-			    :
-			    ((charSetA & 3) << VGA_CSAS2) | ((charSetA & 4) << VGA_CSAS1)) |
-		   (charSetB == SAME ?
-			    charMapSel & ((1 << VGA_CSBS2) | (3 << VGA_CSBS1))
-			    :
-			    ((charSetB & 3) << VGA_CSBS2) | ((charSetB & 4) << VGA_CSBS1));
-}
+#define VGA_SYNC    0
+#define VGA_ASYNC   1
+#define VGA_ENABLE  255
 
-static inline void
-xstdvga_set_character_map_select(const U8 charSetA,
-								 const U8 charSetB)
-{
-	SET_SEQ_REG_FUNCTION(VGA_CHAR_MAP_SELECT_INDEX, __calculate_character_map_select,
-						 charSetA, charSetB);
-}
-	
-static inline __CONST__ U8
-__calculate_map_mask(const U8 mapMask,
-					 const U8 plane0,
-					 const U8 plane1,
-					 const U8 plane2,
-					 const U8 plane3)
-{
-	return (plane0 == SAME ?
-			    mapMask & (1 << VGA_PLANE_0)
-			    :
-			    plane0 << VGA_PLANE_0) |
-		   (plane1 == SAME ?
-			    mapMask & (1 << VGA_PLANE_1)
-			    :
-			    plane1 << VGA_PLANE_1) |
-		   (plane2 == SAME ?
-			    mapMask & (1 << VGA_PLANE_2)
-			    :
-			    plane2 << VGA_PLANE_2) |
-		   (plane3 == SAME ?
-			    mapMask & (1 << VGA_PLANE_3)
-			    :
-			    plane3 << VGA_PLANE_3);
-}
-
-static inline void
-xstdvga_set_map_mask(const U8 plane0,
-					 const U8 plane1,
-					 const U8 plane2,
-					 const U8 plane3)
-{
-	SET_SEQ_REG_FUNCTION(VGA_MAP_MASK_INDEX, __calculate_map_mask,
-						 plane0, plane1, plane2, plane3);
-}
-
-static inline __CONST__ U8
-__calculate_sequencer_mem_mode(const U8 memMode,
-							   const U8 chain4,
-							   const U8 oeDis,
-							   const U8 extMem)
-{
-	return (chain4 == SAME ?
-			    memMode & (1 << VGA_CHAIN4)
-			    :
-			    chain4 << VGA_CHAIN4) |
-		    (oeDis == SAME ?
-			    memMode & (1 << VGA_OE_DIS)
-			    :
-			    oeDis << VGA_OE_DIS)  |
-		    (extMem == SAME ?
-			    memMode & (1 << VGA_EXT_MEM)
-			    :
-			    extMem << VGA_EXT_MEM);
-}
-
-static inline void
-xstdvga_set_sequencer_mem_mode(const U8 chain4,
-							   const U8 oeDis,
-							   const U8 extMem)
-{
-	SET_SEQ_REG_FUNCTION(VGA_SEQ_MEM_MODE_INDEX, __calculate_sequencer_mem_mode,
-						 chain4, oeDis, extMem);
-}
-
+/* 
+ *  Resets or enables the sequencer. Only used in xstdvga_set_clock_mode
+ *--------------------------------------------------------------------*/ 
 static inline void
 xstdvga_reset_sequencer(U8 syncAsync)
 {
@@ -128,15 +61,101 @@ xstdvga_reset_sequencer(U8 syncAsync)
 	}
 }
 
+/* 
+ *  Changes value of Clocking Mode register of the sequencer. (WIP)
+ *--------------------------------------------------------------------*/ 
 static inline void
-xstdvga_set_clocking_mode()
+xstdvga_set_clock_mode()
 {
 	xstdvga_reset_sequencer(VGA_SYNC);
 
-	/* WIP */
+	/* WIP. Just  */
 	
 	xstdvga_reset_sequencer(VGA_ENABLE);
 }
-	
+
+#define CSAS_BIT    BIT5 | BIT3 | BIT2
+#define CSBS_BIT    BIT4 | BIT1 | BIT0
+
+#define CHAR_MAP_SELECT_MASK1(CSAS, CSBS) \
+	(CSAS == SAME ? CSAS_BIT : 0 ) |      \
+	(CSBS == SAME ? CSBS_BIT : 0 )
+
+#define CHAR_MAP_SELECT_MASK2(CSAS, CSBS)                                        \
+	(CSAS != SAME ? ((CSAS & BIT2) << 5) | ((CSAS & (BIT1 | BIT0)) << 2) : 0 ) | \
+	(CSBS != SAME ? ((CSBS & BIT2) << 4) | (CSBS & (BIT1 | BIT0))        : 0 )
+
+#define  VGA_FONT_AT_0000    0
+#define  VGA_FONT_AT_4000    1
+#define  VGA_FONT_AT_8000    2
+#define  VGA_FONT_AT_C000    3
+#define  VGA_FONT_AT_2000    4
+#define  VGA_FONT_AT_6000    5
+#define  VGA_FONT_AT_A000    6
+#define  VGA_FONT_AT_E000    7
+
+/* 
+ *  Changes value of Character Map Select register of the sequencer.
+ *--------------------------------------------------------------------*
+ *  charSetA: Character Set A is used when bit 3 of the attribute
+ *            byte for a character is set to 1.
+ *  charSetB: Character Set B is used when bit 3 of the attribute
+ *            byte for a character is set to 0.
+ *  Use VGA_FONT_AT_<offset> constants defined in sequencer.h.
+ */ 
+static inline void
+xstdvga_set_character_map_select(const U8 charSetA,
+								 const U8 charSetB)
+{
+	SET_SEQ_REG_FUNCTION(CHAR_MAP_SELECT, charSetA, charSetB);
+}
+
+#define MAP_MASK_MASK1(P0, P1, P2, P3) \
+	(P0 == SAME ? BIT0 : 0) |          \
+	(P1 == SAME ? BIT1 : 0) |          \
+	(P2 == SAME ? BIT2 : 0) |          \
+	(P3 == SAME ? BIT3 : 0)
+
+#define MAP_MASK_MASK2(P0, P1, P2, P3) \
+	(P0 != SAME ? P0      : 0) |       \
+	(P1 != SAME ? P1 << 1 : 0) |       \
+	(P2 != SAME ? P2 << 2 : 0) |       \
+	(P3 != SAME ? P3 << 3 : 0)	
+
+static inline void
+xstdvga_set_map_mask(const U8 plane0,
+					 const U8 plane1,
+					 const U8 plane2,
+					 const U8 plane3)
+{
+	SET_SEQ_REG_FUNCTION(MAP_MASK, plane0, plane1, plane2, plane3);
+}
+
+#define C4_BIT       BIT3
+#define OEDIS_BIT    BIT2
+#define EXTMEM_BIT   BIT1
+
+#define SEQUENCER_MEMORY_MODE_MASK1(C4, OEDIS, EXTMEM) \
+	(C4     == SAME? C4_BIT     : 0) |                 \
+	(OEDIS  == SAME? OEDIS_BIT  : 0) |                 \
+	(EXTMEM == SAME? EXTMEM_BIT : 0)
+
+#define SEQUENCER_MEMORY_MODE_MASK2(C4, OEDIS, EXTMEM) \
+	(C4     != SAME? C4 << 3     : 0) |                \
+	(OEDIS  != SAME? OEDIS << 2  : 0) |                \
+	(EXTMEM != SAME? EXTMEM << 1 : 0)
+
+/* 
+ *  Changes value of Character Map Select register of the sequencer.
+ *--------------------------------------------------------------------*
+ */ 
+static inline void
+xstdvga_set_sequencer_mem_mode(const U8 chain4,
+							   const U8 oeDis,
+							   const U8 extMem)
+{
+	SET_SEQ_REG_FUNCTION(SEQUENCER_MEMORY_MODE, chain4, oeDis, extMem);
+}
+
 
 #endif /* ! _XSTDVGA_SEQUENCER_H_ */

@@ -14,7 +14,6 @@ CROSSDEV_CONF_DIR=/etc/portage/repos.conf
 CROSSDEV_CONF=$CROSSDEV_CONF_DIR/crossdev.conf
 
 CROSSDEV_FLAGS='--stage1 -S --target x86_64-elf --show-fail-log'
-CROSSDEV_USE='lto sanitize'
 
 gentoo-install()
 {
@@ -44,7 +43,7 @@ gentoo-install()
 		${PRINTF}    "${OK_SIGN} Installed crossdev.\n"
 	fi
 
-	USE=${CROSSDEV_USE} crossdev $CROSSDEV_FLAGS
+	crossdev $CROSSDEV_FLAGS
 	${PRINTF}	${PRETTY_LINE}
 	[[ $? -eq 0 ]] && ${PRINTF} "${OK_SIGN} Installed x86_64-elf-gcc.\n" && return
 	${PRINTF}    "${ERROR_SIGN} Installation failed.\n"
