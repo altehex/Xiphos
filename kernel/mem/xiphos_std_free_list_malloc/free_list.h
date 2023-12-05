@@ -7,25 +7,38 @@
 
 #include <mem/init.h>
 
+#include <stdatomic.h>
+
+
+#define BIG_ALLOC_THRESHOLD     1024
+
 
 typedef struct _MemRegion MemRegion;
 
+
 struct __PACKED__
 _MemRegion {
-	U16         canary; /* To be used */
-	U16         flags;
 	U64         sz;
 	MemRegion * next;
 	MemRegion * prev;
 };
 
 
-/* Don't use volatile here (these are used only on startup with one thread anyway) */
-static __USED__ MemRegion * freeMemRegions;
-static __USED__ MemRegion * usedMemRegions;
+extern MemRegion * freeMemRegions; /* Points to the first free region, order is important here */
+extern MemRegion * usedMemRegions; /* Points to the last allocated region */
 
-static MemRegion            __sentinelRegion = { 0, 0, 0, 0, 0 };
-static __USED__ MemRegion * sentinelRegion   = &__sentinelRegion;
+extern MemRegion * sentinelRegion;
+
+
+#define LOCK_LISTS                              \
+    while (atomic_flag_test_and_set(&listLock)) \
+		pause();
+
+#define UNLOCK_LISTS \
+    atomic_flag_clear(&listLock);
+
+
+extern atomic_flag listLock;
 
 
 #endif /* ! _XSTDMALLOC_FREE_LIST_H_ */

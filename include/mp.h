@@ -6,7 +6,7 @@
 #include "kernel.h"
 #include "types.h"
 
-#include <libc/stdlib.h>
+#include <stdlib.h>
 
 
 typedef struct __PACKED__ {

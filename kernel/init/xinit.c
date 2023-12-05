@@ -20,7 +20,7 @@
 __NORETURN__ __XINIT__(xiphos_init) void
 xiphos_init(PTR kernelStackBase, U64 coreNum)
 {
-	alloc_init(kernelStackBase);    /* Allocator initialization. */
+	memory_init(kernelStackBase); /* Allocator initialization. */
 	enumerate_cores(coreNum);     /* Create Core structures */
 	
 #if !defined DISPLAY_OFF

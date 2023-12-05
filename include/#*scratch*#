@@ -1,0 +1,13 @@
+if (prevNearbyReg == buf + targetReg->sz) {
+		prevNearbyReg->prev->prev = targetReg;
+		prevNearbyReg->prev->prev = targetReg;
+		
+		targetReg->sz += prevNearbyReg->sz + sizeof(MemRegion);
+		targetReg->prev = prevNearbyReg;
+		targetReg->prev = prevNearbyReg->prev;
+	}
+	else {
+		prevNearbyReg->prev = targetReg;
+		targetReg->prev = prevNearbyReg;
+	}
+	

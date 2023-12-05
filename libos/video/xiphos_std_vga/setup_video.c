@@ -8,5 +8,4 @@ xstdvga_pci_detect_vga()
 	return (void *) 0xBABE;
 }
 
-void * __ALIAS__(xstdvga_pci_detect_vga)
-libos_pci_detect_vga();
+void * __ALIAS__(xstdvga_pci_detect_vga) libos_pci_detect_vga();

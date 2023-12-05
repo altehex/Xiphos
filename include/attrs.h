@@ -6,13 +6,14 @@
 #define __OUT__
 #define __OPTIONAL__
 
-/* Function attributes */
 #define __ALIAS__(S)        __attribute__ ((alias(#S)))
 #define __ALIGN__(N)        __attribute__ ((aligned(N)))
 #define __COLD__            __attribute__ ((cold))
 #define __CONST__           __attribute__ ((const))
 #define __HOT__             __attribute__ ((hot))
 #define __MALLOC_LIKE__     __attribute__ ((malloc))
+#define __NAKED__           __attribute__ ((naked))
+#define __NONNULL__(N, ...)      __attribute__ ((nonnull(N, ##__VA_ARGS__)))
 #define __NORETURN__        __attribute__ ((noreturn))
 #define __PACKED__          __attribute__ ((packed))
 #define __PURE__            __attribute__ ((pure))
@@ -21,8 +22,10 @@
 #define __USED__            __attribute__ ((used))
 #define __WEAK__            __attribute__ ((weak))
 
-/* Variable attributes */
 #define __NONSTRING__       __attribute__ ((nonstring))
+
+/* NOTE: GCC emits ud2 without __USED__ attribute */
+#define __XGLOBAL__     __SECTION__(.global) __USED__
 
 #define __XINIT__(S)    __SECTION__(.init.S) __attribute__((no_stack_protector)) __COLD__
 #define __XINIT_ACPI__  __XINIT__(acpi)

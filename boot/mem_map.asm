@@ -141,7 +141,7 @@ parse_mem_map:
 	mov		RAX, [RBX + 4]
 	mov		RBX, [RBX + 4 + 8]
 	add		RAX, RBX
-	add		RAX, 8
+	add		RAX, 7
 	and		AL, 0xF8
 	
 ;; ......

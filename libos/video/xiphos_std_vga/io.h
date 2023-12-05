@@ -103,7 +103,7 @@ xstdvga_out_to_reg_without_port_arg(U8 byte)
  *  2. xstdvga_in_from_reg():
  *  - Input from DX to AL (get the current register value)
  *  3. xstdvga_out_to_reg() with APPLY_MASKS:
- *  - Apply <INDEX>_NASK1 on AL to reset the bits we need to change
+ *  - Apply <INDEX>_MASK1 on AL to reset the bits we need to change
  *  - Apply <INDEX>_MASK2 on AL to change the needed bits
  *  - Output to DX
  *

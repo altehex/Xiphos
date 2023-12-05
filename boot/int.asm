@@ -51,7 +51,7 @@ GATE_ATTR   equ 0x8E0000000000
 	mov		qword [RAX], RBX
 	lidt	[RAX]
 	
-	add		RAX, IDT_SZ + IDT_DESC_SZ + GEN_INT_SZ + 0x1000
+	add		RAX, IDT_SZ + IDT_DESC_SZ + GEN_INT_SZ + 0xFFF
 	and 	AX, 0xF000
 	mov		[pml4Base], RAX
 	

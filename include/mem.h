@@ -7,8 +7,6 @@
 
 #define NULLPTR     (PTR) 0
 
-#define BIG_ALLOC_THRESHOLD 1 << 10
-
 
 
 #endif /* ! _XIPHOS_MEM_H_ */

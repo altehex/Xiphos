@@ -17,6 +17,7 @@ SECTIONS
 
 	.data : 
 	{
+		*(.global)
 		*(.data .data.*)
 	}
 

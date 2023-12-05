@@ -3,7 +3,7 @@ include $(SRC_ROOT)/utils/macro.mk
 MALLOC_NAME     = xiphos_std_free_list_malloc
 
 ALL := $(MALLOC_NAME).o
-SOURCE_NAMES = malloc init
+SOURCE_NAMES = globals malloc init
 
 OBJ := $(call OBJ_WRAP, $(SOURCE_NAMES))
 LDS := ld.lds

@@ -42,8 +42,12 @@ xstdvga_set_reset(const U8 sync,
 #define VGA_ENABLE  255
 
 /* 
- *  Resets or enables the sequencer. Only used in xstdvga_set_clock_mode
- *--------------------------------------------------------------------*/ 
+ *  Resets or enables the sequencer. Only used in xstdvga_set_clock_mode().
+ *--------------------------------------------------------------------*
+ *  Use VGA_SYNC and VGA_ASYNC for synchronous and asynchronous resetting
+ *  correspondingly. Any other value enables the sequencer (VGA_ENABLE is
+ *  just for clarity).
+ */
 static inline void
 xstdvga_reset_sequencer(U8 syncAsync)
 {
