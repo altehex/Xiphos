@@ -34,8 +34,6 @@ typedef U32     PORT32;
 typedef U32     SIZE32;
 typedef U64     SIZE64;
 
-typedef unsigned BITFIELD;
-
 /*
  *  Macros
  */
