@@ -1,9 +1,10 @@
-export OS_NAME            =  Xiphos
-export OS_VERSION_MAJOR_L =  alpha
-	   OS_VERSION_MAJOR   =  α
-	   OS_VERSION_MINOR   =  2.3
-export OS_VERSION         := $(OS_VERSION_MAJOR)-$(OS_VERSION_MINOR)
-export PACKAGE_NAME       := xiphos-$(OS_EDITION_LATIN)-$(OS_VERSION)
+export OS_NAME          =  Xiphos
+	   OS_VERSION_MAJOR =  0
+	   OS_VERSION_MINOR =  2.3
+export OS_VERSION       := $(OS_VERSION_MAJOR).$(OS_VERSION_MINOR)
+export OS_EDITION       =  α
+export OS_EDITION_LATIN =  alpha
+export PACKAGE_NAME     := xiphos-$(OS_EDITION_LATIN)-$(OS_VERSION)
 
 
 include utils/macro.mk
@@ -119,7 +120,6 @@ clean: $(CLEAN_DIRS)
 
 $(CLEAN_DIRS):
 	$(MAKE) clean -C $(basename $@)
-	$(RM) *.tar.*
 
 .PHONY += help
 help: MAKEFLAGS += -s
