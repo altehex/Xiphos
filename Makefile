@@ -2,8 +2,8 @@ export OS_NAME            =  Xiphos
 export OS_VERSION_MAJOR_L =  alpha
 	   OS_VERSION_MAJOR   =  α
 	   OS_VERSION_MINOR   =  2.3
-export OS_VERSION         := $(OS_VERSION_MAJOR)-$(OS_VERSION_MINOR)
-export PACKAGE_NAME       := xiphos-$(OS_EDITION_LATIN)-$(OS_VERSION)
+export OS_VERSION         := $(OS_VERSION_MAJOR_L)-$(OS_VERSION_MINOR)
+export PACKAGE_NAME       := xiphos-$(OS_VERSION)
 
 
 include utils/macro.mk
