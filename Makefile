@@ -1,12 +1,9 @@
-export OS_NAME          =  Xiphos
-	   OS_VERSION_MAJOR =  0
-	   OS_VERSION_MINOR =  2.3
-export OS_VERSION       := $(OS_VERSION_MAJOR).$(OS_VERSION_MINOR)
-export OS_EDITION       =  α
-export OS_EDITION_LATIN =  alpha
-export PACKAGE_NAME     := xiphos-$(OS_EDITION_LATIN)-$(OS_VERSION)
-TARNAME := $(PACKAGE_NAME).tar.xz
-ISONAME := $(PACKAGE_NAME).iso
+export OS_NAME            =  Xiphos
+export OS_VERSION_MAJOR_L =  alpha
+	   OS_VERSION_MAJOR   =  α
+	   OS_VERSION_MINOR   =  2.3
+export OS_VERSION         := $(OS_VERSION_MAJOR)-$(OS_VERSION_MINOR)
+export PACKAGE_NAME       := xiphos-$(OS_EDITION_LATIN)-$(OS_VERSION)
 
 
 include utils/macro.mk
@@ -24,22 +21,21 @@ unexport LC_ALL
 export LC_COLLATE = C
 export LC_NUMERIC = C
 
-
-RM      = rm -f
-CP      = cp -r
-MKDIR   = mkdir
-MV		= mv
-
 ifeq (1, $(CONFIG_QUIET))
 	MAKEFLAGS += -s
 endif
 
-export RM CP MKDIR MV
-
 
 # Toolchain configuration 
 #--------------------------------*
-TARGET = x86_64-elf
+export RM    = rm -f
+export CP    = cp -r
+export MKDIR = mkdir
+export MV    = mv
+export TAR   = tar
+export ZIP   = gzip
+
+export TARGET = x86_64-elf
 
 ifeq (1,$(CONFIG_LLVM))
 	CC		:= clang -target $(TARGET)
@@ -48,15 +44,14 @@ else
 	CC		:= $(TARGET)-gcc
 	LD		:= $(TARGET)-ld
 endif
-FASM 	= fasm
-OBJCOPY = objcopy
+export FASM 	= fasm
 
 ifeq (1,$(CONFIG_DEBUG))
-	CC   += -g -dp -fopt-info-optimized-note -flto-report
+	CC   += -g -dp -fopt-info-all -flto-report
 	FASM += -s $@.fas
 endif
 
-export CC LD FASM OBJCOPY TARGET
+export CC LD
 
 
 # Flags configuration 
@@ -80,38 +75,41 @@ ifeq (1, $(CONFIG_DEBUG))
 	CWARNINGS += -Wpadded
 endif
 
-CFLAGS  += $(USER_CFLAGS) $(CWARNINGS)
-LDFLAGS += $(USER_LDFLAGS)
+export CFLAGS  += $(USER_CFLAGS) $(CWARNINGS)
+export LDFLAGS += $(USER_LDFLAGS)
 
-INCLUDE := -I$(SRC_ROOT) \
+export INCLUDE := -I$(SRC_ROOT) \
 		   -I$(SRC_ROOT)/include \
 		   -I$(SRC_ROOT)/libc
 
 
-export CFLAGS LDFLAGS INCLUDE
-
-
 # Targets
 #-------------------------------*
+
 # The ordering is important (boot is last and kernel is second-to-last)
-_DIRS = api libos devman kernel boot
-DIRS := $(foreach DIR,$(_DIRS),$(SRC_ROOT)/$(DIR))
+DIRS = api libos devman kernel boot
+ROOT_FILES = config.mk CONTRIBUTING Makefile \
+             mem_layout.mk README.md TODO
 
 .PHONY = all
 all: $(DIRS)
 
 .PHONY += $(DIRS)
-# check_build_dir is like a force target
 $(DIRS): check_build_dir
 	$(MAKE) -C $@
 
 .PHONY += check_build_dir
 check_build_dir: _force
-	[[ -e build ]] || mkdir build
-	[[ -e subsys ]] || mkdir subsys
+	[[ -e build ]]  || $(MKDIR) build
+	[[ -e subsys ]] || $(MKDIR) subsys
 
 .PHONY += dist
-dist: # tar: compress the kernel image and the bootloader
+dist: _force
+	[[ -e $(PACKAGE_NAME) ]] || $(MKDIR) $(PACKAGE_NAME)
+	$(CP) -R $(DIRS) $(ROOT_FILES) libc utils
+	$(TAR) -cf $(PACKAGE_NAME).tar $(PACKAGE_NAME)
+	$(ZIP) $(PACKAGE_NAME).tar
+	$(RM) -rf $(PACKAGE_NAME)
 
 CLEAN_DIRS := $(foreach DIR,$(DIRS),$(addsuffix .clean,$(DIR)))
 
@@ -120,6 +118,7 @@ clean: MAKEFLAGS += -s
 clean: $(CLEAN_DIRS)
 	$(RM) -r build
 	$(RM) -r subsys
+	$(RM) *.tar.*
 
 $(CLEAN_DIRS):
 	$(MAKE) clean -C $(basename $@)

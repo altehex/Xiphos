@@ -1,4 +1,4 @@
-![Static Badge](https://img.shields.io/badge/Xiphos-%CE%B1--0.2.3-262431)
+![Static Badge](https://img.shields.io/badge/Xiphos-%CE%B1--2.3-262431)
 
 Run with:
 ```bash

@@ -4,7 +4,7 @@ CONFIG_DEBUG    = 0
 
 CONFIG_LLVM = 0
 
-USER_CFLAGS   = -O2 -march=x86-64 -fopt-info-missed
+USER_CFLAGS   = -O2 -march=x86-64
 USER_LDFLAGS  = -O2
 
 CONFIG_MK = config.mk
