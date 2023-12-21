@@ -1,4 +1,3 @@
-api_key
 NEWS
 COPYING
 AUTHORS
@@ -7,14 +6,17 @@ TAGS
 *~
 '#*#'
 .#*
-run.sh
+*.sh
 debug.log
 log.txt
 *.efi
 *.fas
 build
 #*#
-test.sh
-_test.sh
 *.o
 *.img
+subsys
+obj
+*/obj
+*.k
+*.tar.*
