@@ -1,9 +1,12 @@
-export OS_NAME            =  Xiphos
-export OS_VERSION_MAJOR_L =  alpha
-	   OS_VERSION_MAJOR   =  α
-	   OS_VERSION_MINOR   =  2.3
-export OS_VERSION         := $(OS_VERSION_MAJOR)-$(OS_VERSION_MINOR)
-export PACKAGE_NAME       := xiphos-$(OS_EDITION_LATIN)-$(OS_VERSION)
+export OS_NAME          =  Xiphos
+	   OS_VERSION_MAJOR =  0
+	   OS_VERSION_MINOR =  2.3
+export OS_VERSION       := $(OS_VERSION_MAJOR).$(OS_VERSION_MINOR)
+export OS_EDITION       =  α
+export OS_EDITION_LATIN =  alpha
+export PACKAGE_NAME     := xiphos-$(OS_EDITION_LATIN)-$(OS_VERSION)
+TARNAME := $(PACKAGE_NAME).tar.xz
+ISONAME := $(PACKAGE_NAME).iso
 
 
 include utils/macro.mk
@@ -21,20 +24,22 @@ unexport LC_ALL
 export LC_COLLATE = C
 export LC_NUMERIC = C
 
+
+RM      = rm -f
+CP      = cp -r
+MKDIR   = mkdir
+MV		= mv
+
 ifeq (1, $(CONFIG_QUIET))
 	MAKEFLAGS += -s
 endif
 
+export RM CP MKDIR MV
+
 
 # Toolchain configuration 
-export RM    = rm -f
-export CP    = cp -r
-export MKDIR = mkdir
-export MV    = mv
-export TAR   = tar
-export ZIP   = gzip
-
-export TARGET = x86_64-elf
+#--------------------------------*
+TARGET = x86_64-elf
 
 ifeq (1,$(CONFIG_LLVM))
 	CC		:= clang -target $(TARGET)
@@ -43,18 +48,20 @@ else
 	CC		:= $(TARGET)-gcc
 	LD		:= $(TARGET)-ld
 endif
-export FASM 	= fasm
+FASM 	= fasm
+OBJCOPY = objcopy
 
 ifeq (1,$(CONFIG_DEBUG))
 	CC   += -g -dp -fopt-info-optimized-note -flto-report
 	FASM += -s $@.fas
 endif
 
-export CC LD
+export CC LD FASM OBJCOPY TARGET
 
 
 # Flags configuration 
-CFLAGS = -std=c2x \
+#---------------------------------*
+CFLAGS = -std=c17 \
 		 -funsigned-char \
          -nostdlib \
          -nolibc \
@@ -73,20 +80,22 @@ ifeq (1, $(CONFIG_DEBUG))
 	CWARNINGS += -Wpadded
 endif
 
-export CFLAGS  += $(USER_CFLAGS) $(CWARNINGS)
-export LDFLAGS += $(USER_LDFLAGS)
+CFLAGS  += $(USER_CFLAGS) $(CWARNINGS)
+LDFLAGS += $(USER_LDFLAGS)
 
-export INCLUDE := -I$(SRC_ROOT) \
-	 	          -I$(SRC_ROOT)/include \
-		          -I$(SRC_ROOT)/libc
+INCLUDE := -I$(SRC_ROOT) \
+		   -I$(SRC_ROOT)/include \
+		   -I$(SRC_ROOT)/libc
+
+
+export CFLAGS LDFLAGS INCLUDE
 
 
 # Targets
 #-------------------------------*
 # The ordering is important (boot is last and kernel is second-to-last)
-DIRS       = api libos devman kernel boot
-ROOT_FILES = config.mk CONTRIBUTING Makefile \
-             mem_layout.mk README.md TODO
+_DIRS = api libos devman kernel boot
+DIRS := $(foreach DIR,$(_DIRS),$(SRC_ROOT)/$(DIR))
 
 .PHONY = all
 all: $(DIRS)
@@ -98,16 +107,11 @@ $(DIRS): check_build_dir
 
 .PHONY += check_build_dir
 check_build_dir: _force
-	[[ -e build ]]  || $(MKDIR) build
-	[[ -e subsys ]] || $(MKDIR) subsys
+	[[ -e build ]] || mkdir build
+	[[ -e subsys ]] || mkdir subsys
 
 .PHONY += dist
-dist: _force
-	[[ -e $(PACKAGE_NAME) ]] || $(MKDIR) $(PACKAGE_NAME)
-	$(CP) -R $(DIRS) $(ROOT_FILES) libc utils
-	$(TAR) -cf $(PACKAGE_NAME).tar $(PACKAGE_NAME)
-	$(ZIP) $(PACKAGE_NAME).tar
-	$(RM) -rf $(PACKAGE_NAME)
+dist: # tar: compress the kernel image and the bootloader
 
 CLEAN_DIRS := $(foreach DIR,$(DIRS),$(addsuffix .clean,$(DIR)))
 
@@ -119,7 +123,6 @@ clean: $(CLEAN_DIRS)
 
 $(CLEAN_DIRS):
 	$(MAKE) clean -C $(basename $@)
-	$(RM) *.tar.*
 
 .PHONY += help
 help: MAKEFLAGS += -s
@@ -129,6 +132,8 @@ help:
 		@echo   ""
 		@echo   "Targets:"
 		@echo   "    all         - build both the kernel and the bootloader"
+		@echo   "    kernel      - build the kernel"
+		@echo   "    bootloader  - build the bootloader"
 		@echo   "    dist        - compress the kernel and the bootloader"
 		@echo   "    clean       - remove generated files"
 		@echo   "    test        - for developers. Outputs flags and general settings"
