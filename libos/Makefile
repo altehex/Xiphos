@@ -1,4 +1,4 @@
-DIRS = serial video
+DIRS = bus serial video
 
 .PHONY = all
 all: $(DIRS)

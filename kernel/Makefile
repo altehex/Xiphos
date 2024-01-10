@@ -9,12 +9,12 @@ KERNEL_SUBSYS = devman # shaman netman etc.
 SUBSYS_OBJ := $(foreach SUBSYS,$(KERNEL_SUBSYS), \
 			   $(SRC_ROOT)/subsys/$(SUBSYS).o)
 
-KERNEL_OBJ := $(XINIT_ALL) $(XMEM_ALL) $(XSCHED_ALL) $(API_OBJ) $(LIBOS_OBJ) $(SUBSYS_OBJ)
+KERNEL_OBJ := $(XINIT_ALL) $(XMEM_ALL) $(XSCHED_ALL) $(LIBOS_OBJ) $(SUBSYS_OBJ)
 KERNEL_LDS = kernel.lds
 
 export INCLUDE += -I$(SRC_ROOT)/kernel
 
-CFLAGS += $(KERNEL_CONFIG_DEFINES)
+CFLAGS += $(CONFIG_DEFINES)
 
 DIRS = mem sched init
 

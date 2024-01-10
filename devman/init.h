@@ -12,7 +12,7 @@
 static inline void
 devman_init(void)
 {
-	PTR dbBase = 
+	/* PTR dbBase =  */
 	
 	devman_populate_db();
 }

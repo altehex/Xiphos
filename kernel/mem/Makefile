@@ -1,11 +1,10 @@
-XMEM_DIRS := $(CONFIG_MALLOC)
+XMEM_DIRS := $(MAKE_MALLOC_IMPL)
 
-XMEM_LOCAL_SOURCE_NAMES = info mem_globals
-XMEM_SOURCE_NAMES := $(CONFIG_MALLOC)
-
-XMEM_LDS     =  mem.lds
-XMEM_OBJ     := $(foreach OBJ, $(XMEM_SOURCE_NAMES), $(OBJ).o)
-XMEM_LOCAL_OBJ :=  $(foreach OBJ, $(XMEM_LOCAL_SOURCE_NAMES), $(OBJ).o)
+XMEM_LDS            =  mem.lds
+XMEM_COMMON_SOURCES =  info.c mem_globals.c
+XMEM_COMMON_OBJ     := $(XMEM_COMMON_SOURCES:.c=.o)
+XMEM_MALLOC_SOURCES := $(MAKE_MALLOC_IMPL).c
+XMEM_MALLOC_OBJ     := $(XMEM_MALLOC_SOURCES:.c=.o)
 
 export XMEM_INCLUDE := $(INCLUDE) \
 				       -I$(SRC_ROOT)/kernel/mem
@@ -14,8 +13,8 @@ export XMEM_INCLUDE := $(INCLUDE) \
 all: $(XMEM_ALL)
 	$(CP) $^ $(SRC_ROOT)/kernel
 
-$(XMEM_ALL): $(XMEM_DIRS) $(XMEM_LOCAL_OBJ)
-	$(LD) --relocatable -T $(XMEM_LDS) $(XMEM_OBJ) $(XMEM_LOCAL_OBJ) -o $@
+$(XMEM_ALL): $(XMEM_DIRS) $(XMEM_COMMON_OBJ)
+	$(LD) --relocatable -T $(XMEM_LDS) $(XMEM_MALLOC_OBJ) $(XMEM_COMMON_OBJ) -o $@
 
 .PHONY += $(XMEM_DIRS)
 $(XMEM_DIRS): _force

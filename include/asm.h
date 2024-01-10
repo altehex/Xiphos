@@ -13,9 +13,13 @@
 #define word    U16
 #define dword   U32
 
+/*
+ *  MMIO
+ */
+
 /* Operand ordering is the same as in Intel syntax */
 
-#define DECL_IN_FROM_IMM8(SIZE, A_REG)		 \
+#define DEFINE_IN_FROM_IMM8(SIZE, A_REG)  	 \
 	static inline SIZE					     \
 	in_from_imm8_##SIZE (U8 port)            \
 	{                                        \
@@ -30,11 +34,11 @@
 		return __in;                         \
 	}
 
-DECL_IN_FROM_IMM8(byte,  al)
-DECL_IN_FROM_IMM8(word,  ax)
-DECL_IN_FROM_IMM8(dword, eax)
+DEFINE_IN_FROM_IMM8(byte,  al)
+DEFINE_IN_FROM_IMM8(word,  ax)
+DEFINE_IN_FROM_IMM8(dword, eax)
 
-#define DECL_IN_FROM_DX(SIZE, A_REG)               \
+#define DEFINE_IN_FROM_DX(SIZE, A_REG)             \
 	static inline SIZE                             \
 	in_from_dx_##SIZE(U16 port)                    \
 	{                                              \
@@ -50,11 +54,11 @@ DECL_IN_FROM_IMM8(dword, eax)
 		return __in;                               \
 	}                                              
 
-DECL_IN_FROM_DX(byte,  al)
-DECL_IN_FROM_DX(word,  ax)
-DECL_IN_FROM_DX(dword, eax)
+DEFINE_IN_FROM_DX(byte,  al)
+DEFINE_IN_FROM_DX(word,  ax)
+DEFINE_IN_FROM_DX(dword, eax)
 
-#define DECL_OUT_TO_IMM8(SIZE, A_REG)               \
+#define DEFINE_OUT_TO_IMM8(SIZE, A_REG)             \
 	static inline void                              \
 	out_to_imm8_##SIZE(U8 port, SIZE out)           \
 	{                                               \
@@ -67,11 +71,11 @@ DECL_IN_FROM_DX(dword, eax)
 		: [port]"N"(port), [out]"r"(__out));        \
 	}
 
-DECL_OUT_TO_IMM8(byte,  al)
-DECL_OUT_TO_IMM8(word,  ax)
-DECL_OUT_TO_IMM8(dword, eax)
+DEFINE_OUT_TO_IMM8(byte,  al)
+DEFINE_OUT_TO_IMM8(word,  ax)
+DEFINE_OUT_TO_IMM8(dword, eax)
 
-#define DECL_OUT_TO_DX(SIZE, A_REG)                   \
+#define DEFINE_OUT_TO_DX(SIZE, A_REG)                 \
 	static inline void                                \
 	out_to_dx_##SIZE(U16 port, SIZE out)              \
 	{                                                 \
@@ -85,9 +89,9 @@ DECL_OUT_TO_IMM8(dword, eax)
 		: [port]"r"(__port), [out]"r"(__out));        \
 	}
 
-DECL_OUT_TO_DX(byte,  al)
-DECL_OUT_TO_DX(word,  ax)
-DECL_OUT_TO_DX(dword, eax)
+DEFINE_OUT_TO_DX(byte,  al)
+DEFINE_OUT_TO_DX(word,  ax)
+DEFINE_OUT_TO_DX(dword, eax)
 
 #undef byte
 #undef word

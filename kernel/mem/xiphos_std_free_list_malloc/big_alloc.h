@@ -30,9 +30,11 @@ __big_alloc(SIZE64 sz)
 		 targetRegion->sz < sz;
 		 targetRegion = targetRegion->prev)
 
-	if (targetRegion == sentinelRegion)
+	if (targetRegion == sentinelRegion) {
+		UNLOCK_LISTS
 		return NULLPTR;
-
+	}
+		
 	allocRegion = targetRegion;
 	
 	/* Divide the finded region if it's bigger than needed */
@@ -45,9 +47,8 @@ __big_alloc(SIZE64 sz)
 
 		allocRegion->sz = sz;
 	}
-	else {
+	else
 		targetRegion = targetRegion->next;
-	}
 
 	if (allocRegion == freeMemRegions)
 		freeMemRegions = targetRegion;

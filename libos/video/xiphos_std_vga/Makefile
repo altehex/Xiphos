@@ -3,10 +3,10 @@ include $(SRC_ROOT)/utils/macro.mk
 LIBOS_NAME     = xiphos_std_vga
 
 ALL := $(LIBOS_NAME).o
-SOURCE_NAMES = memory setup_video
+SOURCES = memory.c setup_video.c
 
 LIBOS = serial/bus/xiphos_std_pci_express
-OBJ := $(call OBJ_WRAP, $(SOURCE_NAMES))
+OBJ := $(SOURCES:.c=.o)
 LDS := $(LIBOS_NAME).lds
 
 _INCLUDE := $(INCLUDE) \
