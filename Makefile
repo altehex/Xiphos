@@ -106,7 +106,7 @@ check_build_dir: _force
 .PHONY += dist
 dist: _force
 	[[ -e $(PACKAGE_NAME) ]] || $(MKDIR) $(PACKAGE_NAME)
-	$(CP) -R $(DIRS) $(ROOT_FILES) libc utils
+	$(CP) -R $(DIRS) $(ROOT_FILES) libc utils (PACKAGE_NAME)
 	$(TAR) -cf $(PACKAGE_NAME).tar $(PACKAGE_NAME)
 	$(ZIP) $(PACKAGE_NAME).tar
 	$(RM) -rf $(PACKAGE_NAME)
