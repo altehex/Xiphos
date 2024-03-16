@@ -86,10 +86,10 @@ export INCLUDE := -I$(SRC_ROOT) \
 # Targets
 #-------------------------------*
 
-# The ordering is important (boot is last and kernel is second-to-last)
-DIRS = api libos devman kernel boot
-ROOT_FILES = config.mk CONTRIBUTING Makefile \
-             mem_layout.mk README.md TODO
+# boot is supposed to be last
+DIRS = libos devman kernel boot
+ROOT_FILES = config.mk CHANGELOG.md CONTRIBUTING.md Makefile \
+             mem_layout.mk README.md TODO.md
 
 .PHONY = all
 all: $(DIRS)
@@ -106,7 +106,7 @@ check_build_dir: _force
 .PHONY += dist
 dist: _force
 	[[ -e $(PACKAGE_NAME) ]] || $(MKDIR) $(PACKAGE_NAME)
-	$(CP) -R $(DIRS) $(ROOT_FILES) libc utils (PACKAGE_NAME)
+	$(CP) -R $(DIRS) $(ROOT_FILES) libc utils $(PACKAGE_NAME)
 	$(TAR) -cf $(PACKAGE_NAME).tar $(PACKAGE_NAME)
 	$(ZIP) $(PACKAGE_NAME).tar
 	$(RM) -rf $(PACKAGE_NAME)
