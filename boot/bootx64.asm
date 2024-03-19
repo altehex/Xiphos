@@ -35,18 +35,12 @@ load_kernel:
 				EfiFile, imgFileHandle,	\
 				imgPath, EFI_FILE_MODE_READ, 0	
 	test	EAX, EAX
-	jz		@f			
-
-	cmp		EAX, EFI_NOT_FOUND
-	jne		.error
-	__eficall	EfiTextOut, output_string,	\
-				EfiTextOut, imgNotFoundMsg
-	jmp		$
+	jz		@f	
+	lea		RDX, [imgNotFoundMsg]
+	jmp		error
 
 @@:
-_sub_EfiFile	equ imgFileHandle
-
-	mov		RBX, [_sub_EfiFile]
+	mov		RBX, [imgFileHandle]
 	mov		RCX, RBX
 	mov		RBX, [RBX + _EfiFile.read]
 	mov		RDX, imgSz
@@ -55,20 +49,14 @@ _sub_EfiFile	equ imgFileHandle
 
 	test	RAX, RAX
 	jz		@f
-	
-.error:
 	lea		RDX, [imgLoadErrorMsg]
-	__eficall	EfiTextOut, output_string,	\
-				EfiTextOut, RDX
-	jmp		$
+	jmp		error
 
 @@:
-	mov		RBX, [_sub_EfiFile]
+	mov		RBX, [imgFileHandle]
 	mov		RCX, RBX
 	mov		RBX, [RBX + _EfiFile.close]
 	call	RBX
-	
-	purge	_sub_EfiFile
 
 ;; Zero out <1 MB memory
 	mov		RCX, 0xFFFFF / 8
@@ -119,15 +107,18 @@ include "./setup_args.asm"
 				[imgHandle], [memMapKey]
 	
 	test	EAX, EAX
-	jnz 	error
+	jz 		@f
+	lea		RDX, [errorMsg]
+	jmp		error
 	
+@@:
 	mov		byte [bspReady], 1
 
 CR4_OSFXSR		equ	0000000001000000000b
 CR4_OSXMMEXCPT	equ	0000000010000000000b
 CR4_OSXSAVE		equ 1000000000000000000b
-	
-core_init:
+
+core_init:	
 ;; Wait until BSP finishes
 	pause
 	bt		qword [bspReady], 0
@@ -138,6 +129,7 @@ core_init:
 	and		AX, 0xFFFB
 	or		AX, 0x2
 	mov		CR0, RAX
+	
 	mov		RAX, CR4
 	or		EAX, CR4_OSFXSR + CR4_OSXMMEXCPT + CR4_OSXSAVE
 	mov		CR4, RAX
@@ -157,7 +149,7 @@ core_init:
 	and		SP, 0xF000
 	mov		RBP, RSP
 
-;; Setup kinit arguments (sysv amd64 abi)
+;; Setup xinit arguments (sysv amd64 abi)
 	mov     RDI, RBP
 	mov	    RSI, [corenum]
 	
@@ -170,56 +162,33 @@ core_init:
 ;; Default error handler
 error:			
 	__eficall 	EfiTextOut, output_string, 	\ 
- 				EfiTextOut, errorMsg
+ 				EfiTextOut, RDX
 	xor		RAX, RAX	; EFI_SUCCESS
 	ret
 
 	
 section		'.data'	data readable
 	
-;; String table
-;;-------------------------------------------
-imgPath			du	IMG_PATH, 0
-
-;; Error messages
-errorMsg		du	"!!! An error occured.", 13, 10, 0
-imgNotFoundMsg	du	"!!! The kernel image is not present.", 13, 10, 0
-imgLoadErrorMsg du	"!!! Failed to load the kernel image.", 13, 10, 0
-	
-;; UUID table
 EFI_LOADED_IMAGE_PROTOCOL_GUID:			_EFI_LOADED_IMAGE_PROTOCOL_GUID
-EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID:	_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
-EFI_MP_SERVICES_PROTOCOL_GUID:			_EFI_MP_SERVICES_PROTOCOL_GUID 
-	
-EFI_RSDP_GUID:		_EFI_ACPI_TABLE_GUID	
-
-xsdp            PTR
-	
-imgHandle		PTR
-sysTable		PTR
-return			PTR
-	
-EfiFile			PTR
-EfiFileSystem	PTR
 EfiLoadedImg	PTR
-
+	
+EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID:	_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
+EfiFileSystem	PTR
+EfiFile			PTR
 imgFileHandle	PTR
 imgSz			I64		IMG_SIZE
+imgPath			du		IMG_PATH, 0
 	
-EfiMP			PTR
-_event			PTR
-_arg			IN	0
-corenum	    	IN
-activeCoreNum	IN
-procNum			IN
-procInfo		EfiProcInfo
-	align	4
-bspReady		I8
+imgNotFoundMsg	du	"!!! The kernel image is not present.", 13, 10, 0
+imgLoadErrorMsg du	"!!! Failed to load the kernel image.", 13, 10, 0
+errorMsg		du	"!!! An error occured.", 13, 10, 0
 	
-pml4Base		PTR
-idtBase			PTR
-gdtBase			PTR
-
+EFI_RSDP_GUID:		_EFI_ACPI_TABLE_GUID	
+xsdp            PTR
+	
+return			PTR
+imgHandle		PTR
+sysTable		PTR
 memMapBase		PTR
 	
 memMapSz		IN	
@@ -227,6 +196,24 @@ memMapKey		IN
 memMapDescSz	IN	
 memMapDescVer	I32
 memMap			PTR	
+
+bspReady		I8
+	
+pml4Base		PTR
+idtBase			PTR
+gdtBase			PTR
+	
+corenum	    	IN
+EFI_MP_SERVICES_PROTOCOL_GUID:			_EFI_MP_SERVICES_PROTOCOL_GUID 
+EfiMP			PTR
+_event			PTR
+_arg			IN	0
+activeCoreNum	IN
+procNum			IN
+procInfo		EfiProcInfo
+	align	4
+	
+
 	
 	
 section		'.reloc'	fixups data discardable

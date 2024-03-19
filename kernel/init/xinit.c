@@ -17,8 +17,26 @@
 #endif
 
 
-__NORETURN__ __XINIT__(xiphos_init) void
-xiphos_init(PTR kernelStackBase, U64 coreNum)
+__NORETURN__ __XINIT__(xiphos_init) void xiphos_init(PTR, U64);
+
+
+__XINIT_THUNK__ void
+xiphos_init_thunk(void)
+{	
+	__asm__
+	(
+	    "lea     (%%rip), %%rax;"
+	    "add     %[xiphos_init], %%rax;"
+	    "push    %%rax"
+    : 
+	: [xiphos_init]"g"(xiphos_init)
+	: "rax", "memory");
+}
+
+
+void
+xiphos_init(PTR  kernelStackBase,
+			U64  coreNum)
 {
 	memory_init(kernelStackBase); /* Allocator initialization. */
 	enumerate_cores(coreNum);     /* Create Core structures */

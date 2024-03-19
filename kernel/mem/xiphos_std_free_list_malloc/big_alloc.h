@@ -15,16 +15,16 @@
 static inline PTR
 __big_alloc(SIZE64 sz)
 {
-	MemRegion * targetRegion; /* Target region */
-	MemRegion * allocRegion;  /* Region to return */
+	MemRegion *  targetRegion;  /* Target region */
+	MemRegion *  freeRegion;    /* What is remained after region splitting/next free region */
 
 	if (__UNLIKELY__(!sz))
 		return NULLPTR;
-	
-	LOCK_LISTS;
 		
 	sz = (sz + 7) & 0xF8; /* Align */
 
+	LOCK_LISTS;
+	
 	/* Find unlocked free region of a fitting size */
 	for (targetRegion = freeMemRegions;
 		 targetRegion->sz < sz;
@@ -34,47 +34,45 @@ __big_alloc(SIZE64 sz)
 		UNLOCK_LISTS
 		return NULLPTR;
 	}
-		
-	allocRegion = targetRegion;
 	
-	/* Divide the finded region if it's bigger than needed */
+	/* Split the finded region if it's bigger than needed */
 	if (__LIKELY__(sz != targetRegion->sz)) {
-		targetRegion = (PTR) ((U64) allocRegion + sizeof(MemRegion) + sz);
+		freeRegion = (PTR) ((U64) targetRegion + sizeof(MemRegion) + sz);
 
-		targetRegion->sz    = allocRegion->sz - sz;
-		targetRegion->prev  = allocRegion->prev;
-		targetRegion->next  = allocRegion->next;
+		freeRegion->sz   = targetRegion->sz - sz - sizeof(MemRegion);
+		freeRegion->prev = targetRegion->prev;
+		freeRegion->next = targetRegion->next;
 
-		allocRegion->sz = sz;
+		targetRegion->sz = sz;
 	}
 	else
-		targetRegion = targetRegion->next;
+		freeRegion = targetRegion->next;
 
-	if (allocRegion == freeMemRegions)
-		freeMemRegions = targetRegion;
+	if (targetRegion == freeMemRegions)
+		freeMemRegions = freeRegion;
 	
 	/* Fix the order in free and used lists */
-	allocRegion->prev->next = allocRegion->next;
-	allocRegion->next->prev = allocRegion->prev;
+	targetRegion->prev->next = targetRegion->next;
+	targetRegion->next->prev = targetRegion->prev;
 	
-	usedMemRegions->next = allocRegion;
-	allocRegion->prev = usedMemRegions;
-	allocRegion->next = sentinelRegion;
+	usedMemRegions->next = targetRegion;
+	targetRegion->prev = usedMemRegions;
+	targetRegion->next = sentinelRegion;
 
-	usedMemRegions = allocRegion;
+	usedMemRegions = targetRegion;
 	
 	UNLOCK_LISTS;
 	
-	return (PTR) allocRegion + sizeof(MemRegion);
+	return (PTR) targetRegion + sizeof(MemRegion);
 }
 
 
 static inline void
 __big_free(PTR buf)
 {
-	MemRegion * targetRegion;     /* The region to free */
-	MemRegion * nextNearbyRegion; /* The next nearby free region */
-	MemRegion * prevNearbyRegion; /* The previous nearby free region */
+	MemRegion *  targetRegion;     /* The region to free */
+	MemRegion *  nextNearbyRegion; /* The next nearby free region */
+	MemRegion *  prevNearbyRegion; /* The previous nearby free region */
 
 	if (__UNLIKELY__(!buf))
 		return;

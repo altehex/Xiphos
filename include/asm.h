@@ -117,25 +117,29 @@ DEFINE_OUT_TO_DX(dword, eax)
 							                 U16: out_to_dx_word, \
 							                 U32: out_to_dx_dword)) (_1, _2)
 
+
 static inline void
 pause(void)
 {
-	__asm__ __volatile__ ( "pause;" );
+	__asm__ __volatile__ ( "pause" );
 }
+
 
 static inline void
 int1(void)
 {
-	__asm__ __volatile__ ( "int1;" );
+	__asm__ __volatile__ ( "int1" );
 }
 
 
 static inline void
-__qfill(PTR buf, SIZE64 sz, U64 qword)
+__qfill(PTR     buf,
+		SIZE64  sz,
+		U64     qword)
 {
-	register U64 __qword __asm__("rax") = qword;
-	register U64 __rep __asm__ ("rcx")  = sz >> 3;
-	register PTR __buf __asm__ ("rdi")  = buf;
+	register U64  __qword __asm__ ("rax") = qword;
+	register U64  __rep   __asm__ ("rcx") = sz >> 3;
+	register PTR  __buf   __asm__ ("rdi") = buf;
 
 	__asm__ __volatile__
 	(

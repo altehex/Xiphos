@@ -1,13 +1,21 @@
 ENTRY(xiphos_init);
 SECTIONS
 {
-	kinit = 0x100000;
+	init = 0x100000;
+	.init_thunk : { *(.init.thunk) }
 	.text : 
 	{
-		*(.init .init.*)
 		*(.text .text.*)
 		*(.plt .plt.*)
 	}
+	. = ALIGN (4K); 
+	/* init sections are omitted after initialization */
+	.init.xiphos_init : { *(.init.xiphos_init) }
+	.init :
+	{
+		*(.init .init.*)
+	}
+	
 	.data : 
 	{
 		*(.data .data.*)

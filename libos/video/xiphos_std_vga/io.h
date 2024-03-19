@@ -15,10 +15,11 @@
  */
 
 static inline void
-xstdvga_select_reg(U16 port, U8 index)
+xstdvga_select_reg(U16  port,
+				   U8   index)
 {
-	register U8  byte __asm__ ("al");
-	register U16 __port __asm__ ("dx") = port;
+	register U8   byte   __asm__ ("al");
+	register U16  __port __asm__ ("dx") = port;
 
 	/* NOTE: Removing __volatile__ makes compiler omit this funtion */
 	__asm__ __volatile__
@@ -32,7 +33,7 @@ xstdvga_select_reg(U16 port, U8 index)
 
 /* Use these three right after xstdvga_select_reg */
 static inline __PURE__ U8
-xstdvga_in_from_reg()
+xstdvga_in_from_reg(void)
 {
 	register U8 byte __asm__ ("al");
 	
@@ -49,8 +50,8 @@ xstdvga_in_from_reg()
 static inline void
 xstdvga_out_to_reg_with_port_arg(U16 port, U8 byte)
 {
-	register U8  __byte __asm__ ("al") = byte;
-	register U16 __port __asm__ ("dx") = port;
+	register U8   __byte __asm__ ("al") = byte;
+	register U16  __port __asm__ ("dx") = port;
 	
 	__asm__
 	(

@@ -57,11 +57,12 @@ export CC LD
 # Flags configuration 
 #---------------------------------*
 CFLAGS = -std=c17 \
-		 -funsigned-char \
          -nostdlib \
          -nolibc \
          -mno-red-zone \
-	     -ffreestanding
+	     -ffreestanding \
+		 -funsigned-char \
+		 -fPIE
 
 CWARNINGS = -Wall \
 		    -Wextra 
