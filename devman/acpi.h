@@ -9,7 +9,7 @@
 #include <include/types.h>
 
 
-__XINIT_ACPI__ void acpi_init(AcpiXsdp *);
+__XINIT__() void acpi_init(AcpiXsdp *);
 __DEVMAN__ PTR acpi_locate_table(__NONSTRING__ CHARPTR, AcpiXsdt *);
 
 

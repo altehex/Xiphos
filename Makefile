@@ -61,8 +61,7 @@ CFLAGS = -std=c17 \
          -nolibc \
          -mno-red-zone \
 	     -ffreestanding \
-		 -funsigned-char \
-		 -fPIE
+		 -funsigned-char
 
 CWARNINGS = -Wall \
 		    -Wextra 

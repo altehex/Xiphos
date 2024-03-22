@@ -6,8 +6,6 @@
 #include <types.h>
 
 
-#define ACPI_TABLES_RECORD_INDEX    1
-
 #define MMAP_RAM              0
 #define MMAP_ACPI_TABLES      1
 #define MMAP_ACPI_NVS         2
@@ -17,17 +15,13 @@
 
 
 typedef struct __PACKED__ {
-	U32     type;
-	void *  base;
-	U64     sz;
+	U32  type;
+	PTR  base;
+	U64  sz;
 } MemRecord;
 
 
 extern MemRecord * xiphosMemMap;
-extern U64 xiphosTotalMemory;
-
-
-U64 get_total_memory(void);
 
 
 #endif /* ! _XIPHOS_MEM_MAP_H_ */

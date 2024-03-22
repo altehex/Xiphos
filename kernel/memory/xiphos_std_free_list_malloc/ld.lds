@@ -1,16 +1,12 @@
 SECTIONS
 {
-    .init.mem :
+    .init :
 	{
 		*(.init .init.*)
 	}
-	.text.mem :
+	.text :
 	{
 		*(.text .text.*)
-		*(.subsys) *(.subsys.*)
-		*(.api .api.*)
-		*(.libos .libos.*)
-		*(.plt .plt.*)
 	}
 	/* https://www.redhat.com/zh/blog/linkers-warnings-about-executable-stacks-and-segments */
 	. = ALIGN (4K); 

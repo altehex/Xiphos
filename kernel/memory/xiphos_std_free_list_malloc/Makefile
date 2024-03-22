@@ -15,7 +15,7 @@ DEFINES := -D$(IMG_BASE)
 
 .PHONY = all
 all: $(ALL)
-	$(CP) $^ $(SRC_ROOT)/kernel/mem
+	$(CP) $^ $(SRC_ROOT)/kernel/$(MEMORY_DIR)
 
 $(ALL): $(OBJ)
 	$(LD) --relocatable -T $(LDS) $^ -o $@

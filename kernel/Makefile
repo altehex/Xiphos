@@ -1,8 +1,10 @@
 KERNEL_IMAGE_DIR  := $(SRC_ROOT)/build/efi/xiphos
 KERNEL_IMAGE_NAME := $(PACKAGE_NAME).img
 
+export MEMORY_DIR = memory
+
 export XINIT_ALL  = init.o
-export XMEM_ALL   = mem.o
+export XMEM_ALL   = $(MEMORY_DIR).o
 export XSCHED_ALL = sched.o
 
 KERNEL_SUBSYS = devman # shaman netman etc.
@@ -16,7 +18,7 @@ export INCLUDE += -I$(SRC_ROOT)/kernel
 
 CFLAGS += $(CONFIG_DEFINES)
 
-DIRS = mem sched init
+DIRS = $(MEMORY_DIR) sched init
 
 .PHONY = all
 all: $(KERNEL_IMAGE_NAME)

@@ -2,5 +2,7 @@
 ---
 *New info will be added.*
 
-- xiphos_std_free_list_malloc unlocks the lists when it founds no free regions.
 - Memory dedicated to kernel initialization is freed for later use.
+- Fixes for xiphos_std_free_list_malloc:
+  - The lists are unlocked if no free regions are found.
+  - memory_init() now parses memory map to get available free regions.

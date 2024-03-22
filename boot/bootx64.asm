@@ -149,14 +149,13 @@ core_init:
 	and		SP, 0xF000
 	mov		RBP, RSP
 
-;; Setup xinit arguments (sysv amd64 abi)
+;; Setup xiphos_init arguments (sysv amd64 abi)
 	mov     RDI, RBP
 	mov	    RSI, [corenum]
 	
-;; Push kernel code
+;; jump to xiphos_init_thunk
 	mov		RAX, IMG_BASE
-	push	RAX
-	ret
+	jmp 	RAX
 
 	
 ;; Default error handler

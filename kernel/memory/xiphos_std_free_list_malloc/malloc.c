@@ -18,23 +18,23 @@ __UNUSED__ PTR __small_alloc();
  *  Returns NULLPTR if size is 0
  */
 PTR
-__malloc(SIZE64 sz)
+_malloc(SIZE64 sz)
 {
 	if (__UNLIKELY__(sz == 0))
 		return NULLPTR;
 
-	if (sz <= BIG_ALLOC_THRESHOLD)
+	if (sz <= XSMFL_BIG_ALLOC_THRESHOLD)
         /* return small_alloc(); */
 		
 	return __big_alloc(sz);
 }
 
 
-PTR __calloc(U64 num, SIZE64 sz)
+PTR _calloc(U64 num, SIZE64 sz)
 {
 	PTR buf;
 
-	buf = __malloc(sz * num);
+	buf = _malloc(sz * num);
 	__qfill(buf, sz * num, 0);
 
     return buf;
@@ -42,7 +42,7 @@ PTR __calloc(U64 num, SIZE64 sz)
 
 
 void
-__free(PTR buf)
+_free(PTR buf)
 {
 	/* NOTE: No options for small allocation yet */
 	__big_free(buf);

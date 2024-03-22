@@ -37,7 +37,7 @@ The following directories are generated when building:
 ## Programming languages
 The main language of the kernel is C. The main assembler is FASM. Additional modules can be written in C++, Rust, Pascal or any other language able to do low-level stuff and make freestanding flat binaries.
 
-## Naming convintions 
+## Naming conventions 
 - Use `snake_case` for function names and function pointer typedefs(end those with `_t`).
 - Use `camelCase` for variable and structure names. Structure names should start with a capital letter(`CamelCase`).
 - Use `SNAKE_CASE_WITH_CAPITAL_LETTERS` for macros and enums.

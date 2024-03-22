@@ -25,12 +25,6 @@
 #define __NONSTRING__       __attribute__ ((nonstring))
 
 #define __XINIT__(S)    __SECTION__(.init.S) __attribute__((no_stack_protector)) __COLD__
-#define __XINIT_THUNK__ __XINIT__(thunk)
-#define __XINIT_ACPI__  __XINIT__(acpi)
-#define __XINIT_CPU__   __XINIT__(cpu)
-#define __XINIT_IRQ__   __XINIT__(irq)
-#define __XINIT_MEM__   __XINIT__(mem)
-#define __XINIT_VIDEO__ __XINIT__(video)
 
 #define __API__(S)      __SECTION__(.api.S)
 #define __LIBOS__(S)    __SECTION__(.libos.S)

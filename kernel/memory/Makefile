@@ -1,13 +1,13 @@
 XMEM_DIRS := $(MAKE_MALLOC_IMPL)
 
 XMEM_LDS            =  mem.lds
-XMEM_COMMON_SOURCES =  info.c mem_globals.c
+XMEM_COMMON_SOURCES =  mem_globals.c
 XMEM_COMMON_OBJ     := $(XMEM_COMMON_SOURCES:.c=.o)
 XMEM_MALLOC_SOURCES := $(MAKE_MALLOC_IMPL).c
 XMEM_MALLOC_OBJ     := $(XMEM_MALLOC_SOURCES:.c=.o)
 
 export XMEM_INCLUDE := $(INCLUDE) \
-				       -I$(SRC_ROOT)/kernel/mem
+				       -I$(SRC_ROOT)/kernel/$(MEMORY_DIR)
 
 .PHONY = all
 all: $(XMEM_ALL)

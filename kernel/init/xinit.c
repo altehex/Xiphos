@@ -1,11 +1,11 @@
 #include <acpi.h>
 #include <attrs.h>
 #include <types.h>
-#include <mp.h>
 #include <settings.h>
 
-#include <mem/init.h>
+#include <memory/init.h>
 #include <sched/idle.h>
+#include <sched/task.h>
 
 /* #include <devman/init.h> */
 /* #include <netman/init.h> */
@@ -20,26 +20,20 @@
 __NORETURN__ __XINIT__(xiphos_init) void xiphos_init(PTR, U64);
 
 
-__XINIT_THUNK__ void
-xiphos_init_thunk(void)
+__NORETURN__ __NAKED__ __XINIT__(thunk) void
+xiphos_init_thunk(PTR  kernelStackBase,
+				  U64  coreNumber)
 {	
-	__asm__
-	(
-	    "lea     (%%rip), %%rax;"
-	    "add     %[xiphos_init], %%rax;"
-	    "push    %%rax"
-    : 
-	: [xiphos_init]"g"(xiphos_init)
-	: "rax", "memory");
+	xiphos_init(kernelStackBase, coreNumber);
 }
 
 
 void
 xiphos_init(PTR  kernelStackBase,
-			U64  coreNum)
+			U64  coreNumber)
 {
-	memory_init(kernelStackBase); /* Allocator initialization. */
-	enumerate_cores(coreNum);     /* Create Core structures */
+	memory_init(kernelStackBase);
+	enumerate_cores(coreNumber);  /* Create Core structures */
 	
 #if !defined DISPLAY_OFF
 	setup_boot_stdout();
@@ -66,7 +60,5 @@ xiphos_init(PTR  kernelStackBase,
 	 * - Starting services
 	 */
 
-	/* xiphos_idle(); */
-
-	while (1) {}
+	xiphos_serve();
 }

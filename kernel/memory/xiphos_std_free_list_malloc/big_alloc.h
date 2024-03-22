@@ -9,37 +9,35 @@
 #include <include/asm.h>
 #include <include/mem.h>
 
-#include <mem/mem_map.h>
-
 
 static inline PTR
 __big_alloc(SIZE64 sz)
 {
-	MemRegion *  targetRegion;  /* Target region */
-	MemRegion *  freeRegion;    /* What is remained after region splitting/next free region */
+	xsmfl_MemRegion *  targetRegion;  /* Target region */
+	xsmfl_MemRegion *  freeRegion;    /* What is remained after region splitting/Next free region */
 
 	if (__UNLIKELY__(!sz))
 		return NULLPTR;
 		
 	sz = (sz + 7) & 0xF8; /* Align */
 
-	LOCK_LISTS;
+	XSMFL_LOCK_LISTS;
 	
 	/* Find unlocked free region of a fitting size */
-	for (targetRegion = freeMemRegions;
+	for (targetRegion = xsmfl_freeMemRegions;
 		 targetRegion->sz < sz;
 		 targetRegion = targetRegion->prev)
 
-	if (targetRegion == sentinelRegion) {
-		UNLOCK_LISTS
+	if (targetRegion == &xsmfl_sentinelRegion) {
+		/* XSMFL_UNLOCK_LISTS */
 		return NULLPTR;
 	}
 	
 	/* Split the finded region if it's bigger than needed */
 	if (__LIKELY__(sz != targetRegion->sz)) {
-		freeRegion = (PTR) ((U64) targetRegion + sizeof(MemRegion) + sz);
+		freeRegion = (PTR) ((U64) targetRegion + sizeof(xsmfl_MemRegion) + sz);
 
-		freeRegion->sz   = targetRegion->sz - sz - sizeof(MemRegion);
+		freeRegion->sz   = targetRegion->sz - sz - sizeof(xsmfl_MemRegion);
 		freeRegion->prev = targetRegion->prev;
 		freeRegion->next = targetRegion->next;
 
@@ -48,58 +46,58 @@ __big_alloc(SIZE64 sz)
 	else
 		freeRegion = targetRegion->next;
 
-	if (targetRegion == freeMemRegions)
-		freeMemRegions = freeRegion;
+	if (targetRegion == xsmfl_freeMemRegions)
+		xsmfl_freeMemRegions = freeRegion;
 	
 	/* Fix the order in free and used lists */
 	targetRegion->prev->next = targetRegion->next;
 	targetRegion->next->prev = targetRegion->prev;
 	
-	usedMemRegions->next = targetRegion;
-	targetRegion->prev = usedMemRegions;
-	targetRegion->next = sentinelRegion;
+	xsmfl_usedMemRegions->next = targetRegion;
+	targetRegion->prev = xsmfl_usedMemRegions;
+	targetRegion->next = &xsmfl_sentinelRegion;
 
-	usedMemRegions = targetRegion;
+	xsmfl_usedMemRegions = targetRegion;
 	
-	UNLOCK_LISTS;
+	XSMFL_UNLOCK_LISTS;
 	
-	return (PTR) targetRegion + sizeof(MemRegion);
+	return (PTR) targetRegion + sizeof(xsmfl_MemRegion);
 }
 
 
 static inline void
 __big_free(PTR buf)
 {
-	MemRegion *  targetRegion;     /* The region to free */
-	MemRegion *  nextNearbyRegion; /* The next nearby free region */
-	MemRegion *  prevNearbyRegion; /* The previous nearby free region */
+	xsmfl_MemRegion *  targetRegion;     /* The region to free */
+	xsmfl_MemRegion *  nextNearbyRegion; /* The next nearby free region */
+	xsmfl_MemRegion *  prevNearbyRegion; /* The previous nearby free region */
 
 	if (__UNLIKELY__(!buf))
 		return;
 
-	LOCK_LISTS;
+	XSMFL_LOCK_LISTS;
 	
-	targetRegion = buf - sizeof(MemRegion);
+	targetRegion = buf - sizeof(xsmfl_MemRegion);
 	
 	/* Remove the region from the used list */
 	targetRegion->prev->next = targetRegion->next;
 	targetRegion->next->prev = targetRegion->prev;
 
-	if (targetRegion == usedMemRegions)
-		usedMemRegions = targetRegion->prev;
+	if (targetRegion == xsmfl_usedMemRegions)
+		xsmfl_usedMemRegions = targetRegion->prev;
 	
 	/* Look for nearby free regions */
-	for (nextNearbyRegion = freeMemRegions;
+	for (nextNearbyRegion = xsmfl_freeMemRegions;
 	     nextNearbyRegion < targetRegion;
 		 nextNearbyRegion = nextNearbyRegion->next);
 	
 	prevNearbyRegion = nextNearbyRegion->prev;
 
 	/* Merge nearby regions if they're adjacent */
-	if ((prevNearbyRegion != sentinelRegion) &&
-		((U64) prevNearbyRegion + prevNearbyRegion->sz + sizeof(MemRegion) == (U64) targetRegion))
+	if ((prevNearbyRegion != &xsmfl_sentinelRegion) &&
+		((U64) prevNearbyRegion + prevNearbyRegion->sz + sizeof(xsmfl_MemRegion) == (U64) targetRegion))
 	{
-		prevNearbyRegion->sz += targetRegion->sz + sizeof(MemRegion);
+		prevNearbyRegion->sz += targetRegion->sz + sizeof(xsmfl_MemRegion);
 		targetRegion = prevNearbyRegion;
 	}
 	else {
@@ -107,12 +105,12 @@ __big_free(PTR buf)
 		targetRegion->prev = prevNearbyRegion;
 	}
 
-	if ((nextNearbyRegion != sentinelRegion) &&
-		((U64) buf + ((MemRegion *) (buf - sizeof(MemRegion)))->sz == (U64) nextNearbyRegion))
+	if ((nextNearbyRegion != &xsmfl_sentinelRegion) &&
+		((U64) buf + ((xsmfl_MemRegion *) (buf - sizeof(xsmfl_MemRegion)))->sz == (U64) nextNearbyRegion))
 	{
 		nextNearbyRegion->next->prev = targetRegion;
 		
-		targetRegion->sz += nextNearbyRegion->sz + sizeof(MemRegion);
+		targetRegion->sz += nextNearbyRegion->sz + sizeof(xsmfl_MemRegion);
 		targetRegion->next = nextNearbyRegion->next;
 	}
 	else if (targetRegion != prevNearbyRegion) {
@@ -120,10 +118,10 @@ __big_free(PTR buf)
 		nextNearbyRegion->prev = targetRegion;
 	}
 	
-	if (nextNearbyRegion == freeMemRegions)
-		freeMemRegions = targetRegion;
+	if (nextNearbyRegion == xsmfl_freeMemRegions)
+		xsmfl_freeMemRegions = targetRegion;
 	
-	UNLOCK_LISTS;
+	XSMFL_UNLOCK_LISTS;
 }
 
 
